@@ -38,11 +38,19 @@
   .node:last-child .lnk{display:none}
   .node .badge{display:block;margin-top:2px;font-family:var(--mono);font-size:8.5px;
                color:var(--ink-2);letter-spacing:.06em;line-height:1}
+  a.say{color:inherit;text-decoration:none;border-bottom:1px dotted rgba(31,27,22,.45)}
+  a.say:hover{border-bottom-color:var(--ink);color:#000}
+  a.say .saybtn{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:#8a8378;margin-left:10px;white-space:nowrap;border:0}
+  a.say:hover .saybtn{color:var(--ink)}
+  .node a{color:inherit;text-decoration:none;border-bottom:1px dotted rgba(31,27,22,.4)}
+  .node a:hover{border-bottom-color:#1F1B16}
+  .board.picking .node a{pointer-events:none}
   .tag-tree{font-family:var(--mono);font-size:9.5px;color:#A33;letter-spacing:.04em;margin-top:6px;text-align:center;line-height:1.4}
 
   /* 右面板 */
   .panel{border:1px solid var(--line);border-radius:3px;padding:18px 18px 16px;background:rgba(255,255,255,.4)}
   .panel .lb{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+  .keycard .hintx{font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;color:#8a8378;margin-top:6px;font-weight:400}
   .keycard{margin:8px 0 14px;padding:14px 12px;border:1px solid var(--ink);border-radius:2px;
            background:#FBF8F0;text-align:center;font-family:var(--mono);font-size:22px;letter-spacing:.04em}
   .steps{font-family:var(--mono);font-size:11.5px;line-height:2;color:var(--ink-2);min-height:104px}
@@ -160,6 +168,15 @@
     return h;
   }
   function spread(h){ return (h ^ (h >>> 16)) >>> 0; }
+  function forvo(key){
+    var w = String(key).replace(/[^A-Za-z ]/g, '').trim() || String(key);
+    return 'https://forvo.com/search/' + encodeURIComponent(w) + '/';
+  }
+  function sayLink(key, cls, tag){
+    return '<a class="' + (cls || 'say') + '" href="' + forvo(key) + '" target="_blank" rel="noopener"'
+         + ' title="去 Forvo 听 ' + key + ' 的真人发音">'
+         + key + (tag ? '<span class="saybtn">▶ Forvo</span>' : '') + '</a>';
+  }
   function bucketOf(key, cap){ return spread(javaHash(key)) & (cap - 1); }
 
   /* ---------- 关卡数据（每个 key 的落桶位置已用真实 Java 算法核对过） ---------- */
@@ -229,7 +246,7 @@
       (S.buckets[i] || []).forEach(function(k){
         var n = document.createElement('div');
         n.className = 'node' + (S.treeified && i === S.treeBucket ? ' tree' : '');
-        n.textContent = k;
+        n.innerHTML = sayLink(k, 'nw', false);
         var lnk = document.createElement('i');
         lnk.className = 'lnk';
         n.appendChild(lnk);
@@ -275,7 +292,7 @@
     });
     $('treeFig').innerHTML = '';
     $('ltip').textContent = L.title + ' —— ' + L.sub;
-    $('key').textContent = S.queue[0] || '—';
+    $('key').innerHTML = S.queue[0] ? sayLink(S.queue[0], 'say', true) + '<div class="hintx">点单词去 Forvo 听真人发音</div>' : '—';
     ['s1','s2','s3','s4'].forEach(function(id){ $(id).classList.remove('on','hl'); $(id).querySelector('.v').textContent = '—'; });
     $('bHash').disabled = false; $('bIdx').disabled = true; $('bTree').style.display = 'none';
     setMsg('这个 key 要放进哪个桶？先点「算 hash」。');
@@ -313,7 +330,7 @@
     S.q++;
     if (S.q >= S.queue.length){ done(); return; }
     S.phase = 'ready';
-    $('key').textContent = S.queue[S.q];
+    $('key').innerHTML = sayLink(S.queue[S.q], 'say', true) + '<div class="hintx">点单词去 Forvo 听真人发音</div>';
     ['s1','s2','s3','s4'].forEach(function(id){ $(id).classList.remove('on','hl'); $(id).querySelector('.v').textContent = '—'; });
     $('bHash').disabled = false; $('bIdx').disabled = true;
     paintSteps(0);
@@ -403,6 +420,7 @@
     if (S.phase !== 'ready') return;
     S.phase = 'hashed';
     paintSteps(2);
+    setPicking(false);
     this.disabled = true;
     $('bIdx').disabled = false;
     setMsg('h 是 hashCode；h >>> 16 把高位挪到低位；两者异或是为了让高位也参与选桶。接着算位置。');
@@ -415,8 +433,13 @@
     this.disabled = true;
     var key = S.queue[S.q];
     var b = bucketOf(key, S.cap);
+    setPicking(true);
     setMsg('算出来了，看上面最后一行。现在点它该去的那个桶。', '');
   };
+
+  function setPicking(on){
+    $('board').classList.toggle('picking', !!on);
+  }
 
   $('board').addEventListener('click', function(e){
     var el = e.target.closest('.bucket');
@@ -443,6 +466,7 @@
     var existed = S.buckets[i].length;
     S.buckets[i].push(key);
     S.phase = 'idle';
+    setPicking(false);
     renderBoard();
     var cell = document.querySelector('.bucket[data-i="' + i + '"]');
     if (cell){

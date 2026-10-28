@@ -2,3 +2,5 @@ __pycache__/
 *.pyc
 _*.png
 _edge*/
+_eg/
+_edge*/
