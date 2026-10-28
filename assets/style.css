@@ -1,0 +1,266 @@
+/* 求职自习室 · Offer Camp
+   纸感 + 账本排版：宋体做标题，黑体做正文，朱红只留给「钩」与「印」 */
+
+:root{
+  --paper:#F2EDE1;
+  --paper-2:#EAE3D2;
+  --paper-3:#E3DAC6;
+  --ink:#17150F;
+  --ink-soft:#4C4638;
+  --ink-faint:#7A7261;
+  --rule:#C8BEA4;
+  --rule-soft:#D9D0B8;
+  --red:#A93226;
+  --moss:#2E463A;
+  --serif:"Noto Serif SC","Source Han Serif SC","Songti SC","SimSun",serif;
+  --sans:"Noto Sans SC","PingFang SC","Microsoft YaHei","Helvetica Neue",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,"Cascadia Code",Consolas,monospace;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+
+html{-webkit-text-size-adjust:100%}
+
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-size:16px;
+  line-height:1.75;
+  letter-spacing:.01em;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* 纸的颗粒：极淡的一层噪点，避免大面积纯色发假 */
+.grain{
+  position:fixed; inset:0; z-index:99; pointer-events:none;
+  opacity:.05; mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+a{color:inherit}
+
+/* ---------- 报头 ---------- */
+.masthead{
+  display:flex; align-items:baseline; justify-content:space-between; gap:16px;
+  max-width:1120px; margin:0 auto; padding:22px 28px 18px;
+  border-bottom:1px solid var(--rule);
+}
+.mh-left{display:flex; align-items:baseline; gap:14px}
+.mh-mark{
+  font-family:var(--serif); font-weight:700; font-size:20px; letter-spacing:.18em;
+}
+.mh-en{
+  font-family:var(--mono); font-size:10.5px; letter-spacing:.28em; color:var(--ink-faint);
+}
+.mh-right{
+  font-family:var(--mono); font-size:11.5px; letter-spacing:.14em; color:var(--ink-faint);
+  white-space:nowrap;
+}
+.mh-right b{color:var(--ink); font-weight:600}
+.sep{color:var(--rule); margin:0 6px}
+
+/* ---------- 主容器 ---------- */
+main{max-width:1120px; margin:0 auto; padding:0 28px 40px}
+
+/* ---------- 首屏 ---------- */
+.hero{
+  position:relative;
+  padding:clamp(48px,9vh,104px) 0 clamp(36px,6vh,72px);
+  border-bottom:1px solid var(--rule);
+}
+.kicker{
+  margin:0 0 26px; font-size:12px; letter-spacing:.22em; color:var(--ink-faint);
+}
+.hero h1{
+  margin:0; font-family:var(--serif); font-weight:700;
+  font-size:clamp(2.1rem,5.2vw,4.1rem);
+  line-height:1.16; letter-spacing:.01em;
+}
+.hero h1 em{
+  font-style:normal; position:relative; white-space:nowrap;
+}
+.hero h1 em::after{
+  content:""; position:absolute; left:0; right:0; bottom:.06em; height:.34em;
+  background:var(--red); opacity:.16; z-index:-1;
+}
+.lede{
+  margin:34px 0 0; max-width:36em; font-size:15.5px; line-height:1.95; color:var(--ink-soft);
+}
+
+/* 朱印 */
+.seal{
+  position:absolute; right:0; bottom:clamp(40px,7vh,80px);
+  width:92px; height:112px; padding:10px 0;
+  border:2.5px solid var(--red); border-radius:3px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+  color:var(--red); transform:rotate(-5deg);
+  font-family:var(--serif); font-weight:700; font-size:26px; line-height:1.25;
+  opacity:.88;
+}
+.seal i{
+  font-family:var(--mono); font-style:normal; font-size:9px; letter-spacing:.18em;
+  border-top:1px solid currentColor; padding-top:3px; margin-top:4px;
+}
+
+/* ---------- 区块 ---------- */
+.block{padding:clamp(40px,7vh,64px) 0; border-bottom:1px solid var(--rule)}
+.block h2{
+  display:flex; align-items:baseline; gap:14px;
+  margin:0 0 28px; font-family:var(--serif); font-size:19px; font-weight:700; letter-spacing:.04em;
+}
+.num{
+  font-family:var(--mono); font-size:11px; font-weight:500; letter-spacing:.1em;
+  color:var(--red); border:1px solid currentColor; border-radius:2px; padding:1px 5px;
+}
+.hint{margin-left:auto; font-family:var(--sans); font-size:11.5px; font-weight:400; color:var(--ink-faint); letter-spacing:.04em}
+
+/* ---------- 今日三件事 ---------- */
+.tri{list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(3,1fr); gap:0;
+  border-top:1px solid var(--rule-soft)}
+.tri li{border-bottom:1px solid var(--rule-soft); border-right:1px solid var(--rule-soft)}
+.tri li:last-child{border-right:none}
+.tri label{
+  display:grid; grid-template-columns:auto 1fr; grid-template-areas:"tick body" "tick min";
+  gap:4px 14px; padding:20px 22px 18px; cursor:pointer; position:relative;
+  transition:background .25s ease;
+}
+.tri label:hover{background:var(--paper-2)}
+.tri input{position:absolute; opacity:0; width:1px; height:1px}
+.tick{
+  grid-area:tick; width:18px; height:18px; margin-top:4px;
+  border:1.5px solid var(--ink-faint); border-radius:2px; position:relative;
+  transition:border-color .2s ease, background .2s ease;
+}
+.tick::after{
+  content:""; position:absolute; left:5px; top:1px; width:4px; height:9px;
+  border-right:2px solid var(--paper); border-bottom:2px solid var(--paper);
+  transform:rotate(42deg) scale(.4); opacity:0; transition:all .2s ease;
+}
+input:checked + .tick{background:var(--red); border-color:var(--red)}
+input:checked + .tick::after{opacity:1; transform:rotate(42deg) scale(1)}
+input:focus-visible + .tick{outline:2px solid var(--moss); outline-offset:2px}
+.t-body{grid-area:body; display:flex; flex-direction:column; gap:3px}
+.t-name{font-family:var(--serif); font-size:17px; font-weight:700; letter-spacing:.02em}
+input:checked ~ .t-body .t-name{color:var(--ink-faint); text-decoration:line-through; text-decoration-color:var(--rule)}
+.t-note{font-size:12.5px; color:var(--ink-faint); line-height:1.6}
+.t-min{grid-area:min; font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; color:var(--ink-faint)}
+
+.stamp-line{
+  margin:20px 0 0; font-size:12.5px; letter-spacing:.06em; color:var(--ink-faint);
+  display:flex; align-items:center; gap:10px;
+}
+.stamp-line::before{content:""; width:26px; height:1px; background:var(--rule)}
+.stamp-line.done{color:var(--red)}
+.stamp-line.done::before{background:var(--red)}
+
+/* ---------- 学习地图 ---------- */
+.cards{display:grid; grid-template-columns:repeat(2,1fr); gap:0;
+  border-top:1px solid var(--rule-soft)}
+.card{
+  position:relative; display:flex; flex-direction:column; gap:8px;
+  padding:26px 28px 24px; text-decoration:none;
+  border-bottom:1px solid var(--rule-soft); border-right:1px solid var(--rule-soft);
+  transition:background .25s ease, transform .25s ease;
+}
+.card:nth-child(2n){border-right:none}
+.card:hover{background:var(--paper-2)}
+.card:hover .c-title{transform:translateX(4px)}
+.card:hover .c-no{background:var(--red); color:var(--paper)}
+.c-no{
+  position:absolute; top:24px; right:28px;
+  width:22px; height:22px; display:grid; place-items:center;
+  font-family:var(--mono); font-size:10.5px; color:var(--red);
+  border:1px solid currentColor; border-radius:2px; transition:.25s ease;
+}
+.c-title{font-family:var(--serif); font-size:20px; font-weight:700; letter-spacing:.03em; transition:transform .25s ease}
+.c-desc{font-size:13px; line-height:1.85; color:var(--ink-soft); max-width:34em}
+.c-meta{margin-top:6px; font-family:var(--mono); font-size:10.5px; letter-spacing:.12em; color:var(--ink-faint)}
+
+/* ---------- 台账 ---------- */
+.ledger{width:100%; border-collapse:collapse; font-size:13.5px}
+.ledger th{
+  text-align:left; font-weight:400; font-family:var(--mono); font-size:10.5px;
+  letter-spacing:.14em; color:var(--ink-faint);
+  padding:0 14px 10px 0; border-bottom:1px solid var(--rule);
+}
+.ledger td{
+  padding:13px 14px 13px 0; border-bottom:1px solid var(--rule-soft);
+  vertical-align:baseline;
+}
+.ledger td:nth-child(1){font-family:var(--serif); font-size:15px; font-weight:700; white-space:nowrap}
+.ledger td:nth-child(2){font-family:var(--mono); font-size:12.5px; letter-spacing:.02em; white-space:nowrap}
+.ledger td:last-child{color:var(--ink-soft); font-size:12.5px}
+.ledger tbody tr:hover td{background:var(--paper-2)}
+
+/* ---------- 日志 ---------- */
+.log{list-style:none; counter-reset:l; margin:0; padding:0; border-top:1px solid var(--rule-soft)}
+.log li{
+  counter-increment:l; display:grid; grid-template-columns:56px 1fr; gap:18px;
+  padding:16px 0; border-bottom:1px solid var(--rule-soft);
+}
+.log li::before{
+  content:counter(l,decimal-leading-zero);
+  font-family:var(--mono); font-size:11px; color:var(--ink-faint); letter-spacing:.08em; padding-top:2px;
+}
+.log .l-meta{
+  display:block; font-family:var(--mono); font-size:10.5px; letter-spacing:.12em;
+  color:var(--red); margin-bottom:3px;
+}
+.log .l-text{margin:0; font-size:14px; line-height:1.85; color:var(--ink-soft)}
+.log-tip{margin:18px 0 0; font-size:12px; color:var(--ink-faint)}
+.log-tip code{font-family:var(--mono); font-size:11.5px; background:var(--paper-3); padding:1px 5px; border-radius:2px}
+
+/* ---------- 页脚 ---------- */
+footer{
+  max-width:1120px; margin:0 auto; padding:26px 28px 40px;
+  display:flex; justify-content:space-between; gap:14px; flex-wrap:wrap;
+  font-family:var(--mono); font-size:10.5px; letter-spacing:.12em; color:var(--ink-faint);
+}
+footer a{text-decoration:none; border-bottom:1px solid var(--rule); padding-bottom:1px}
+footer a:hover{color:var(--red); border-color:var(--red)}
+
+/* ---------- 入场动效 ---------- */
+.hero > *{opacity:0; transform:translateY(14px); animation:rise .9s cubic-bezier(.2,.7,.2,1) forwards}
+.hero .kicker{animation-delay:.05s}
+.hero h1{animation-delay:.14s}
+.hero .lede{animation-delay:.26s}
+.hero .seal{animation-delay:.4s}
+
+.block{opacity:0; transform:translateY(18px); transition:opacity .8s ease, transform .8s cubic-bezier(.2,.7,.2,1)}
+.block.in{opacity:1; transform:none}
+
+@keyframes rise{to{opacity:1; transform:none}}
+
+@media (prefers-reduced-motion:reduce){
+  .hero > *, .block{animation:none; transition:none; opacity:1; transform:none}
+}
+
+/* ---------- 移动端 ---------- */
+@media (max-width:820px){
+  .masthead{padding:18px 20px 14px; flex-wrap:wrap; gap:6px}
+  main{padding:0 20px 32px}
+  .mh-en{display:none}
+  .mh-right{white-space:normal; font-size:10.5px}
+  .hero{padding:40px 0 36px}
+  .hero h1{font-size:clamp(1.7rem,7.4vw,2.1rem); line-height:1.24}
+  .hero h1 em{white-space:normal}
+  .lede{margin-top:24px; font-size:14.5px}
+  .seal{position:static; margin:28px 0 0; transform:rotate(-4deg); width:76px; height:94px; font-size:21px}
+  .tri{grid-template-columns:1fr}
+  .tri li{border-right:none}
+  .cards{grid-template-columns:1fr}
+  .card{border-right:none; padding:22px 0}
+  .c-no{right:0; top:22px}
+  .hint{display:none}
+  .ledger th:nth-child(3), .ledger td:nth-child(3){display:none}
+  .log li{grid-template-columns:44px 1fr; gap:10px}
+  footer{padding:22px 20px 36px}
+}
+
+@media (max-width:430px){
+  .mh-mark{letter-spacing:.12em; font-size:18px}
+  .hero h1{font-size:1.72rem}
+  .seal{width:68px; height:84px; font-size:19px}
+}
