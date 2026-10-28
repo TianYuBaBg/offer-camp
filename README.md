@@ -37,6 +37,22 @@ So the rule is:
 
 Work that is ready but not published yet can sit in the repo for a day. Nothing is lost.
 
+
+## Follow-up pages (29)
+
+Every question ends with **"this question opened these new questions"**. Each row is its own page,
+one level deeper than the question itself:
+
+| From | Follow-ups | Where |
+| --- | --- | --- |
+| Q1 HashMap | 9 | `questions/d1-*.html` |
+| Q2 payment callback | 8 | `questions/d2-*.html` |
+| Q3 Redis cache | 6 | `questions/d3-*.html` |
+| Q4 order timeout | 6 | `questions/d4-*.html` |
+
+Each follow-up page has the same skeleton: breadcrumb → one-line headline → **先给答案** → 2–4 mechanism
+sections (table / code / comparison) → **面试这么说** → back-link to its parent question.
+
 ## Language switch (top right)
 
 | Button | What you see |

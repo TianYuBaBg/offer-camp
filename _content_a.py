@@ -11,7 +11,7 @@ INDEX = {
              "So every page gives one idea, five new words, and three questions I answer out loud.",
              "我不懂 Java，而且我想用英文学，不是用中文背。所以每一页只讲一个概念、"
              "给五个新词、三道要出声回答的题。"),
-    "tags": [("4 questions", "4 道题"), ("7 lessons", "7 节课")],
+    "tags": [("4 questions", "4 道题"), ("29 follow-ups", "29 个追问"), ("7 lessons", "7 节课")],
     "blocks": [
         ("h2", "01", "Four interview questions", "四道面试题",
          [
