@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>第 1 题 · HashMap 的原理 · 面试题本</title>
-<meta name="description" content="HashMap 原理：结构、put 六步、哈希扰动、索引定位、扩容、树化、线程安全与追问。">
+<title>How does HashMap work · Java Notes</title>
+<meta name="description" content="How HashMap works, explained in simple English: buckets, hash, resize, tree, thread safety.">
 <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body>
@@ -12,105 +12,92 @@
 
 <header class="masthead">
   <div class="mh-left">
-    <span class="mh-mark">求职自习室</span>
+    <span class="mh-mark">Java Notes</span>
     <span class="mh-en">OFFER&nbsp;CAMP</span>
     <nav class="mh-nav">
-      <a href="../index.html" class="on">面试题</a>
-      <a href="../about.html">关于</a>
+      <a href="../index.html" class="on">Questions</a>
+      <a href="../basics/array.html">Basics</a>
+      <a href="../glossary.html">Words</a>
     </nav>
   </div>
-  <div class="mh-right">
-    <span>第 <b>1</b> 题</span>
-    <span class="sep">·</span>
-    <span>Java 集合</span>
-  </div>
+  <div class="mh-right"><span>Question 1</span></div>
 </header>
 
 <main>
-  <p class="crumb"><a href="../index.html">面试题本</a> / 第 1 题</p>
+  <p class="crumb"><a href="../index.html">Home</a> / Question 1: HashMap</p>
 
   <div class="qhead">
-    <p class="kicker">第 1 题 · 高频 · 开场题</p>
-    <h1>说说 Java 中 HashMap 的原理？</h1>
-    <div class="qmeta">
-      <span class="tag hot">必须会</span>
-      <span class="tag">Java 集合</span>
-      <span class="tag">口播 60 秒</span>
-      <span class="tag">追问 6 个</span>
-    </div>
+    <p class="kicker">Question 1 · HashMap</p>
+    <h1>How does HashMap work?</h1>
+    <p class="lede">A box of small boxes. Give it a key, get back a value, very fast.</p>
+    <span class="tag hot">Must know</span><span class="tag">HashMap</span><span class="tag">speak 60s</span><span class="tag">7 lessons</span>
+    <button class="listen" data-listen>🔊 Listen to this page</button>
   </div>
 
+
   <section class="sec">
-    <h2><span class="num">01</span>30 秒版</h2>
+    <h2><span class="num">01</span>One sentence</h2>
     <blockquote class="short">
-      <span class="lbl">先背这一段 · 再往下看</span>
-      数组加链表，JDK 8 起冲突多了会树化。put 时先做 hash 扰动，再用 <code>(n-1)&amp;hash</code> 定位桶：空桶直接放，冲突就比较 key，相同就覆盖，不同就挂在链表尾部；链表到 8 个、且容量到 64 就转红黑树。元素超过「容量 × 0.75」就扩容一倍，扩容时元素要么留在原位、要么挪到「原位 + 旧容量」。它不保证顺序、允许一个 null key、<strong>不是线程安全的</strong>。
+      <span class="lbl">Say this first</span>
+      A HashMap is a box of small boxes. You give it a <b>key</b> (a name), and it gives you back a <b>value</b> (a thing) very fast. Inside, it uses an <b>array</b>. Each box in the array is called a <b>bucket</b>. When two keys fall into the same bucket, they stand in a line.
     </blockquote>
   </section>
 
   <section class="sec">
-    <h2><span class="num">02</span>结构：一个数组，三种桶</h2>
-    <p>HashMap 底层就是一个 <code>Node&lt;K,V&gt;[] table</code>。每个位置叫「桶」，桶里按冲突程度有三种形态：空、链表、红黑树。</p>
+    <h2><span class="num">02</span>What is inside</h2>
+    <p>On the outside it looks like a table of names and values:</p>
+    <table class="ledger">
+      <thead><tr><th>key</th><th>value</th></tr></thead>
+      <tbody>
+        <tr><td>"apple"</td><td>5</td></tr>
+        <tr><td>"pear"</td><td>3</td></tr>
+      </tbody>
+    </table>
+    <p>On the inside it is an <b>array of buckets</b>. A bucket can be in one of three states:</p>
 
     <figure class="figure">
       <div class="arr">
-        <div class="cell">0</div>
-        <div class="cell">1</div>
-        <div class="cell">2</div>
-        <div class="cell on">3</div>
-        <div class="cell">4</div>
-        <div class="cell">5</div>
-        <div class="cell">6</div>
-        <div class="cell">7</div>
-        <div class="cell">8</div>
-        <div class="cell on">9</div>
-        <div class="cell">10</div>
-        <div class="cell">11</div>
-        <div class="cell on">12</div>
-        <div class="cell">13</div>
-        <div class="cell">14</div>
-        <div class="cell">15</div>
+        <div class="cell">0</div><div class="cell">1</div><div class="cell">2</div><div class="cell on">3</div>
+        <div class="cell">4</div><div class="cell">5</div><div class="cell">6</div><div class="cell">7</div>
+        <div class="cell">8</div><div class="cell on">9</div><div class="cell">10</div><div class="cell">11</div>
+        <div class="cell on">12</div><div class="cell">13</div><div class="cell">14</div><div class="cell">15</div>
       </div>
       <div class="chainrow">
-        <div class="chain">
-          <span class="node">桶 3：Node</span><span class="nil">→ null</span>
-        </div>
-        <div class="chain">
-          <span class="node">桶 9：Node</span><span class="arrow">→</span><span class="node">Node</span><span class="arrow">→</span><span class="node">Node</span><span class="nil">→ null</span>
-        </div>
-        <div class="chain">
-          <span class="node tree">桶 12：TreeNode（红黑树）</span>
-        </div>
+        <div class="chain"><span class="node">bucket 3: Node</span><span class="nil">→ null</span></div>
+        <div class="chain"><span class="node">bucket 9: Node</span><span class="arrow">→</span><span class="node">Node</span><span class="arrow">→</span><span class="node">Node</span><span class="nil">→ null</span></div>
+        <div class="chain"><span class="node tree">bucket 12: red-black tree</span></div>
       </div>
-      <figcaption>长度 16 的数组。桶 9 冲突 3 次挂成链表；链表到 8 个且容量 ≥ 64 时，该桶转红黑树。</figcaption>
+      <figcaption>An array of 16 buckets. Bucket 9 holds a short line. Bucket 12 has become a tree.</figcaption>
     </figure>
-
-    <ul>
-      <li><strong>Node</strong>：存 <code>hash</code>、<code>key</code>、<code>value</code>、<code>next</code>。key 和 value 都允许 null，但 <strong>null key 只有一个</strong>（hash 固定为 0，永远落在 0 号桶）。</li>
-      <li><strong>TreeNode</strong>：红黑树节点，额外存父子指针和颜色；它同时保留 <code>next</code>，所以退化回链表时不用重建。</li>
-      <li><strong>顺序</strong>：完全不保证。要按插入顺序用 <code>LinkedHashMap</code>，要按 key 排序用 <code>TreeMap</code>。</li>
-    </ul>
   </section>
 
   <section class="sec">
-    <h2><span class="num">03</span>put 的六步</h2>
-    <p>这是整道题的主干。面试时能把下面六个动作按顺序说完，基本就赢了一半。</p>
+    <h2><span class="num">03</span>How put works</h2>
+    <p>When you call <code>map.put("apple", 5)</code>, six things happen:</p>
+    <ol class="steps">
+      <li><b>Make the table</b> — the first put creates the array with 16 buckets. (Before that, it is empty.)</li>
+      <li><b>Compute the hash</b> — a number from the key: <code>(h = key.hashCode()) ^ (h &gt;&gt;&gt; 16)</code>. The second half mixes the high bits into the low bits, so the number spreads better.</li>
+      <li><b>Find the bucket</b> — <code>index = (n - 1) &amp; hash</code>. Because n is a power of two, this is the same as <code>hash % n</code>, but faster.</li>
+      <li><b>Empty bucket?</b> — put a new node there. Done.</li>
+      <li><b>Not empty?</b> — compare the key: same key → replace the value; different key → go to the end of the line and add a new node. If the line reaches 8 items, the bucket may become a tree.</li>
+      <li><b>Too full?</b> — if <code>size &gt; capacity × 0.75</code>, double the array and move the items.</li>
+    </ol>
 
     <pre><code>if ((tab = table) == null || (n = tab.length) == 0)
-    n = (tab = resize()).length;                  // ① 懒初始化：第一次 put 才建数组，默认 16
+    n = (tab = resize()).length;                  // 1. create the array
 if ((p = tab[i = (n - 1) &amp; hash]) == null)
-    tab[i] = newNode(hash, key, value, null);     // ② 定位桶，空桶直接放
+    tab[i] = newNode(hash, key, value, null);     // 2. empty bucket
 else {
     if (p.hash == hash &amp;&amp; (p.key == key || key.equals(p.key)))
-        e = p;                                    // ③ 首节点就是同一个 key → 覆盖
+        e = p;                                    // 3. same key: replace
     else if (p instanceof TreeNode)
-        e = ((TreeNode&lt;K,V&gt;) p).putTreeVal(...);   // ④ 桶已树化 → 走红黑树插入
+        e = ((TreeNode&lt;K,V&gt;) p).putTreeVal(...);   // 4. bucket is a tree
     else {
         for (int binCount = 0; ; ++binCount) {
             if ((e = p.next) == null) {
-                p.next = newNode(hash, key, value, null);  // ⑤ 尾插（JDK 7 是头插）
+                p.next = newNode(hash, key, value, null);  // 5. add at the end
                 if (binCount &gt;= TREEIFY_THRESHOLD - 1)
-                    treeifyBin(tab, hash);                 //    到 8 → 尝试树化
+                    treeifyBin(tab, hash);                 //    line is long: tree
                 break;
             }
             if (e.hash == hash &amp;&amp; (e.key == key || key.equals(e.key))) break;
@@ -120,175 +107,150 @@ else {
     if (e != null) { V old = e.value; e.value = value; return old; }
 }
 ++modCount;
-if (++size &gt; threshold) resize();                 // ⑥ 超阈值 → 扩容
+if (++size &gt; threshold) resize();                 // 6. too full: grow
 return null;</code></pre>
-
-    <h3>① 先算 hash：扰动函数</h3>
-    <pre><code>static final int hash(Object key) {
-    int h;
-    return (key == null) ? 0 : (h = key.hashCode()) ^ (h &gt;&gt;&gt; 16);
-}</code></pre>
-    <p>把 hashCode 的<strong>高 16 位异或到低 16 位</strong>。因为定位桶时只用低几位，如果高低位分布不均，高位的信息就浪费了；异或之后高位信息也参与进来，碰撞显著减少。</p>
-
-    <h3>② 定位桶：为什么是位运算</h3>
-    <p><code>(n - 1) &amp; hash</code> 等价于 <code>hash % n</code>，但只有在 <strong>n 是 2 的幂</strong>时才成立。位运算比取模快，而且扩容时可以复用（见下一节）。</p>
-
-    <h3>③④⑤ 冲突的三种处理</h3>
-    <ul>
-      <li>同一个 key（hash 相等且 <code>==</code> 或 <code>equals</code> 相等）→ <strong>覆盖 value</strong>，把旧值返回给调用方。</li>
-      <li>桶里已经是树 → 按红黑树规则插入，O(log n)。</li>
-      <li>桶里是链表 → 遍历到尾插；插完检查长度，到 8 就调 <code>treeifyBin</code>，但<strong>容量不足 64 时只会扩容、不会树化</strong>。</li>
-    </ul>
   </section>
 
   <section class="sec">
-    <h2><span class="num">04</span>扩容：为什么敢说「不用重算 hash」</h2>
-    <p>元素个数超过 <code>threshold = 容量 × 0.75</code> 就扩容到 2 倍。经典说法是「扩容后所有元素重新取模」，<strong>这在 JDK 8 已经不成立</strong>：</p>
-
-    <pre><code>// 旧容量 oldCap，新容量是它的 2 倍
-// 每个节点只需回答一个问题：留在原位，还是挪到「原位 + oldCap」
-if ((e.hash &amp; oldCap) == 0)  loTail.next = e;   // 这一位是 0 → 留在原位 i
-else                          hiTail.next = e;   // 这一位是 1 → 挪到 i + oldCap</code></pre>
-
-    <p>因为容量是 2 的幂，扩容只是多出一个高位参与定位。所以 <strong>JDK 8 用 lo / hi 两条链把桶拆成两半，保持了原相对顺序</strong>，既不用重新计算 hash，也顺手消除了 JDK 7 头插带来的成环问题。</p>
-
-    <div class="box tip">
-      <b>顺带提一句（加分项）：</b>构造时传的初始容量不是最终大小。<code>new HashMap&lt;&gt;(1000)</code> 会经 <code>tableSizeFor</code> 向上取到最近的 2 的幂 —— 1024。所以想放 1000 个元素，正经写法是 <code>new HashMap&lt;&gt;((int)(1000 / 0.75f) + 1)</code>，一次性给够，避免中途扩容。
-    </div>
+    <h2><span class="num">04</span>Why resize is cheap</h2>
+    <p>When the array grows from 16 to 32, an item has only two possible new places: <b>where it is</b>, or <b>where it is + 16</b>. One bit decides:</p>
+    <pre><code>if ((e.hash &amp; oldCap) == 0)  keep the item at index i
+else                          move it to index i + oldCap</code></pre>
+    <p>So HashMap does not recompute the hash or the index for every item. It splits each bucket into two small lines and moves them.</p>
   </section>
 
   <section class="sec">
-    <h2><span class="num">05</span>两个数字：0.75 和 8，别搞混</h2>
-    <p>这两件事经常被答成一件事，其实原因不同：</p>
+    <h2><span class="num">05</span>Two numbers: 0.75 and 8</h2>
     <table class="ledger">
-      <thead>
-        <tr><th>数字</th><th>含义</th><th>为什么是它</th></tr>
-      </thead>
+      <thead><tr><th>Number</th><th>What it means</th><th>Why</th></tr></thead>
       <tbody>
-        <tr><td>0.75</td><td>负载因子，阈值 = 容量 × 0.75</td><td>空间与冲突的折中。调小 → 桶用不满、扩容频繁；调大 → 冲突变多、查询退化。0.75 是通用平衡点。</td></tr>
-        <tr><td>8</td><td>链表长度到 8 才考虑树化</td><td>hash 均匀时链表长度近似泊松分布（λ≈0.5），到 8 的概率约 0.00000006。真到 8 说明冲突已经很不正常，此时转树把最坏 O(n) 降到 O(log n) 才划算。</td></tr>
-        <tr><td>64</td><td>小于它只扩容、不树化</td><td>小数组扩容很便宜，扩容比建树更划算；容量到 64 后才允许树化。</td></tr>
-        <tr><td>6</td><td>树的节点少到 6 就退化回链表</td><td>留出缓冲，避免在 7～8 之间反复树化/退化。</td></tr>
+        <tr><td>0.75</td><td>load factor: grow when size &gt; capacity × 0.75</td><td>A balance: smaller wastes memory, bigger makes more collisions. 0.75 is the usual middle.</td></tr>
+        <tr><td>8</td><td>a bucket with 8 items may become a tree</td><td>With a good hash, a line of 8 is very rare (about 1 in 10,000,000). If it happens, the bucket is unlucky, so a tree makes it fast again.</td></tr>
+        <tr><td>64</td><td>the array must have 64 buckets before a tree is allowed</td><td>With a small array it is cheaper to grow the array than to build a tree.</td></tr>
+        <tr><td>6</td><td>a tree with 6 items turns back into a line</td><td>A buffer, so the bucket does not flip between tree and line again and again.</td></tr>
       </tbody>
     </table>
   </section>
 
   <section class="sec">
-    <h2><span class="num">06</span>线程安全：这是送分题，也是送命题</h2>
-    <ul>
-      <li><strong>JDK 7</strong>：扩容用头插法，并发扩容可能让链表反向相接<strong>成环</strong>，之后 <code>get</code> 在环里打转，CPU 打满——这是最有名的 HashMap 事故。</li>
-      <li><strong>JDK 8</strong>：改成尾插 + lo/hi 拆分，<strong>不会成环</strong>了，但并发 put 依然会互相覆盖、丢数据、size 不准。</li>
-      <li><strong>所以并发场景用 <code>ConcurrentHashMap</code></strong>：JDK 8 用 CAS 尝试无锁插入，失败再 <code>synchronized</code> 只锁<strong>桶的头节点</strong>（锁粒度从整表降到单个桶），读操作靠 volatile 基本不加锁。</li>
-    </ul>
-    <div class="box warn">
-      <b>别说这句：</b>「HashMap 加个 synchronized 就线程安全了」。面试官下一句就会问「那和 Hashtable 什么区别、和 ConcurrentHashMap 差在哪」——因为 Hashtable 正是整表加锁，性能差。
-    </div>
+    <h2><span class="num">06</span>Why it is not thread-safe</h2>
+    <p>Two threads can call <code>put</code> at the same time. Both read the same <code>size</code>, both write it back — one increase is lost. In JDK 7, two threads resizing at once could even bend the lines into a circle, and then <code>get</code> would spin forever.</p>
+    <p>So in a web application use <b>ConcurrentHashMap</b>. It locks only the bucket that is being changed, not the whole map.</p>
+    <p class="note"><b>Want the long version?</b> Read <a href="../basics/threads.html">Lesson 7: Why HashMap is not thread-safe</a>.</p>
   </section>
 
   <section class="sec">
-    <h2><span class="num">07</span>追问六连</h2>
-
-    <details class="ask">
-      <summary>为什么容量必须是 2 的幂？</summary>
-      <div class="a">
-        <p>三个原因：</p>
-        <p>1）只有 n 是 2 的幂时，<code>(n-1) &amp; hash</code> 才等价于 <code>hash % n</code>，位运算比取模快；</p>
-        <p>2）<code>n-1</code> 的二进制全是 1，hash 的每一位都能用上，桶的分布才均匀；否则有些位永远取不到，桶会被浪费；</p>
-        <p>3）扩容时多出来的正好是一个高位，元素要么留在原位、要么挪到原位 + oldCap，不用重新算 hash。</p>
-      </div>
-    </details>
-
-    <details class="ask">
-      <summary>为什么负载因子是 0.75，不是 0.5 或 1？</summary>
-      <div class="a">
-        <p>它是<strong>空间和冲突的折中</strong>。太小（比如 0.5）：桶用不满，扩容次数翻倍，内存浪费；太接近 1：几乎每个桶都有冲突，链表变长，查询退化。</p>
-        <p>0.75 的额外好处是：容量 × 0.75 一定是整数、且不会让元素挤满整表，大部分业务场景下扩容次数和查询性能都够用。</p>
-        <p><b>注意别说：</b>「0.75 是泊松分布算出来的」。泊松分布解释的是<strong>树化阈值 8</strong>，不是负载因子。</p>
-      </div>
-    </details>
-
-    <details class="ask">
-      <summary>链表为什么到 8 才转红黑树？</summary>
-      <div class="a">
-        <p>理想哈希下，一个桶里的节点数服从泊松分布，参数 λ≈0.5。算下来长度到 8 的概率约 6×10⁻⁸——<strong>正常情况根本到不了</strong>。真到了 8，说明这个桶的 key 哈希冲突异常严重，链表查询 O(n) 已经拖慢性能，转树后是 O(log n)，用一点内存换时间，值得。</p>
-        <p>同时还有个前置条件：容量 <strong>≥ 64</strong>。容量太小先扩容，因为扩容很可能就把冲突摊开了，比建树便宜。</p>
-      </div>
-    </details>
-
-    <details class="ask">
-      <summary>JDK 7 的 HashMap 并发为什么会死循环？</summary>
-      <div class="a">
-        <p>两个线程同时 <code>resize</code>：线程 A 迁移到一半挂起，线程 B 迁完，A 醒来继续用自己的引用迁移——因为头插法每次把节点插到链头，两个线程交错执行后链表指针可能反向，形成 <code>a → b → a</code> 的环。之后任何 <code>get</code> 命中这个桶，就会在环里无限循环，CPU 直接 100%。</p>
-        <p>JDK 8 改尾插、且用 lo/hi 两条链整体搬迁，所以不会再成环；但并发写入的数据覆盖问题依然存在。</p>
-      </div>
-    </details>
-
-    <details class="ask">
-      <summary>HashMap、Hashtable、ConcurrentHashMap 区别？</summary>
-      <div class="a">
-        <p><b>HashMap</b>：非线程安全，允许一个 null key、多个 null value，性能最好，单线程或读多写少且外部同步时用。</p>
-        <p><b>Hashtable</b>：整表 <code>synchronized</code>，不允许 null key/value，并发性能差，已经不推荐使用。</p>
-        <p><b>ConcurrentHashMap</b>：JDK 8 用 CAS + <code>synchronized</code> 锁桶头节点，读基本无锁；不允许 null key/value（因为并发下 <code>containsKey</code> 之后仍可能变，null 会有歧义）。</p>
-      </div>
-    </details>
-
-    <details class="ask">
-      <summary>为什么重写 equals 必须重写 hashCode？</summary>
-      <div class="a">
-        <p>put 分两步：先靠 <code>hashCode</code> 找桶，再靠 <code>equals</code> 判等。只重写 equals 的话，两个「相等」的对象 hashCode 不同，会落到不同的桶里，于是同一个 key 在 map 里出现两份，<code>get</code> 还可能取不到。</p>
-        <p>反过来只重写 hashCode 也不行：hash 相同、equals 不等，会挤在同一个桶里变成链表，等于人为制造冲突。</p>
-      </div>
-    </details>
-  </section>
-
-  <section class="sec">
-    <h2><span class="num">08</span>照念稿（60 秒）</h2>
+    <h2><span class="num">07</span>Say it in 60 seconds</h2>
     <blockquote class="script">
-      <span class="lbl">念到不磕巴 · 再填自己的例子</span>
-      <p>HashMap 本质是一个用 key 的 hash 定位的数组，数组每个位置叫桶。JDK 8 里桶内冲突了先挂链表，链表到 8 个、并且数组长度到 64，就转成红黑树，查找从 O(n) 变成 O(log n)。</p>
-      <p>put 的时候先算 hash：把 hashCode 的高 16 位异或到低 16 位，让高位也参与定位，减少碰撞；然后用 <em>(n-1) &amp; hash</em> 找到桶——因为容量是 2 的幂，这个位运算等价于取模。</p>
-      <p>桶空就直接放；有东西就比较 key，相等就覆盖 value，不等就挂到链表尾部。</p>
-      <p>size 超过容量乘 0.75 就扩容一倍；因为容量是 2 的幂，扩容时每个元素<em>要么留在原位、要么挪到原位加旧容量</em>，不用重新算 hash。</p>
-      <p>它不是线程安全的：JDK 7 头插加并发扩容会形成环形链表，导致 get 死循环；JDK 8 改尾插不会成环了，但并发 put 依然会丢数据。所以并发场景用 ConcurrentHashMap，它用 CAS 加 synchronized 只锁桶的头节点。</p>
+      <span class="lbl">Read it out loud · then say it in your own words</span>
+      <p>A HashMap is an array of buckets. You give it a key, it computes a hash, and the hash tells it which bucket to use.</p>
+      <p>If the bucket is empty, the value goes in. If the bucket already has items with different keys, they stand in a line — a linked list. When one line reaches 8 items and the array has at least 64 buckets, the line becomes a red-black tree, so the worst case is O(log n) instead of O(n).</p>
+      <p>When the map is 75 percent full, the array doubles. Because the size is a power of two, each item either stays in its bucket or moves to bucket + old size, so there is no need to recompute the hash.</p>
+      <p>HashMap is fast and simple, but it is not thread-safe. In a web application I would use ConcurrentHashMap instead.</p>
     </blockquote>
   </section>
 
   <section class="sec">
-    <h2><span class="num">09</span>六个数字速记</h2>
+    <h2><span class="num">08</span>The numbers to remember</h2>
     <table class="ledger">
-      <thead><tr><th>默认容量</th><th>负载因子</th><th>树化阈值</th><th>退化阈值</th><th>树化最小容量</th><th>扩容倍数</th></tr></thead>
-      <tbody><tr><td>16</td><td>0.75</td><td>8</td><td>6</td><td>64</td><td>2</td></tr></tbody>
+      <thead><tr><th>capacity</th><th>load factor</th><th>tree at</th><th>back to list at</th><th>tree needs capacity</th><th>growth</th></tr></thead>
+      <tbody><tr><td>16</td><td>0.75</td><td>8</td><td>6</td><td>64</td><td>×2</td></tr></tbody>
     </table>
   </section>
 
   <section class="sec">
-    <h2><span class="num">10</span>常见的答错</h2>
-    <ul class="wrong">
-      <li><b>只说「数组 + 链表」。</b>JDK 8 必须补红黑树，否则会被追问「冲突特别多怎么办」。</li>
-      <li><b>把头插说成 JDK 8 的行为。</b>JDK 7 头插、JDK 8 尾插，这个顺序说反等于暴露没读过源码。</li>
-      <li><b>「0.75 和 8 都是泊松分布算的」。</b>泊松分布只解释 8；0.75 是空间/时间折中。</li>
-      <li><b>「扩容后所有元素重新取模」。</b>JDK 8 是 lo/hi 拆分，元素只可能原位或 +oldCap。</li>
-      <li><b>「HashMap 线程安全」或「加 synchronized 就行」。</b>并发要用 ConcurrentHashMap，且它的锁粒度是桶头节点。</li>
-      <li><b>「null key 的 hash 是随机的」。</b>是固定的 0，所以永远落在 0 号桶。</li>
+    <h2><span class="num">09</span>Go deeper</h2>
+    <ul>
+      <li><a href="../basics/array.html">Lesson 1: What is an array?</a></li>
+      <li><a href="../basics/linked-list.html">Lesson 2: What is a linked list?</a></li>
+      <li><a href="../basics/tree.html">Lesson 3: What is a tree? And a red-black tree?</a></li>
+      <li><a href="../basics/hash.html">Lesson 4: What is a key, a hash, a collision?</a></li>
+      <li><a href="../basics/big-o.html">Lesson 5: What is O(1), O(n), O(log n)?</a></li>
+      <li><a href="../basics/hashmap-methods.html">Lesson 6: HashMap methods in real life</a></li>
+      <li><a href="../basics/threads.html">Lesson 7: Why HashMap is not thread-safe?</a></li>
     </ul>
   </section>
 
+
   <section class="sec">
-    <p class="log-tip">下一题：<a href="../index.html">回题目本</a> · 建议接着做 <code>ConcurrentHashMap</code> 或 <code>ArrayList / LinkedList</code>，这两题会被连着问。</p>
+    <h2><span class="num">→</span>New words</h2>
+    <div class="wordlist">
+      <div class="word">
+        <span class="w">bucket</span>
+        <span class="ipa">/ˈbʌkɪt/</span>
+        <span class="mean">One box in the array that holds items with the same hash.</span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/bucket/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="bucket" aria-label="say bucket">🔊</button></span>
+      </div>
+      <div class="word">
+        <span class="w">hash</span>
+        <span class="ipa">/hæʃ/</span>
+        <span class="mean">A number computed from the key. Like a fingerprint.</span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/hash/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="hash" aria-label="say hash">🔊</button></span>
+      </div>
+      <div class="word">
+        <span class="w">collision</span>
+        <span class="ipa">/kəˈlɪʒn/</span>
+        <span class="mean">Two different keys that land in the same bucket.</span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/collision/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="collision" aria-label="say collision">🔊</button></span>
+      </div>
+      <div class="word">
+        <span class="w">resize</span>
+        <span class="ipa">/ˌriːˈsaɪz/</span>
+        <span class="mean">Make the array bigger and move the items.</span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/resize/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="resize" aria-label="say resize">🔊</button></span>
+      </div>
+      <div class="word">
+        <span class="w">load factor</span>
+        <span class="ipa">/loʊd ˈfæktər/</span>
+        <span class="mean">How full the table can be before it grows. Default 0.75.</span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/load%20factor/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="load factor" aria-label="say load factor">🔊</button></span>
+      </div>
+      <div class="word">
+        <span class="w">threshold</span>
+        <span class="ipa">/ˈθreʃhoʊld/</span>
+        <span class="mean">The size that triggers a resize: capacity × load factor.</span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/threshold/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="threshold" aria-label="say threshold">🔊</button></span>
+      </div>
+      <div class="word">
+        <span class="w">treeify</span>
+        <span class="ipa">/ˈtriːɪfaɪ/</span>
+        <span class="mean">Turn a long line in a bucket into a tree.</span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/treeify/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="treeify" aria-label="say treeify">🔊</button></span>
+      </div>
+      <div class="word">
+        <span class="w">capacity</span>
+        <span class="ipa">/kəˈpæsəti/</span>
+        <span class="mean">How many buckets the array has. Default 16.</span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/capacity/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="capacity" aria-label="say capacity">🔊</button></span>
+      </div>
+      <div class="word">
+        <span class="w">thread-safe</span>
+        <span class="ipa">/θred seɪf/</span>
+        <span class="mean">Safe to use from several threads at the same time.</span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/thread-safe/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="thread-safe" aria-label="say thread-safe">🔊</button></span>
+      </div>
+    </div>
+    <p class="note">Click <b>hear it</b> to listen to real people say the word on YouGlish. Click <b>🔊</b> to hear the computer say it.</p>
   </section>
+
+  <section class="sec">
+    <h2><span class="num">✓</span>Check yourself</h2>
+    <ol class="checks">
+      <li>What is a bucket?<small>One box in the array. Items that hash to the same index stand in that box.</small></li>
+      <li>How does HashMap find the bucket?<small>index = (n - 1) &amp; hash, where n is the number of buckets.</small></li>
+      <li>When does a line become a tree?<small>When one bucket has 8 items and the array has at least 64 buckets.</small></li>
+      <li>Why does resize not recompute every hash?<small>Because capacity is a power of two: an item either stays at i or moves to i + oldCap.</small></li>
+      <li>Why is HashMap not thread-safe?<small>put is many steps; two threads can overwrite each other, lose updates, or corrupt the lines.</small></li>
+    </ol>
+  </section>
+
+  <p class="log-tip">Next: <a href="../index.html">back to all pages</a> · then try <a href="../basics/hash.html">Lesson 4</a> if “hash” still feels unclear.</p>
 </main>
 
 <footer>
-  <div class="f-left">
-    <span>第 1 题 / 共 1 题</span>
-    <span class="sep">·</span>
-    <span>更新 2026.10.29</span>
-  </div>
-  <div class="f-right">
-    <a href="../index.html">回目录</a>
-    <span class="sep">·</span>
-    <a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a>
-  </div>
+  <div class="f-left"><span>Written for learning English · Wang Tianyu</span></div>
+  <div class="f-right"><a href="../index.html">Home</a><span class="sep">·</span><a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a></div>
 </footer>
+<script src="../assets/app.js"></script>
 </body>
 </html>

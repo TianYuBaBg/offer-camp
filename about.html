@@ -1,9 +1,10 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>关于 · 求职自习室</title>
+<title>About · Java Notes</title>
+<meta name="description" content="Why this site is in English, and how to use it.">
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
@@ -11,56 +12,78 @@
 
 <header class="masthead">
   <div class="mh-left">
-    <span class="mh-mark">求职自习室</span>
+    <span class="mh-mark">Java Notes</span>
     <span class="mh-en">OFFER&nbsp;CAMP</span>
     <nav class="mh-nav">
-      <a href="index.html">面试题</a>
-      <a href="about.html" class="on">关于</a>
+      <a href="index.html">Questions</a>
+      <a href="basics/array.html">Basics</a>
+      <a href="glossary.html">Words</a>
     </nav>
   </div>
-  <div class="mh-right"><span>2026.10.29</span></div>
+  <div class="mh-right"><span>About</span></div>
 </header>
 
 <main>
-  <p class="crumb"><a href="index.html">面试题本</a> / 关于</p>
+  <p class="crumb"><a href="index.html">Home</a> / About</p>
 
   <div class="qhead">
-    <p class="kicker">关于这个站</p>
-    <h1>给自己用的一本面试题本。</h1>
-    <div class="qmeta">
-      <span class="tag">纯静态</span>
-      <span class="tag">无框架</span>
-      <span class="tag">无追踪</span>
-    </div>
+    <p class="kicker">About</p>
+    <h1>Learn Java, in English.</h1>
+    <p class="lede">Short sentences, real pronunciation, no Chinese in the learning path.</p>
+    <span class="tag">English first</span><span class="tag">no tracking</span>
+    <button class="listen" data-listen>🔊 Listen to this page</button>
   </div>
 
+
   <section class="sec">
-    <h2><span class="num">01</span>为什么做它</h2>
-    <p>找工作的时候，题看了很多，但开口讲就卡。原因很简单：看过 ≠ 讲过。所以这里的每道题都强制按「先开口、再看、再念」的顺序走一遍，目标是<strong>能对着人讲 60 秒不磕巴</strong>，而不是收藏夹里躺着 200 道题。</p>
-    <p>顺带一个私心：把讲不清楚的地方写下来，面试复盘时能看见自己到底缺哪一块。</p>
+    <h2><span class="num">01</span>Why this site is in English</h2>
+    <p>I am learning Java, and I am learning English at the same time. If I read Java in Chinese, I only learn the idea. If I read it in English, I learn the idea <b>and</b> the words I will hear in an interview.</p>
+    <p>So every page here is in English, with short sentences and no idioms. Every technical word has a real pronunciation link.</p>
   </section>
 
   <section class="sec">
-    <h2><span class="num">02</span>一道题的结构</h2>
+    <h2><span class="num">02</span>How to use it</h2>
     <ul>
-      <li><strong>30 秒版</strong> —— 骨架，先背下来。</li>
-      <li><strong>拆解</strong> —— 结构图 + 关键代码 + 每个设计选择的原因。</li>
-      <li><strong>追问</strong> —— 面试官真正筛人的地方，每题 5～6 个。</li>
-      <li><strong>照念稿</strong> —— 60 秒口播，念顺了再换成自己的话。</li>
-      <li><strong>常见答错</strong> —— 别人踩过的坑，别再踩。</li>
+      <li><b>Listen first.</b> Press “Listen to this page” and follow with your eyes.</li>
+      <li><b>Say the new words.</b> Five words a page. YouGlish gives real people saying them.</li>
+      <li><b>Answer the checks out loud.</b> If you cannot say it, read the page again.</li>
+      <li><b>Come back tomorrow.</b> Yesterday's words, then one new page.</li>
     </ul>
   </section>
 
   <section class="sec">
-    <h2><span class="num">03</span>谁在写</h2>
-    <p>王天宇，Java 后端，北京。做过点云处理、系统集成、商业 SaaS，最近在把「能讲清楚」当成一项单独的技能在练。</p>
-    <p>页面就是几个静态 HTML 文件，放在 <a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a> 上，由 Cloudflare Pages 自动发布。想改哪里，改完 push 就行。</p>
+    <h2><span class="num">03</span>What is on it</h2>
+    <ul>
+      <li><b>Basics</b> — seven short lessons: array, linked list, tree, hash, Big O, HashMap methods, threads.</li>
+      <li><b>Questions</b> — one page per interview question, starting with HashMap.</li>
+      <li><b>Words</b> — every word in one list, with pronunciation.</li>
+    </ul>
+    <p class="note">The site is plain HTML with no framework and no tracking. It is published from <a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a> by Cloudflare Pages.</p>
   </section>
+
+
+  <section class="sec">
+    <h2><span class="num">→</span>New words</h2>
+    <div class="wordlist">
+
+    </div>
+    <p class="note">Click <b>hear it</b> to listen to real people say the word on YouGlish. Click <b>🔊</b> to hear the computer say it.</p>
+  </section>
+
+  <section class="sec">
+    <h2><span class="num">✓</span>Check yourself</h2>
+    <ol class="checks">
+
+    </ol>
+  </section>
+
+  <p class="log-tip">Next: <a href="basics/array.html">start Lesson 1</a>.</p>
 </main>
 
 <footer>
-  <div class="f-left"><span>写代码的人：王天宇</span><span class="sep">·</span><span>北京</span></div>
-  <div class="f-right"><a href="index.html">回目录</a><span class="sep">·</span><a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a></div>
+  <div class="f-left"><span>Written for learning English · Wang Tianyu</span></div>
+  <div class="f-right"><a href="index.html">Home</a><span class="sep">·</span><a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a></div>
 </footer>
+<script src="assets/app.js"></script>
 </body>
 </html>

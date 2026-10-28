@@ -12,7 +12,7 @@
   --rule-soft:#D9D0B8;
   --red:#A93226;
   --moss:#2E463A;
-  --serif:"Noto Serif SC","Source Han Serif SC","Songti SC","SimSun",serif;
+  --serif:"Iowan Old Style","Palatino Linotype",Georgia,"Noto Serif SC","Songti SC",serif;
   --sans:"Noto Sans SC","PingFang SC","Microsoft YaHei","Helvetica Neue",sans-serif;
   --mono:"JetBrains Mono",ui-monospace,"Cascadia Code",Consolas,monospace;
 }
@@ -450,4 +450,59 @@ pre code{background:none; padding:0; font-size:inherit}
 @media (max-width:820px){
   .mh-left{flex-wrap:wrap; row-gap:4px}
   .mh-nav{flex-basis:100%}
+}
+
+/* ============================================================
+   English edition：单词卡 + 朗读按钮 + 类比框
+   ============================================================ */
+.listen{
+  display:inline-flex; align-items:center; gap:8px; margin-top:20px;
+  padding:9px 16px; border:1px solid var(--ink); background:transparent;
+  font-family:var(--mono); font-size:11px; letter-spacing:.14em; color:var(--ink);
+  cursor:pointer; border-radius:2px; transition:.2s ease;
+}
+.listen:hover{background:var(--ink); color:var(--paper)}
+.listen.on{background:var(--red); border-color:var(--red); color:var(--paper)}
+
+.analogy{
+  margin:20px 0; padding:18px 20px; border-left:3px solid var(--moss);
+  background:var(--paper-2); font-size:14.5px; line-height:1.9; color:var(--ink-soft);
+}
+.analogy b{display:block; margin-bottom:6px; font-family:var(--mono); font-size:10px; letter-spacing:.16em; color:var(--moss)}
+
+.wordlist{display:block; border-top:1px solid var(--rule-soft)}
+.word{
+  display:grid; grid-template-columns:190px 96px 1fr auto; align-items:baseline; gap:4px 14px;
+  padding:13px 0; border-bottom:1px solid var(--rule-soft);
+}
+.word .w{font-family:var(--mono); font-size:14px; font-weight:600; letter-spacing:.01em}
+.word .ipa{font-family:var(--mono); font-size:11.5px; color:var(--ink-faint)}
+.word .mean{font-size:13px; line-height:1.7; color:var(--ink-soft)}
+.word .links{display:flex; gap:8px; align-items:center; white-space:nowrap}
+.word .say, .word .spk{
+  font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-decoration:none;
+  border:1px solid var(--rule); border-radius:2px; padding:3px 7px; cursor:pointer;
+  background:transparent; color:var(--ink-soft); transition:.2s ease;
+}
+.word .say:hover, .word .spk:hover{background:var(--red); border-color:var(--red); color:var(--paper)}
+
+.checks{list-style:none; counter-reset:ck; padding:0; margin:0}
+.checks li{
+  counter-increment:ck; position:relative; padding:12px 0 12px 34px;
+  border-bottom:1px solid var(--rule-soft); font-size:14.5px; line-height:1.9; color:var(--ink-soft);
+}
+.checks li::before{
+  content:counter(ck); position:absolute; left:0; top:12px;
+  width:20px; height:20px; display:grid; place-items:center;
+  font-family:var(--mono); font-size:10px; color:var(--red); border:1px solid currentColor; border-radius:50%;
+}
+.checks li small{display:block; margin-top:4px; font-size:12px; color:var(--ink-faint)}
+
+.note{margin:16px 0; font-size:13px; color:var(--ink-faint); line-height:1.8}
+.note b{color:var(--ink)}
+
+@media (max-width:820px){
+  .word{grid-template-columns:1fr; gap:2px}
+  .word .links{margin-top:2px}
+  .word .mean{margin-bottom:4px}
 }

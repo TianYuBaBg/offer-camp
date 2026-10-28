@@ -1,46 +1,66 @@
-# 求职自习室 · 面试题本
+# Java Notes
 
-一个**纯静态**的面试题本：一题一页，每页固定五块——30 秒版、原理拆解、追问、照念稿、常见答错。
+A small website for learning Java **in English**, written for a complete beginner.
+Every page gives one idea, five new words, a picture, and a few questions to check yourself.
 
-线上：<https://offer-camp-4no.pages.dev>
+Live: **https://offer-camp.pages.dev**
 
-## 目录
+---
+
+## What is on it
+
+| Page | What it teaches |
+| --- | --- |
+| `index.html` | The map: what to read first |
+| `basics/array.html` | What is an array? Why is reading O(1) and inserting O(n)? |
+| `basics/linked-list.html` | What is a linked list? Array vs list |
+| `basics/tree.html` | What is a tree? What does "red-black" mean? |
+| `basics/hash.html` | What is a key, a hash, a collision? |
+| `basics/big-o.html` | What is O(1), O(n), O(log n)? |
+| `basics/hashmap-methods.html` | HashMap methods, and how they look in real code |
+| `basics/threads.html` | Why HashMap is not thread-safe |
+| `questions/java-hashmap.html` | The whole HashMap answer, in simple English |
+| `glossary.html` | All 46 words, with pronunciation |
+| `about.html` | Why the site is in English |
+
+## Two things on every page
+
+- **🔊 Listen to this page** — the computer reads the page out loud, in English.
+- **▶ hear it** — real people saying a word on [YouGlish](https://youglish.com).
+  Every technical word is linked: `https://youglish.com/pronounce/<word>/english`
+
+## How to use it
+
+1. Open the page you are on (start with Lesson 1).
+2. Press **Listen to this page**, follow the words with your eyes. Twice is enough.
+3. Click **▶ hear it** on five words. Say each word out loud three times.
+4. Read *Check yourself* and answer **out loud**, not in your head.
+5. Tomorrow: say yesterday's words first, then one new page.
+
+Twenty minutes a day is enough. One page a day is the whole plan.
+
+## Files
 
 ```
-index.html                    题目列表（首页）
-about.html                    这个站是干什么的
-questions/java-hashmap.html   第 1 题：HashMap 的原理
-assets/style.css              全部样式（纸感账本，无框架无依赖）
+index.html            the map
+basics/*.html         seven short lessons
+questions/*.html      interview questions
+glossary.html         all words
+assets/style.css      the look (paper, serif, one accent colour)
+assets/app.js         speak buttons, word links, read-the-page
+_build_main.py        generates index / question / glossary / about
+_build_lessons.py     generates the seven lessons
 ```
 
-## 加一道新题的步骤
+Plain HTML, no framework, no tracking, no build step needed to view.
+If you edit the generated pages, edit the `_build_*.py` script and run `python _build_main.py` so the change is not lost.
 
-1. 复制 `questions/java-hashmap.html`，改名成新题（如 `questions/java-concurrenthashmap.html`）
-2. 改四块内容：题目、30 秒版、拆解、追问、照念稿
-3. 在 `index.html` 的 `.qlist` 里加一行链接，把顶部的「共 N 题」和 `mh-right` 里的更新日期改掉
-4. 提交：
+## Deploy
 
-```bash
-git add -A && git commit -m "加题：ConcurrentHashMap" && git push
-```
+Cloudflare Pages, connected to this GitHub repo:
 
-推上去约 40 秒，Cloudflare Pages 自动发布。
+- Framework preset: **None**
+- Build command: *(empty)*
+- Build output directory: `/`
 
-## 写题时的几条约定
-
-- **30 秒版先给结论**，能用嘴念顺；细节放后面。
-- 每个设计选择都要写「为什么是它」，而不是只写「是什么」。
-- 追问至少 5 个，都是面试官真的会接着问的。
-- 照念稿控制在 250～320 字（约 60 秒），念起来要像人说话，不像论文。
-- 常见答错写「别人踩过的坑」，一条一行。
-
-## 部署
-
-已接好：GitHub `main` 分支 → Cloudflare Pages（项目 `offer-camp`，框架 None，构建命令空，输出目录 `/`）。
-`git push` 即自动部署，无需再点按钮。
-
-本地预览：直接双击 `index.html`，或 `python -m http.server 8000`。
-
-## 注意
-
-仓库是 public，线上也是公开可访问的。别往里放私人信息（电话、住址、公司内部资料）。需要限制访问时，去 Cloudflare Zero Trust → Access 给这个域名加邮箱白名单。
+Every push to `main` republishes the site.

@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>面试题本 · 求职自习室</title>
-<meta name="description" content="一道题一页：30 秒版、原理拆解、追问、照念稿。">
+<title>Java Notes · learn Java in English</title>
+<meta name="description" content="Short English pages about Java: arrays, linked lists, trees, hash, Big O, HashMap.">
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
@@ -12,85 +12,88 @@
 
 <header class="masthead">
   <div class="mh-left">
-    <span class="mh-mark">求职自习室</span>
+    <span class="mh-mark">Java Notes</span>
     <span class="mh-en">OFFER&nbsp;CAMP</span>
     <nav class="mh-nav">
-      <a href="index.html" class="on">面试题</a>
-      <a href="about.html">关于</a>
+      <a href="index.html" class="on">Questions</a>
+      <a href="basics/array.html">Basics</a>
+      <a href="glossary.html">Words</a>
     </nav>
   </div>
-  <div class="mh-right">
-    <span>共 <b>1</b> 题</span>
-    <span class="sep">·</span>
-    <span>更新 2026.10.29</span>
-  </div>
+  <div class="mh-right"><span>7 basics · 1 question</span></div>
 </header>
 
 <main>
   <section class="hero">
-    <p class="kicker">面试题本 · 从第一题开始</p>
-    <h1>先给结论，<br>再讲<em>为什么</em>。</h1>
-    <p class="lede">每道题都按同一套拆：先用嘴讲 30 秒 → 再看结构图和细节 → 过一遍追问 → 最后照口播稿念到顺。题不在多，在能扛住追问。</p>
+    <p class="kicker">Java in English · for a complete beginner</p>
+    <h1>One small page,<br>one <em>idea</em>.</h1>
+    <p class="lede">I know nothing about Java. I want to learn it in English, not in Chinese. So every page gives one idea, five new words, and three questions. Short sentences. No idioms. Read out loud.</p>
   </section>
 
   <section class="block">
-    <h2><span class="num">01</span>题目<span class="hint">点击进入 · 每题四块</span></h2>
+    <h2><span class="num">01</span>Basics — start here<span class="hint">7 short lessons</span></h2>
     <ul class="qlist">
-      <li>
-        <a href="questions/java-hashmap.html">
-          <span class="no">01</span>
-          <span class="t">说说 Java 中 HashMap 的原理？
-            <small>数组 + 链表 + 红黑树 · 扰动函数 · 扩容 · 树化 · 线程安全</small>
-          </span>
-          <span class="m">Java 集合 · 必会 · 约 10 分钟</span>
-        </a>
-      </li>
+      <li><a href="basics/array.html">
+        <span class="no">01</span>
+        <span class="t">What is an array?<small>A row of numbered boxes. Fast to read, slow to insert.</small></span>
+        <span class="m">5 min</span></a></li>
+      <li><a href="basics/linked-list.html">
+        <span class="no">02</span>
+        <span class="t">What is a linked list?<small>Notes with arrows. Fast to insert, slow to find.</small></span>
+        <span class="m">5 min</span></a></li>
+      <li><a href="basics/tree.html">
+        <span class="no">03</span>
+        <span class="t">What is a tree? And a red-black tree?<small>An upside-down family tree that stays short.</small></span>
+        <span class="m">6 min</span></a></li>
+      <li><a href="basics/hash.html">
+        <span class="no">04</span>
+        <span class="t">What is a key? A hash? A collision?<small>The fingerprint idea, in plain words.</small></span>
+        <span class="m">6 min</span></a></li>
+      <li><a href="basics/big-o.html">
+        <span class="no">05</span>
+        <span class="t">What is O(1), O(n), O(log n)?<small>How the work grows when the data grows.</small></span>
+        <span class="m">6 min</span></a></li>
+      <li><a href="basics/hashmap-methods.html">
+        <span class="no">06</span>
+        <span class="t">HashMap methods in real life<small>put, get, merge, computeIfAbsent — with examples.</small></span>
+        <span class="m">7 min</span></a></li>
+      <li><a href="basics/threads.html">
+        <span class="no">07</span>
+        <span class="t">Why is HashMap not thread-safe?<small>Two workers writing the same notebook.</small></span>
+        <span class="m">6 min</span></a></li>
     </ul>
-    <p class="log-tip">下一题从面试反馈里挑：被问住的那道，当天就补成新的一页。</p>
   </section>
 
   <section class="block">
-    <h2><span class="num">02</span>怎么用这一页<span class="hint">四步 · 每步都有产出</span></h2>
+    <h2><span class="num">02</span>Interview questions<span class="hint">one page each</span></h2>
+    <ul class="qlist">
+      <li><a href="questions/java-hashmap.html">
+        <span class="no">Q1</span>
+        <span class="t">How does HashMap work?<small>Buckets, hash, resize, tree, thread safety.</small></span>
+        <span class="m">12 min</span></a></li>
+    </ul>
+  </section>
+
+  <section class="block">
+    <h2><span class="num">03</span>How to use these pages<span class="hint">3 steps, 10 minutes</span></h2>
     <div class="cards">
-      <div class="card">
-        <span class="c-no">1</span>
-        <span class="c-title">先自己讲 30 秒</span>
-        <span class="c-desc">不看答案，开口讲。讲不出来的地方，就是一会儿要重点看的地方。</span>
-        <span class="c-meta">2 分钟</span>
-      </div>
-      <div class="card">
-        <span class="c-no">2</span>
-        <span class="c-title">对照「30 秒版」</span>
-        <span class="c-desc">看漏了哪一层：结构、hash、扩容、树化、线程安全。漏的逐条补。</span>
-        <span class="c-meta">3 分钟</span>
-      </div>
-      <div class="card">
-        <span class="c-no">3</span>
-        <span class="c-title">过「追问」</span>
-        <span class="c-desc">面试官真正筛人的地方。每个追问都要能接住一句，而不是「大概吧」。</span>
-        <span class="c-meta">3 分钟</span>
-      </div>
-      <div class="card">
-        <span class="c-no">4</span>
-        <span class="c-title">照念稿念两遍</span>
-        <span class="c-desc">念到不磕巴为止。稿子是骨架，念顺了再往里填自己的例子。</span>
-        <span class="c-meta">2 分钟</span>
-      </div>
+      <div class="card"><span class="c-no">1</span><span class="c-title">Read it out loud</span>
+        <span class="c-desc">Press Listen. Follow with your eyes and read along. Your mouth learns faster than your eyes.</span>
+        <span class="c-meta">3 min</span></div>
+      <div class="card"><span class="c-no">2</span><span class="c-title">Say the new words</span>
+        <span class="c-desc">Five words per page. Click “hear it” on YouGlish, then say each word three times.</span>
+        <span class="c-meta">4 min</span></div>
+      <div class="card"><span class="c-no">3</span><span class="c-title">Answer the checks</span>
+        <span class="c-desc">Say the answer out loud before you look at the hint. If you cannot say it, read the page again.</span>
+        <span class="c-meta">3 min</span></div>
     </div>
   </section>
+
 </main>
 
 <footer>
-  <div class="f-left">
-    <span>写代码的人：王天宇</span>
-    <span class="sep">·</span>
-    <span>北京</span>
-  </div>
-  <div class="f-right">
-    <a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a>
-    <span class="sep">·</span>
-    <span>纯静态 · 无框架</span>
-  </div>
+  <div class="f-left"><span>Written for learning English · Wang Tianyu · Beijing</span></div>
+  <div class="f-right"><a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a><span class="sep">·</span><span>no framework, no tracking</span></div>
 </footer>
 </body>
 </html>
