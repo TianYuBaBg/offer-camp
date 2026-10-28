@@ -102,6 +102,14 @@
     .wrap{grid-template-columns:1fr}
     .board{grid-template-columns:repeat(4,1fr)}
   }
+  .dictsw{font-size:11px;letter-spacing:.08em;color:#8a8378;white-space:nowrap}
+  .dictsw b{display:inline;font-weight:400}
+  .dictsw button{font:inherit;font-family:var(--mono);background:none;border:1px solid #cfc7b8;
+                 color:#8a8378;cursor:pointer;padding:2px 6px;margin-left:5px;border-radius:2px}
+  .dictsw button.on{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+  .altdict{font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:#9a9389;margin-top:8px}
+  .altdict .say2{color:#8a8378;text-decoration:none;border-bottom:1px dotted #c2bab0;margin:0 2px}
+  .altdict .say2:hover{color:var(--ink)}
 </style>
 </head>
 <body>
@@ -118,6 +126,7 @@
       <div class="sub">three hands-on levels · 手比脑子记得快</div>
     </div>
     <div class="hud">
+      <span class="dictsw">发音站<b id="dictBtns"></b></span>
       <span>关卡<b id="hLevel">1/3</b></span>
       <span>桶数<b id="hCap">16</b></span>
       <span>已放<b id="hCount">0</b></span>
@@ -168,14 +177,41 @@
     return h;
   }
   function spread(h){ return (h ^ (h >>> 16)) >>> 0; }
-  function forvo(key){
-    var w = String(key).replace(/[^A-Za-z ]/g, '').trim() || String(key);
-    return 'https://forvo.com/search/' + encodeURIComponent(w) + '/';
+  var DICTS = [
+    {id:'forvo',  name:'Forvo',    url:function(w){ return 'https://forvo.com/search/' + w + '/'; }},
+    {id:'mw',     name:'MW',       url:function(w){ return 'https://www.merriam-webster.com/dictionary/' + w; }},
+    {id:'cam',    name:'剑桥',      url:function(w){ return 'https://dictionary.cambridge.org/dictionary/english/' + w; }},
+    {id:'yg',     name:'YouGlish', url:function(w){ return 'https://youglish.com/pronounce/' + w + '/english'; }},
+    {id:'youdao', name:'有道',      url:function(w){ return 'https://dict.youdao.com/result?word=' + w + '&lang=en'; }}
+  ];
+  function wordOf(key){
+    return (String(key).replace(/[^A-Za-z ]/g, '').trim() || String(key)).toLowerCase();
   }
-  function sayLink(key, cls, tag){
-    return '<a class="' + (cls || 'say') + '" href="' + forvo(key) + '" target="_blank" rel="noopener"'
-         + ' title="去 Forvo 听 ' + key + ' 的真人发音">'
-         + key + (tag ? '<span class="saybtn">▶ Forvo</span>' : '') + '</a>';
+  function dictUrl(key, id){
+    var d = DICTS[0];
+    for (var i = 0; i < DICTS.length; i++) if (DICTS[i].id === id) d = DICTS[i];
+    return d.url(encodeURIComponent(wordOf(key)));
+  }
+  function dictName(id){
+    for (var i = 0; i < DICTS.length; i++) if (DICTS[i].id === id) return DICTS[i].name;
+    return DICTS[0].name;
+  }
+  function primary(){ return dictUrl(S.queue[0] || '', S.dict); }
+  function sayLink(key, cls, tag, showAll){
+    var url = dictUrl(key, S.dict);
+    var html = '<a class="' + (cls || 'say') + '" href="' + url + '" target="_blank" rel="noopener"'
+             + ' title="听 ' + wordOf(key) + ' 的发音">'
+             + key + (tag ? '<span class="saybtn">▶ ' + dictName(S.dict) + '</span>' : '') + '</a>';
+    if (showAll) {
+      var alt = [];
+      for (var i = 0; i < DICTS.length; i++) {
+        if (DICTS[i].id === S.dict) continue;
+        alt.push('<a class="say2" href="' + dictUrl(key, DICTS[i].id) + '" target="_blank" rel="noopener">'
+                 + DICTS[i].name + '</a>');
+      }
+      html += '<div class="altdict">' + alt.join('<span> · </span>') + '</div>';
+    }
+    return html;
   }
   function bucketOf(key, cap){ return spread(javaHash(key)) & (cap - 1); }
 
@@ -212,7 +248,13 @@
   var S = {
     level: 0, cap: 16, buckets: [], queue: [], q: 0,
     phase: 'idle',            // idle | ready | hashed | placed | done
-    misses: 0, count: 0, treeified: false, resized: false
+    misses: 0, count: 0, treeified: false, resized: false,
+    dict: (function(){
+      var q = null;
+      try { q = new URLSearchParams(location.search).get('dict'); } catch(e){}
+      if (q) return q;
+      try { return localStorage.getItem('fc-dict') || 'forvo'; } catch(e){ return 'forvo'; }
+    })()
   };
 
   var $ = function(id){ return document.getElementById(id); };
@@ -292,7 +334,7 @@
     });
     $('treeFig').innerHTML = '';
     $('ltip').textContent = L.title + ' —— ' + L.sub;
-    $('key').innerHTML = S.queue[0] ? sayLink(S.queue[0], 'say', true) + '<div class="hintx">点单词去 Forvo 听真人发音</div>' : '—';
+    $('key').innerHTML = S.queue[0] ? sayLink(S.queue[0], 'say', true, true) + '<div class="hintx">点单词听真人发音；下面小字是别的站</div>' : '—';
     ['s1','s2','s3','s4'].forEach(function(id){ $(id).classList.remove('on','hl'); $(id).querySelector('.v').textContent = '—'; });
     $('bHash').disabled = false; $('bIdx').disabled = true; $('bTree').style.display = 'none';
     setMsg('这个 key 要放进哪个桶？先点「算 hash」。');
@@ -330,7 +372,7 @@
     S.q++;
     if (S.q >= S.queue.length){ done(); return; }
     S.phase = 'ready';
-    $('key').innerHTML = sayLink(S.queue[S.q], 'say', true) + '<div class="hintx">点单词去 Forvo 听真人发音</div>';
+    $('key').innerHTML = sayLink(S.queue[S.q], 'say', true, true) + '<div class="hintx">点单词听真人发音；下面小字是别的站</div>';
     ['s1','s2','s3','s4'].forEach(function(id){ $(id).classList.remove('on','hl'); $(id).querySelector('.v').textContent = '—'; });
     $('bHash').disabled = false; $('bIdx').disabled = true;
     paintSteps(0);
@@ -414,6 +456,29 @@
     $('veil').classList.add('on');
   }
   function hide(){ $('veil').classList.remove('on'); }
+
+  /* ---------- 发音站切换 ---------- */
+  (function(){
+    var box = $('dictBtns');
+    DICTS.forEach(function(d){
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = d.name;
+      b.setAttribute('data-dict', d.id);
+      if (d.id === S.dict) b.className = 'on';
+      b.onclick = function(){
+        S.dict = d.id;
+        try { localStorage.setItem('fc-dict', d.id); } catch(e){}
+        Array.prototype.forEach.call(box.querySelectorAll('button'), function(x){
+          x.className = (x.getAttribute('data-dict') === S.dict) ? 'on' : '';
+        });
+        renderKey();
+        if (S.buckets.length) renderBoard();
+        if (S.treeBucket) renderTreeFig(S.treeBucket);
+      };
+      box.appendChild(b);
+    });
+  })();
 
   /* ---------- 交互 ---------- */
   $('bHash').onclick = function(){
