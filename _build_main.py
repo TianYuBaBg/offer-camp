@@ -361,7 +361,7 @@ gl_body += """
 render("glossary.html", "All the words", "Every word used on this site, with pronunciation and a one-line meaning.",
        "All the words, in one place.",
        "Glossary", "Every word from the lessons, with a pronunciation link and one simple meaning.",
-       tag("46 words") + tag("read aloud"), "Words", "Glossary", gl_body,
+       tag("45 words") + tag("read aloud"), "Words", "Glossary", gl_body,
        [], [], "Next: <a href=\"basics/array.html\">start with Lesson 1</a>.", on="w")
 
 # ======================================================== about

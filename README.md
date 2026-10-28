@@ -20,7 +20,7 @@ Live: **https://tianyubabg.github.io/offer-camp/**
 | `basics/hashmap-methods.html` | HashMap methods, and how they look in real code |
 | `basics/threads.html` | Why HashMap is not thread-safe |
 | `questions/java-hashmap.html` | The whole HashMap answer, in simple English |
-| `glossary.html` | All 46 words, with pronunciation |
+| `glossary.html` | All 45 words, with pronunciation |
 | `about.html` | Why the site is in English |
 
 ## Two things on every page
