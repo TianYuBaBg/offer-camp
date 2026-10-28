@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="zh-CN" data-lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CAS plus a per-bucket lock, not a segmented lock. · Java Notes</title>
+<meta name="description" content="CAS plus a per-bucket lock, not a segmented lock.">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="masthead">
+  <div class="mh-left">
+    <a class="mh-mark" href="../index.html">Java Notes</a>
+    <nav class="mh-nav">
+      <a href="../questions/index.html" class="on"><span class="in-en">Questions</span><span class="in-zh">题目</span></a>
+      <a href="../basics/array.html"><span class="in-en">Basics</span><span class="in-zh">基础</span></a>
+      <a href="../glossary.html"><span class="in-en">Words</span><span class="in-zh">词表</span></a>
+      <a href="../terms.html"><span class="in-en">Terms</span><span class="in-zh">术语</span></a>
+      <a href="../speak.html"><span class="in-en">Phrasing</span><span class="in-zh">话术</span></a>
+    </nav>
+  </div>
+  <div class="mh-right">
+    <span class="langswitch">
+      <button type="button" data-lang-set="zh">中文</button>
+      <button type="button" data-lang-set="both">中英</button>
+      <button type="button" data-lang-set="en">English</button>
+    </span>
+  </div>
+</header>
+
+<main>
+  <p class="crumb"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a> / <a href="java-hashmap.html"><span class="in-en">Q1</span><span class="in-zh">第 1 题</span></a> / <span class="in-en">ConcurrentHashMap</span><span class="in-zh">并发用哪个</span></p>
+
+  <div class="qhead">
+    <p class="kicker"><span class="in-en">Follow-up 07</span><span class="in-zh">追问 07</span></p>
+    <h1><span class="in-en">CAS plus a per-bucket lock, not a segmented lock.</span><span class="in-zh">CAS 加“每个桶一把锁”，不是分段锁。</span></h1>
+    <p class="lede"><span class="in-en">JDK 8 threw away segments: one lock per bucket head, and reads never lock at all.</span><span class="in-zh">JDK 8 把分段锁扔了：锁的是桶的头节点，读操作完全不加锁。</span></p>
+    <div class="answerbox"><b><span class="in-en">Short answer</span><span class="in-zh">先给答案</span></b><span class="bi-en">Emptied bucket: <span class="tm" data-t="CAS">CAS</span> to install the first node. Occupied bucket: synchronized on the head node. Reads use volatile reads of the node array and the next pointers, so they never block.</span><span class="bi-zh">空桶：CAS 直接放第一个节点。非空桶：对头节点 synchronized。读操作走数组和 next 指针的 volatile 读，所以从不阻塞。</span></div>
+    <p class="tags"><span class="tag"><span class="in-en">must know</span><span class="in-zh">必背</span></span><span class="tag"><span class="in-en">3 min</span><span class="in-zh">3 分钟</span></span></p>
+    <button class="listen" data-listen type="button">🔊</button>
+  </div>
+
+  <section class="sec">
+    <h2><span class="num">01</span><span class="in-en">Put, step by step</span><span class="in-zh">put 的动作顺序</span></h2>
+    <ol class="steps">
+      <li><span class="bi-en">Bucket empty → <span class="tm" data-t="CAS">CAS</span> the new node in. No lock at all.</span><span class="bi-zh">桶是空 → CAS 放新节点，完全不锁。</span></li>
+      <li><span class="bi-en">Bucket busy → synchronized(head) and walk the chain.</span><span class="bi-zh">桶非空 → synchronize 头节点，沿着链走。</span></li>
+      <li><span class="bi-en">Size uses a base counter plus CounterCell[] to spread contention.</span><span class="bi-zh">size 用 base + CounterCell[] 分散计数，避免所有线程抢一个计数。</span></li>
+    </ol>
+  </section>
+  <section class="sec">
+    <h2><span class="num">02</span><span class="in-en">Why not segments</span><span class="in-zh">为什么不用分段</span></h2>
+    <ul>
+      <li><span class="bi-en">Segments gave at most 16-way concurrency and wasted memory.</span><span class="bi-zh">分段锁最多 16 路并发，还浪费内存。</span></li>
+      <li><span class="bi-en">Per-bucket locking scales with the table: more buckets, more parallelism.</span><span class="bi-zh">按桶加锁，并发度随表大小走：桶越多越能并行。</span></li>
+      <li><span class="bi-en">Cost: no atomic “size across the whole map” for free, hence the counter cells.</span><span class="bi-zh">代价：整体 size 不再是免费的原子操作，于是有了计数单元。</span></li>
+    </ul>
+  </section>
+  <section class="sec">
+    <h2><span class="num">03</span><span class="in-en">Say it like this</span><span class="in-zh">面试这么说</span></h2>
+    <blockquote class="read"><span class="lbl"><span class="in-en">Say it like this</span><span class="in-zh">面试就这么说</span></span>
+      <p><span class="bi-en">并发用 ConcurrentHashMap：JDK 8 是 CAS 占空桶 + synchronized 锁桶头，锁粒度从段降到单个桶；reading 不加锁，靠 volatile 和 Node 的 val/next 不可变。</span><span class="bi-zh">并发用 ConcurrentHashMap：JDK 8 是 CAS 占空桶 + synchronized 锁桶头，锁粒度从段降到单个桶；reading 不加锁，靠 volatile 和 Node 的 val/next 不可变。</span></p>
+    </blockquote>
+  </section>
+
+  <p class="log-tip"><a href="java-hashmap.html"><span class="in-en">&#8592; Back to question 1</span><span class="in-zh">&#8592; 回到第 1 题</span></a></p>
+</main>
+
+<footer>
+  <div class="f-left"><span class="in-en">Written for learning English · Wang Tianyu</span><span class="in-zh">为学英语而写 · 王天宇</span></div>
+  <div class="f-right"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a><span class="sep">·</span><a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a></div>
+</footer>
+<script src="../assets/terms.js"></script>
+<script src="../assets/app.js"></script>
+</body>
+</html>

@@ -201,6 +201,21 @@ We chose this over a RabbitMQ delay queue because the project already had Redis 
     </ol>
     <p class="note"><span class="bi-en">Answer out loud first. Only then open the answers below.</span><span class="bi-zh">先自己出声答，再看下面的答案。</span></p>
   </section>
+  <section class="sec">
+    <h2><span class="num">09</span><span class="in-en">New questions this one opened</span><span class="in-zh">这道题又长出了哪些新问题</span></h2>
+    <p class="note"><span class="bi-en">Each one has its own page — click to read the long version.</span><span class="bi-zh">每条都有自己的一页，点进去看完整版。</span></p>
+    <table class="ledger">
+      <thead><tr><th><span class="in-en">Question</span><span class="in-zh">新问题</span></th><th><span class="in-en">One line</span><span class="in-zh">一句话</span></th><th></th></tr></thead>
+      <tbody>
+        <tr><td>为什么 ZSet 能做延时队列？</td><td>score 就是到期时间戳，范围查询天然按时间有序。</td><td><a class="dqlink" href="d4-zset-as-delay-queue.html">打开这一页</a></td></tr>
+        <tr><td>两个实例会不会重复关单？</td><td>按单加锁 + 状态 CAS，锁丢了 CAS 也让重复变空操作。</td><td><a class="dqlink" href="d4-two-instances.html">打开这一页</a></td></tr>
+        <tr><td>关单和支付回调撞上怎么办？</td><td>谁先改到状态谁赢，后到的走退款或直接退出。</td><td><a class="dqlink" href="d4-race-with-callback.html">打开这一页</a></td></tr>
+        <tr><td>ZSet 里十万条会慢吗？</td><td>按分钟分桶建 key，每批 LIMIT，空分片删掉。</td><td><a class="dqlink" href="d4-zset-size.html">打开这一页</a></td></tr>
+        <tr><td>RabbitMQ 做延迟队列有哪两种方式？</td><td>消息 TTL + 死信交换机；或 delayed-message 插件。</td><td><a class="dqlink" href="d4-rabbitmq-ttl.html">打开这一页</a></td></tr>
+        <tr><td>消息丢了怎么兜底？</td><td>每日补偿扫描 PENDING 超时单，配合幂等。</td><td><a class="dqlink" href="d4-message-loss.html">打开这一页</a></td></tr>
+      </tbody>
+    </table>
+  </section>
 
   <p class="log-tip"><a href="redis-cache.html"><span class="in-en">← Question 3: cache</span><span class="in-zh">← 第 3 题：缓存</span></a></p>
 </main>

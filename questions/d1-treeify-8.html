@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-CN" data-lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Why the list turns into a tree only at 8. · Java Notes</title>
+<meta name="description" content="Why the list turns into a tree only at 8.">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="masthead">
+  <div class="mh-left">
+    <a class="mh-mark" href="../index.html">Java Notes</a>
+    <nav class="mh-nav">
+      <a href="../questions/index.html" class="on"><span class="in-en">Questions</span><span class="in-zh">题目</span></a>
+      <a href="../basics/array.html"><span class="in-en">Basics</span><span class="in-zh">基础</span></a>
+      <a href="../glossary.html"><span class="in-en">Words</span><span class="in-zh">词表</span></a>
+      <a href="../terms.html"><span class="in-en">Terms</span><span class="in-zh">术语</span></a>
+      <a href="../speak.html"><span class="in-en">Phrasing</span><span class="in-zh">话术</span></a>
+    </nav>
+  </div>
+  <div class="mh-right">
+    <span class="langswitch">
+      <button type="button" data-lang-set="zh">中文</button>
+      <button type="button" data-lang-set="both">中英</button>
+      <button type="button" data-lang-set="en">English</button>
+    </span>
+  </div>
+</header>
+
+<main>
+  <p class="crumb"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a> / <a href="java-hashmap.html"><span class="in-en">Q1</span><span class="in-zh">第 1 题</span></a> / <span class="in-en">Treeify at 8</span><span class="in-zh">为什么是 8</span></p>
+
+  <div class="qhead">
+    <p class="kicker"><span class="in-en">Follow-up 03</span><span class="in-zh">追问 03</span></p>
+    <h1><span class="in-en">Why the list turns into a tree only at 8.</span><span class="in-zh">为什么链表要到 8 才转红黑树。</span></h1>
+    <p class="lede"><span class="in-en">Because 8 in one bucket is already statistically impossible for good hashes.</span><span class="in-zh">因为对正常的 hash 来说，一个桶里挤到 8 个，本就是小概率事件。</span></p>
+    <div class="answerbox"><b><span class="in-en">Short answer</span><span class="in-zh">先给答案</span></b><span class="bi-en">Under a good hash the chain length follows a Poisson distribution (λ≈0.5): 8 in one bucket happens about 6 in 10 million times. Tree nodes cost more memory, so we only pay that when the hash is clearly bad.</span><span class="bi-zh">hash 均匀时链长近似泊松分布（λ≈0.5）：一个桶里到 8 个的概率约千万分之六。树节点更占内存，所以只有当 hash 明显有问题时才值得付这个代价。</span></div>
+    <p class="tags"><span class="tag"><span class="in-en">must know</span><span class="in-zh">必背</span></span><span class="tag"><span class="in-en">3 min</span><span class="in-zh">3 分钟</span></span></p>
+    <button class="listen" data-listen type="button">🔊</button>
+  </div>
+
+  <section class="sec">
+    <h2><span class="num">01</span><span class="in-en">The Poisson table</span><span class="in-zh">泊松分布那张表</span></h2>
+    <table class="ledger">
+      <thead><tr><th><span class="in-en">Chain length</span><span class="in-zh">链长</span></th><th><span class="in-en">Probability</span><span class="in-zh">概率</span></th></tr></thead>
+      <tbody>
+        <tr><td>2</td><td><span class="bi-en">~7.5%</span><span class="bi-zh">约 7.5%</span></td></tr>
+        <tr><td>4</td><td><span class="bi-en">~0.05%</span><span class="bi-zh">约 0.05%</span></td></tr>
+        <tr><td>8</td><td><span class="bi-en">~6e-7</span><span class="bi-zh">约 6e-7</span></td></tr>
+      </tbody>
+    </table>
+    <p><span class="bi-en">Also note the second condition: the array must be at least 64 long. Below that HashMap resizes instead of treeifying — small tables are cheaper to grow than to convert.</span><span class="bi-zh">还有第二个条件：数组长度至少 64。不到 64 时优先扩容而不是树化——小表扩容比转换便宜。</span></p>
+  </section>
+  <section class="sec">
+    <h2><span class="num">02</span><span class="in-en">Cost of a tree node</span><span class="in-zh">树节点的代价</span></h2>
+    <ul>
+      <li><span class="bi-en">TreeNode keeps parent, left, right, red/black plus the original next pointer.</span><span class="bi-zh">TreeNode 额外存 parent、left、right、红黑标记，还要保留 next。</span></li>
+      <li><span class="bi-en">That is roughly three times the memory of a plain Node, per entry.</span><span class="bi-zh">大约是一个普通 Node 的三倍内存。</span></li>
+      <li><span class="bi-en">So the switch is a trade: pay memory only when the chain proves the hash is broken.</span><span class="bi-zh">所以这是一笔交易：只有链长证明 hash 坏了，才付这份内存。</span></li>
+    </ul>
+  </section>
+  <section class="sec">
+    <h2><span class="num">03</span><span class="in-en">Say it like this</span><span class="in-zh">面试这么说</span></h2>
+    <blockquote class="read"><span class="lbl"><span class="in-en">Say it like this</span><span class="in-zh">面试就这么说</span></span>
+      <p><span class="bi-en">TreeNode 比 Node 大不少，平时用不上；8 这个阈值是统计出来的——到 8 说明 hash 有问题，这时候把 O(n) 降到 O(log n) 才划算。</span><span class="bi-zh">TreeNode 比 Node 大不少，平时用不上；8 这个阈值是统计出来的——到 8 说明 hash 有问题，这时候把 O(n) 降到 O(log n) 才划算。</span></p>
+    </blockquote>
+  </section>
+
+  <p class="log-tip"><a href="java-hashmap.html"><span class="in-en">&#8592; Back to question 1</span><span class="in-zh">&#8592; 回到第 1 题</span></a></p>
+</main>
+
+<footer>
+  <div class="f-left"><span class="in-en">Written for learning English · Wang Tianyu</span><span class="in-zh">为学英语而写 · 王天宇</span></div>
+  <div class="f-right"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a><span class="sep">·</span><a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a></div>
+</footer>
+<script src="../assets/terms.js"></script>
+<script src="../assets/app.js"></script>
+</body>
+</html>

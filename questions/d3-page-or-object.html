@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-CN" data-lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Objects. Page-level caching invalidates too easily. · Java Notes</title>
+<meta name="description" content="Objects. Page-level caching invalidates too easily.">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="masthead">
+  <div class="mh-left">
+    <a class="mh-mark" href="../index.html">Java Notes</a>
+    <nav class="mh-nav">
+      <a href="../questions/index.html" class="on"><span class="in-en">Questions</span><span class="in-zh">题目</span></a>
+      <a href="../basics/array.html"><span class="in-en">Basics</span><span class="in-zh">基础</span></a>
+      <a href="../glossary.html"><span class="in-en">Words</span><span class="in-zh">词表</span></a>
+      <a href="../terms.html"><span class="in-en">Terms</span><span class="in-zh">术语</span></a>
+      <a href="../speak.html"><span class="in-en">Phrasing</span><span class="in-zh">话术</span></a>
+    </nav>
+  </div>
+  <div class="mh-right">
+    <span class="langswitch">
+      <button type="button" data-lang-set="zh">中文</button>
+      <button type="button" data-lang-set="both">中英</button>
+      <button type="button" data-lang-set="en">English</button>
+    </span>
+  </div>
+</header>
+
+<main>
+  <p class="crumb"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a> / <a href="redis-cache.html"><span class="in-en">Q3</span><span class="in-zh">第 3 题</span></a> / <span class="in-en">Page or object</span><span class="in-zh">缓页面还是对象</span></p>
+
+  <div class="qhead">
+    <p class="kicker"><span class="in-en">Follow-up 06</span><span class="in-zh">追问 06</span></p>
+    <h1><span class="in-en">Objects. Page-level caching invalidates too easily.</span><span class="in-zh">缓存对象。整页缓存的失效太容易。</span></h1>
+    <p class="lede"><span class="in-en">One comment on the page and a whole page cache is useless.</span><span class="in-zh">页面里多一条评论，整页缓存就白做了。</span></p>
+    <div class="answerbox"><b><span class="in-en">Short answer</span><span class="in-zh">先给答案</span></b><span class="bi-en">Cache the object (product detail, category list) with a <span class="tm" data-t="TTL">TTL</span>, and compose the page. Page-level caching only works for truly static fragments — and then it is a CDN's job.</span><span class="bi-zh">按对象缓存（商品详情、分类列表）加 TTL，页面在应用层拼装。整页缓存只适合真正静态的片段，而那本来就该交给 CDN。</span></div>
+    <p class="tags"><span class="tag"><span class="in-en">must know</span><span class="in-zh">必背</span></span><span class="tag"><span class="in-en">3 min</span><span class="in-zh">3 分钟</span></span></p>
+    <button class="listen" data-listen type="button">🔊</button>
+  </div>
+
+  <section class="sec">
+    <h2><span class="num">01</span><span class="in-en">Granularity trade-off</span><span class="in-zh">粒度取舍</span></h2>
+    <table class="ledger">
+      <thead><tr><th><span class="in-en">Granularity</span><span class="in-zh">粒度</span></th><th><span class="in-en">Hit rate</span><span class="in-zh">命中率</span></th><th><span class="in-en">Invalidation</span><span class="in-zh">失效成本</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="bi-en">whole page</span><span class="bi-zh">整页</span></td><td><span class="bi-en">low (any block changes)</span><span class="bi-zh">低（任何一块变就废）</span></td><td><span class="bi-en">high</span><span class="bi-zh">高</span></td></tr>
+        <tr><td><span class="bi-en">object</span><span class="bi-zh">对象</span></td><td><span class="bi-en">high</span><span class="bi-zh">高</span></td><td><span class="bi-en">low, one key</span><span class="bi-zh">低，一个 key</span></td></tr>
+        <tr><td><span class="bi-en">field</span><span class="bi-zh">字段</span></td><td><span class="bi-en">highest</span><span class="bi-zh">最高</span></td><td><span class="bi-en">complex to assemble</span><span class="bi-zh">拼装复杂</span></td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="sec">
+    <h2><span class="num">02</span><span class="in-en">Say it like this</span><span class="in-zh">面试这么说</span></h2>
+    <blockquote class="read"><span class="lbl"><span class="in-en">Say it like this</span><span class="in-zh">面试就这么说</span></span>
+      <p><span class="bi-en">缓的是对象，不是整页：整页里任何一块变化，整页就失效；对象粒度更稳，命中率也高。真正静态的片段直接用 CDN。</span><span class="bi-zh">缓的是对象，不是整页：整页里任何一块变化，整页就失效；对象粒度更稳，命中率也高。真正静态的片段直接用 CDN。</span></p>
+    </blockquote>
+  </section>
+
+  <p class="log-tip"><a href="redis-cache.html"><span class="in-en">&#8592; Back to question 3</span><span class="in-zh">&#8592; 回到第 3 题</span></a></p>
+</main>
+
+<footer>
+  <div class="f-left"><span class="in-en">Written for learning English · Wang Tianyu</span><span class="in-zh">为学英语而写 · 王天宇</span></div>
+  <div class="f-right"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a><span class="sep">·</span><a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a></div>
+</footer>
+<script src="../assets/terms.js"></script>
+<script src="../assets/app.js"></script>
+</body>
+</html>

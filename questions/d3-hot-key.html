@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN" data-lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>One key, one shard, one core. · Java Notes</title>
+<meta name="description" content="One key, one shard, one core.">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="masthead">
+  <div class="mh-left">
+    <a class="mh-mark" href="../index.html">Java Notes</a>
+    <nav class="mh-nav">
+      <a href="../questions/index.html" class="on"><span class="in-en">Questions</span><span class="in-zh">题目</span></a>
+      <a href="../basics/array.html"><span class="in-en">Basics</span><span class="in-zh">基础</span></a>
+      <a href="../glossary.html"><span class="in-en">Words</span><span class="in-zh">词表</span></a>
+      <a href="../terms.html"><span class="in-en">Terms</span><span class="in-zh">术语</span></a>
+      <a href="../speak.html"><span class="in-en">Phrasing</span><span class="in-zh">话术</span></a>
+    </nav>
+  </div>
+  <div class="mh-right">
+    <span class="langswitch">
+      <button type="button" data-lang-set="zh">中文</button>
+      <button type="button" data-lang-set="both">中英</button>
+      <button type="button" data-lang-set="en">English</button>
+    </span>
+  </div>
+</header>
+
+<main>
+  <p class="crumb"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a> / <a href="redis-cache.html"><span class="in-en">Q3</span><span class="in-zh">第 3 题</span></a> / <span class="in-en">Hot key</span><span class="in-zh">热 key</span></p>
+
+  <div class="qhead">
+    <p class="kicker"><span class="in-en">Follow-up 04</span><span class="in-zh">追问 04</span></p>
+    <h1><span class="in-en">One key, one shard, one core.</span><span class="in-zh">一个 key，一个分片，一个核。</span></h1>
+    <p class="lede"><span class="in-en">Sharding by key does not help when a single key carries most of the traffic.</span><span class="in-zh">按 key 分片对“单 key 扛住大部分流量”完全无效。</span></p>
+    <div class="answerbox"><b><span class="in-en">Short answer</span><span class="in-zh">先给答案</span></b><span class="bi-en">Two moves: local cache on each application node (reads never leave the box), and split the key itself (key:1 … key:16) with a random suffix on write and a merge on read. Do not try to fix it with more shards.</span><span class="bi-zh">两招：每个应用节点加本地缓存（读不出机器），以及把 key 本身拆开（key:1…key:16），写时随机后缀、读时聚合。靠加更多分片解决不了单 key 热点。</span></div>
+    <p class="tags"><span class="tag"><span class="in-en">must know</span><span class="in-zh">必背</span></span><span class="tag"><span class="in-en">3 min</span><span class="in-zh">3 分钟</span></span></p>
+    <button class="listen" data-listen type="button">🔊</button>
+  </div>
+
+  <section class="sec">
+    <h2><span class="num">01</span><span class="in-en">Where the CPU goes</span><span class="in-zh">CPU 花在哪了</span></h2>
+    <table class="ledger">
+      <thead><tr><th><span class="in-en">Approach</span><span class="in-zh">做法</span></th><th><span class="in-en">Helps?</span><span class="in-zh">有用吗</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="bi-en">add more shards</span><span class="bi-zh">加更多分片</span></td><td><span class="bi-en">no — one key lives on one node</span><span class="bi-zh">没用——一个 key 只在一个节点</span></td></tr>
+        <tr><td><span class="bi-en">read replicas</span><span class="bi-zh">读副本</span></td><td><span class="bi-en">yes for reads</span><span class="bi-zh">读有效</span></td></tr>
+        <tr><td><span class="bi-en">local cache</span><span class="bi-zh">本地缓存</span></td><td><span class="bi-en">yes, best first move</span><span class="bi-zh">有，首选</span></td></tr>
+        <tr><td><span class="bi-en">split the key</span><span class="bi-zh">拆 key</span></td><td><span class="bi-en">yes, for counters/hot sets</span><span class="bi-zh">有，适合计数/热点集合</span></td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="sec">
+    <h2><span class="num">02</span><span class="in-en">Say it like this</span><span class="in-zh">面试这么说</span></h2>
+    <blockquote class="read"><span class="lbl"><span class="in-en">Say it like this</span><span class="in-zh">面试就这么说</span></span>
+      <p><span class="bi-en">热 key 打到一个分片，那个分片的单核就满了。做法是本地缓存先兜读，再把 key 加随机后缀拆成多份，读的时候聚合；写链路不拆，避免计数不一致。</span><span class="bi-zh">热 key 打到一个分片，那个分片的单核就满了。做法是本地缓存先兜读，再把 key 加随机后缀拆成多份，读的时候聚合；写链路不拆，避免计数不一致。</span></p>
+    </blockquote>
+  </section>
+
+  <p class="log-tip"><a href="redis-cache.html"><span class="in-en">&#8592; Back to question 3</span><span class="in-zh">&#8592; 回到第 3 题</span></a></p>
+</main>
+
+<footer>
+  <div class="f-left"><span class="in-en">Written for learning English · Wang Tianyu</span><span class="in-zh">为学英语而写 · 王天宇</span></div>
+  <div class="f-right"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a><span class="sep">·</span><a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a></div>
+</footer>
+<script src="../assets/terms.js"></script>
+<script src="../assets/app.js"></script>
+</body>
+</html>

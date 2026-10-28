@@ -14,6 +14,9 @@ from _content_speak import SPEAK
 from _content_dir import QLIST, DERIVED, LESSONS, TOOLS
 from _content_d2 import D2
 from _content_d2b import D2B
+from _content_d1 import D1
+from _content_d3 import D3
+from _content_d4 import D4
 from _answers import ANSWERS, INDEX_QA_HEAD, INDEX_QA
 
 R.write_assets()
@@ -248,7 +251,7 @@ def page_tail(page, with_tools=True):
 R.page(QUESTION["path"], QUESTION, on="q", tail_blocks=page_tail(QUESTION, with_tools=True))
 R.page(QUESTION2["path"], QUESTION2, on="q", tail_blocks=page_tail(QUESTION2, with_tools=False))
 
-for _b in D2 + D2B:
+for _b in D2 + D2B + D1 + D3 + D4:
     R.page(_b["path"], _b, on="q")
 R.page(QUESTION3["path"], QUESTION3, on="q", tail_blocks=page_tail(QUESTION3, with_tools=False))
 R.page(QUESTION4["path"], QUESTION4, on="q", tail_blocks=page_tail(QUESTION4, with_tools=False))

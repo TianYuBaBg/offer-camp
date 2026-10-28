@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN" data-lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TTL + dead-letter, or the delayed-message plugin. · Java Notes</title>
+<meta name="description" content="TTL + dead-letter, or the delayed-message plugin.">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="masthead">
+  <div class="mh-left">
+    <a class="mh-mark" href="../index.html">Java Notes</a>
+    <nav class="mh-nav">
+      <a href="../questions/index.html" class="on"><span class="in-en">Questions</span><span class="in-zh">题目</span></a>
+      <a href="../basics/array.html"><span class="in-en">Basics</span><span class="in-zh">基础</span></a>
+      <a href="../glossary.html"><span class="in-en">Words</span><span class="in-zh">词表</span></a>
+      <a href="../terms.html"><span class="in-en">Terms</span><span class="in-zh">术语</span></a>
+      <a href="../speak.html"><span class="in-en">Phrasing</span><span class="in-zh">话术</span></a>
+    </nav>
+  </div>
+  <div class="mh-right">
+    <span class="langswitch">
+      <button type="button" data-lang-set="zh">中文</button>
+      <button type="button" data-lang-set="both">中英</button>
+      <button type="button" data-lang-set="en">English</button>
+    </span>
+  </div>
+</header>
+
+<main>
+  <p class="crumb"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a> / <a href="order-timeout.html"><span class="in-en">Q4</span><span class="in-zh">第 4 题</span></a> / <span class="in-en">RabbitMQ delay</span><span class="in-zh">RabbitMQ 延迟</span></p>
+
+  <div class="qhead">
+    <p class="kicker"><span class="in-en">Follow-up 05</span><span class="in-zh">追问 05</span></p>
+    <h1><span class="in-en">TTL + dead-letter, or the delayed-message plugin.</span><span class="in-zh">TTL + 死信，或者 delayed-message 插件。</span></h1>
+    <p class="lede"><span class="in-en">RabbitMQ has no native delay. Either let a message expire into a dead-letter exchange, or install the delayed-message plugin.</span><span class="in-zh">RabbitMQ 没有原生延迟。要么让消息在队列里过期进死信交换机，要么装延迟消息插件。</span></p>
+    <div class="answerbox"><b><span class="in-en">Short answer</span><span class="in-zh">先给答案</span></b><span class="bi-en">Option A: publish with per-message <span class="tm" data-t="TTL">TTL</span> (or a queue TTL) and route expired messages to a DLX consumer — cheap, no plugin, but a long-TTL message at the head blocks shorter ones behind it (head-of-line). Option B: rabbitmq_delayed_message_exchange plugin supports arbitrary delay per message, but you must install and operate it.</span><span class="bi-zh">方案 A：消息带 TTL（或队列 TTL），过期后进死信交换机被消费——不用装插件，但长 TTL 消息在队头会阻塞后面的短 TTL（队头阻塞）。方案 B：装 rabbitmq_delayed_message_exchange 插件，支持任意延迟，但要多运维一个插件。</span></div>
+    <p class="tags"><span class="tag"><span class="in-en">must know</span><span class="in-zh">必背</span></span><span class="tag"><span class="in-en">3 min</span><span class="in-zh">3 分钟</span></span></p>
+    <button class="listen" data-listen type="button">🔊</button>
+  </div>
+
+  <section class="sec">
+    <h2><span class="num">01</span><span class="in-en">Side by side</span><span class="in-zh">两种方式对比</span></h2>
+    <table class="ledger">
+      <thead><tr><th></th><th><span class="in-en"><span class="tm" data-t="TTL">TTL</span> + DLX</span><span class="in-zh">TTL + 死信</span></th><th><span class="in-en">delayed plugin</span><span class="in-zh">延迟插件</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="bi-en">install</span><span class="bi-zh">安装</span></td><td><span class="bi-en">none</span><span class="bi-zh">不用</span></td><td><span class="bi-en">needs plugin</span><span class="bi-zh">要装插件</span></td></tr>
+        <tr><td><span class="bi-en">per-message delay</span><span class="bi-zh">每条不同延迟</span></td><td><span class="bi-en">yes (queue-level TTL differs)</span><span class="bi-zh">可以，但要注意队头</span></td><td><span class="bi-en">yes</span><span class="bi-zh">可以</span></td></tr>
+        <tr><td><span class="bi-en">risk</span><span class="bi-zh">风险</span></td><td><span class="bi-en">head-of-line blocking</span><span class="bi-zh">队头阻塞</span></td><td><span class="bi-en">plugin ops cost</span><span class="bi-zh">插件运维成本</span></td></tr>
+      </tbody>
+    </table>
+    <p class="note"><span class="bi-en">This is exactly the trade the interview wants to hear: choice plus what you gave up.</span><span class="bi-zh">面试想听的正是这个：选了哪个、放弃了什么。</span></p>
+  </section>
+  <section class="sec">
+    <h2><span class="num">02</span><span class="in-en">Say it like this</span><span class="in-zh">面试这么说</span></h2>
+    <blockquote class="read"><span class="lbl"><span class="in-en">Say it like this</span><span class="in-zh">面试就这么说</span></span>
+      <p><span class="bi-en"><span class="tm" data-t="RabbitMQ">RabbitMQ</span> 做延迟两种：TTL + 死信交换机（不用装插件，但队长 TTL 会阻塞），或者 delayed-message 插件（灵活，要多运维）。我们项目里已有 <span class="tm" data-t="Redis">Redis</span>，就直接用 <span class="tm" data-t="ZSet">ZSet</span>。</span><span class="bi-zh"><span class="tm" data-t="RabbitMQ">RabbitMQ</span> 做延迟两种：TTL + 死信交换机（不用装插件，但队长 TTL 会阻塞），或者 delayed-message 插件（灵活，要多运维）。我们项目里已有 <span class="tm" data-t="Redis">Redis</span>，就直接用 <span class="tm" data-t="ZSet">ZSet</span>。</span></p>
+    </blockquote>
+  </section>
+
+  <p class="log-tip"><a href="order-timeout.html"><span class="in-en">&#8592; Back to question 4</span><span class="in-zh">&#8592; 回到第 4 题</span></a></p>
+</main>
+
+<footer>
+  <div class="f-left"><span class="in-en">Written for learning English · Wang Tianyu</span><span class="in-zh">为学英语而写 · 王天宇</span></div>
+  <div class="f-right"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a><span class="sep">·</span><a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a></div>
+</footer>
+<script src="../assets/terms.js"></script>
+<script src="../assets/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="zh-CN" data-lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A sorted set is a timer with an index. · Java Notes</title>
+<meta name="description" content="A sorted set is a timer with an index.">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="masthead">
+  <div class="mh-left">
+    <a class="mh-mark" href="../index.html">Java Notes</a>
+    <nav class="mh-nav">
+      <a href="../questions/index.html" class="on"><span class="in-en">Questions</span><span class="in-zh">题目</span></a>
+      <a href="../basics/array.html"><span class="in-en">Basics</span><span class="in-zh">基础</span></a>
+      <a href="../glossary.html"><span class="in-en">Words</span><span class="in-zh">词表</span></a>
+      <a href="../terms.html"><span class="in-en">Terms</span><span class="in-zh">术语</span></a>
+      <a href="../speak.html"><span class="in-en">Phrasing</span><span class="in-zh">话术</span></a>
+    </nav>
+  </div>
+  <div class="mh-right">
+    <span class="langswitch">
+      <button type="button" data-lang-set="zh">中文</button>
+      <button type="button" data-lang-set="both">中英</button>
+      <button type="button" data-lang-set="en">English</button>
+    </span>
+  </div>
+</header>
+
+<main>
+  <p class="crumb"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a> / <a href="order-timeout.html"><span class="in-en">Q4</span><span class="in-zh">第 4 题</span></a> / <span class="in-en">ZSet as a delay queue</span><span class="in-zh">ZSet 当延时队列</span></p>
+
+  <div class="qhead">
+    <p class="kicker"><span class="in-en">Follow-up 01</span><span class="in-zh">追问 01</span></p>
+    <h1><span class="in-en">A sorted set is a timer with an index.</span><span class="in-zh">有序集合就是“带索引的定时器”。</span></h1>
+    <p class="lede"><span class="in-en">score is the due timestamp, so the earliest-due orders sit at the front of the range.</span><span class="in-zh">score 就是到期时间戳，所以最早到期的单永远排在范围查询的最前面。</span></p>
+    <div class="answerbox"><b><span class="in-en">Short answer</span><span class="in-zh">先给答案</span></b><span class="bi-en">ZADD puts an order in with score = due time (ms). ZRANGEBYSCORE ... LIMIT pulls the ones already due. Ordering is maintained by the skiplist, so “what is due now” is O(log N) instead of a full scan.</span><span class="bi-zh">ZADD 入队时把 score 设成到期时间戳；ZRANGEBYSCORE 按 score 范围取已到期的。有序性由跳表维护，所以“现在谁到期了”是 O(log N)，不用扫全表。</span></div>
+    <p class="tags"><span class="tag"><span class="in-en">must know</span><span class="in-zh">必背</span></span><span class="tag"><span class="in-en">3 min</span><span class="in-zh">3 分钟</span></span></p>
+    <button class="listen" data-listen type="button">🔊</button>
+  </div>
+
+  <section class="sec">
+    <h2><span class="num">01</span><span class="in-en">The four commands</span><span class="in-zh">四条命令搞定</span></h2>
+    <pre><code>-- 入队：到期时间作为 score
+ZADD order:delay <due_ms> "<orderNo>"
+
+-- 取件：score <= now 的，最多 100 条
+ZRANGEBYSCORE order:delay 0 <now_ms> LIMIT 0 100
+
+-- 处理成功后移除
+ZREM order:delay "<orderNo>"
+
+-- 取消订单时也移除
+ZREM order:delay "<orderNo>"</code></pre>
+    <p><span class="bi-en">Nothing else is needed: no table scan, no scheduler table, no polling of the orders table.</span><span class="bi-zh">不需要别的：不扫表、不建定时任务表、不轮询订单表。</span></p>
+  </section>
+  <section class="sec">
+    <h2><span class="num">02</span><span class="in-en">Compared with a DB scan</span><span class="in-zh">和扫表比</span></h2>
+    <table class="ledger">
+      <thead><tr><th></th><th><span class="in-en">DB scan every minute</span><span class="in-zh">每分钟扫表</span></th><th><span class="tm" data-t="Redis">Redis</span> <span class="tm" data-t="ZSet">ZSet</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="bi-en">cost</span><span class="bi-zh">成本</span></td><td><span class="bi-en">full scan hits rows</span><span class="bi-zh">扫到整张表</span></td><td><span class="bi-en">range query only</span><span class="bi-zh">只查范围内</span></td></tr>
+        <tr><td><span class="bi-en">precision</span><span class="bi-zh">精度</span></td><td><span class="bi-en">up to 60s late</span><span class="bi-zh">最多晚 60 秒</span></td><td><span class="bi-en">sub-second</span><span class="bi-zh">亚秒级</span></td></tr>
+        <tr><td><span class="bi-en">extra component</span><span class="bi-zh">额外组件</span></td><td><span class="bi-en">none</span><span class="bi-zh">无</span></td><td><span class="bi-en"><span class="tm" data-t="Redis">Redis</span> (usually already there)</span><span class="bi-zh">Redis（一般已有）</span></td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="sec">
+    <h2><span class="num">03</span><span class="in-en">Say it like this</span><span class="in-zh">面试这么说</span></h2>
+    <blockquote class="read"><span class="lbl"><span class="in-en">Say it like this</span><span class="in-zh">面试就这么说</span></span>
+      <p><span class="bi-en"><span class="tm" data-t="ZSet">ZSet</span> 天然按 score 有序，score 存到期时间戳，就能按时间取到期的单；入队和取件都是 O(log N)，比每分钟扫全表省得多，也不需要多一个中间件。</span><span class="bi-zh">ZSet 天然按 score 有序，score 存到期时间戳，就能按时间取到期的单；入队和取件都是 O(log N)，比每分钟扫全表省得多，也不需要多一个中间件。</span></p>
+    </blockquote>
+  </section>
+
+  <p class="log-tip"><a href="order-timeout.html"><span class="in-en">&#8592; Back to question 4</span><span class="in-zh">&#8592; 回到第 4 题</span></a></p>
+</main>
+
+<footer>
+  <div class="f-left"><span class="in-en">Written for learning English · Wang Tianyu</span><span class="in-zh">为学英语而写 · 王天宇</span></div>
+  <div class="f-right"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a><span class="sep">·</span><a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a></div>
+</footer>
+<script src="../assets/terms.js"></script>
+<script src="../assets/app.js"></script>
+</body>
+</html>

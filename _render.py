@@ -562,8 +562,8 @@ def page(path, data, on="", tail_blocks=None):
     </details>
   </section>""" % answers_html(data["answers"])
 
-        if tail_blocks:
-            body += "\n" + render_blocks(tail_blocks)
+    if tail_blocks:
+        body += "\n" + render_blocks(tail_blocks)
 
     subs = {
         "__TITLE__": data["title"][0], "__DESC__": data["title"][0],

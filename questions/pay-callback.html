@@ -182,6 +182,23 @@
     </ol>
     <p class="note"><span class="bi-en">Answer out loud first. Only then open the answers below.</span><span class="bi-zh">先自己出声答，再看下面的答案。</span></p>
   </section>
+  <section class="sec">
+    <h2><span class="num">09</span><span class="in-en">New questions this one opened</span><span class="in-zh">这道题又长出了哪些新问题</span></h2>
+    <p class="note"><span class="bi-en">Each one has its own page — click to read the long version.</span><span class="bi-zh">每条都有自己的一页，点进去看完整版。</span></p>
+    <table class="ledger">
+      <thead><tr><th><span class="in-en">Question</span><span class="in-zh">新问题</span></th><th><span class="in-en">One line</span><span class="in-zh">一句话</span></th><th></th></tr></thead>
+      <tbody>
+        <tr><td>为什么用唯一索引当锁，而不是先查再插？</td><td>两个线程能同时查出“不存在”；唯一索引是数据库自己把门的。</td><td><a class="dqlink" href="d2-unique-index.html">打开这一页</a></td></tr>
+        <tr><td>幂等记录插进去了，但业务崩了怎么办？</td><td>靠状态 CAS 兜底：只允许 PENDING → PAID，重试影响 0 行就按已处理返回。</td><td><a class="dqlink" href="d2-crash-after-idempotent.html">打开这一页</a></td></tr>
+        <tr><td>钱到了但订单已经关闭，怎么处理？</td><td>CAS 影响 0 行且状态 CLOSED → 比时间戳，走退款或复活订单。</td><td><a class="dqlink" href="d2-paid-but-closed.html">打开这一页</a></td></tr>
+        <tr><td>Redisson 的 watchdog 到底在续什么？</td><td>续的是锁的租约：线程活着才续，进程挂掉租约自然过期。</td><td><a class="dqlink" href="d2-watchdog.html">打开这一页</a></td></tr>
+        <tr><td>主从切换把锁丢了怎么办？</td><td>异步复制下锁可能没同步过去；靠数据库兜底（条件更新 + fencing token）。</td><td><a class="dqlink" href="d2-lock-lost-on-failover.html">打开这一页</a></td></tr>
+        <tr><td>MQ 消费重复和这个是一回事吗？</td><td>同一类病：所有 MQ 都是至少一次，去重必须在消费端做。</td><td><a class="dqlink" href="d2-mq-duplicate.html">打开这一页</a></td></tr>
+        <tr><td>那库存怎么保证只扣一次、还不超卖？</td><td>条件更新 where qty >= 1 防超卖；CAS 成功之后才扣，保证只扣一次。</td><td><a class="dqlink" href="d2-stock-once.html">打开这一页</a></td></tr>
+        <tr><td>数据库里除了唯一索引，还有哪些索引？</td><td>按作用七种：主键/唯一/普通/联合/覆盖/前缀/全文；结构基本 B+ 树。</td><td><a class="dqlink" href="d2-index-types.html">打开这一页</a></td></tr>
+      </tbody>
+    </table>
+  </section>
 
   <p class="log-tip"><a href="java-hashmap.html"><span class="in-en">← Question 1: HashMap</span><span class="in-zh">← 第 1 题：HashMap</span></a></p>
 </main>

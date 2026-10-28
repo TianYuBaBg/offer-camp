@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-CN" data-lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Delete the cache, do not update it — and delete it twice. · Java Notes</title>
+<meta name="description" content="Delete the cache, do not update it — and delete it twice.">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="masthead">
+  <div class="mh-left">
+    <a class="mh-mark" href="../index.html">Java Notes</a>
+    <nav class="mh-nav">
+      <a href="../questions/index.html" class="on"><span class="in-en">Questions</span><span class="in-zh">题目</span></a>
+      <a href="../basics/array.html"><span class="in-en">Basics</span><span class="in-zh">基础</span></a>
+      <a href="../glossary.html"><span class="in-en">Words</span><span class="in-zh">词表</span></a>
+      <a href="../terms.html"><span class="in-en">Terms</span><span class="in-zh">术语</span></a>
+      <a href="../speak.html"><span class="in-en">Phrasing</span><span class="in-zh">话术</span></a>
+    </nav>
+  </div>
+  <div class="mh-right">
+    <span class="langswitch">
+      <button type="button" data-lang-set="zh">中文</button>
+      <button type="button" data-lang-set="both">中英</button>
+      <button type="button" data-lang-set="en">English</button>
+    </span>
+  </div>
+</header>
+
+<main>
+  <p class="crumb"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a> / <a href="redis-cache.html"><span class="in-en">Q3</span><span class="in-zh">第 3 题</span></a> / <span class="in-en">Cache and DB consistency</span><span class="in-zh">缓存和库不一致</span></p>
+
+  <div class="qhead">
+    <p class="kicker"><span class="in-en">Follow-up 01</span><span class="in-zh">追问 01</span></p>
+    <h1><span class="in-en">Delete the cache, do not update it — and delete it twice.</span><span class="in-zh">写完删缓存，不要更新缓存；而且要删两次。</span></h1>
+    <p class="lede"><span class="in-en">Two concurrent writes can interleave so the older value lands in the cache last.</span><span class="in-zh">两个并发写交错时，旧值可能最后落进缓存。</span></p>
+    <div class="answerbox"><b><span class="in-en">Short answer</span><span class="in-zh">先给答案</span></b><span class="bi-en">Cache Aside: read → miss → load from DB → put with <span class="tm" data-t="TTL">TTL</span>; write → update DB → delete cache. Why delete instead of update: update needs a value that may itself be stale from a concurrent read. Why twice: a reader that loaded before your commit can write the old value back after your delete, so delete once more ~500ms later (or via a delayed message).</span><span class="bi-zh">Cache Aside：读 → 未命中 → 查库 → 回填带 TTL；写 → 更新库 → 删缓存。为什么删不更新：更新要用值，而这个值可能来自并发读的旧快照。为什么删两次：读请求可能在提交前拿到旧值，在你删除之后又写回缓存，所以约 500 毫秒后再删一次。</span></div>
+    <p class="tags"><span class="tag"><span class="in-en">must know</span><span class="in-zh">必背</span></span><span class="tag"><span class="in-en">3 min</span><span class="in-zh">3 分钟</span></span></p>
+    <button class="listen" data-listen type="button">🔊</button>
+  </div>
+
+  <section class="sec">
+    <h2><span class="num">01</span><span class="in-en">The interleaving that bites</span><span class="in-zh">会咬人的交错</span></h2>
+    <pre><code>T1: update db  (value = 2)
+T2: read db    (value = 1, still old snapshot)
+T1: delete cache
+T2: set cache = 1      <-- 旧值被写回，且不会自愈
+
+-- 所以 500ms 后再删一次，把这段窗口压掉</code></pre>
+    <p><span class="bi-en">This is also why “delete twice” is not paranoia — it is covering a specific interleaving.</span><span class="bi-zh">这也是“删两次”不是玄学的原因：它在盖一段具体的交错。</span></p>
+  </section>
+  <section class="sec">
+    <h2><span class="num">02</span><span class="in-en">When not to cache at all</span><span class="in-zh">什么时候干脆别缓存</span></h2>
+    <ul>
+      <li><span class="bi-en">Money, stock, and anything the user compares against a bank statement: read the master.</span><span class="bi-zh">钱、库存、任何用户会拿去和流水核对的东西：直接读主库。</span></li>
+      <li><span class="bi-en">If the read is already fast and the write is frequent, the cache is pure overhead.</span><span class="bi-zh">读本来就快、写又频繁，缓存纯粹是负担。</span></li>
+      <li><span class="bi-en">Say the boundary out loud: “strong consistency paths do not go through the cache”.</span><span class="bi-zh">把边界说出来：“强一致的链路不走缓存”。</span></li>
+    </ul>
+  </section>
+  <section class="sec">
+    <h2><span class="num">03</span><span class="in-en">Say it like this</span><span class="in-zh">面试这么说</span></h2>
+    <blockquote class="read"><span class="lbl"><span class="in-en">Say it like this</span><span class="in-zh">面试就这么说</span></span>
+      <p><span class="bi-en">一致性走 Cache Aside：写完删缓存，不更新缓存；再加一次延迟双删，大约 500 毫秒后再删一次。本质是最终一致——要说清“不一致窗口有多长”，别说“绝对一致”。</span><span class="bi-zh">一致性走 Cache Aside：写完删缓存，不更新缓存；再加一次延迟双删，大约 500 毫秒后再删一次。本质是最终一致——要说清“不一致窗口有多长”，别说“绝对一致”。</span></p>
+    </blockquote>
+  </section>
+
+  <p class="log-tip"><a href="redis-cache.html"><span class="in-en">&#8592; Back to question 3</span><span class="in-zh">&#8592; 回到第 3 题</span></a></p>
+</main>
+
+<footer>
+  <div class="f-left"><span class="in-en">Written for learning English · Wang Tianyu</span><span class="in-zh">为学英语而写 · 王天宇</span></div>
+  <div class="f-right"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a><span class="sep">·</span><a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a></div>
+</footer>
+<script src="../assets/terms.js"></script>
+<script src="../assets/app.js"></script>
+</body>
+</html>

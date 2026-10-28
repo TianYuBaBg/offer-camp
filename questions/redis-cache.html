@@ -198,6 +198,21 @@ For consistency we use Cache Aside: delete after writing, delete again after 500
     </ol>
     <p class="note"><span class="bi-en">Answer out loud first. Only then open the answers below.</span><span class="bi-zh">先自己出声答，再看下面的答案。</span></p>
   </section>
+  <section class="sec">
+    <h2><span class="num">09</span><span class="in-en">New questions this one opened</span><span class="in-zh">这道题又长出了哪些新问题</span></h2>
+    <p class="note"><span class="bi-en">Each one has its own page — click to read the long version.</span><span class="bi-zh">每条都有自己的一页，点进去看完整版。</span></p>
+    <table class="ledger">
+      <thead><tr><th><span class="in-en">Question</span><span class="in-zh">新问题</span></th><th><span class="in-en">One line</span><span class="in-zh">一句话</span></th><th></th></tr></thead>
+      <tbody>
+        <tr><td>缓存和数据库怎么保持一致？</td><td>Cache Aside：写完删缓存，500 毫秒后再删一次。</td><td><a class="dqlink" href="d3-cache-consistency.html">打开这一页</a></td></tr>
+        <tr><td>穿透和击穿到底差在哪？</td><td>穿透是数据不存在；击穿是一个热 key 过期被同时重建。</td><td><a class="dqlink" href="d3-penetration-vs-breakdown.html">打开这一页</a></td></tr>
+        <tr><td>Redis 挂了怎么办？</td><td>本地缓存 + 熔断限流，只读页降级。</td><td><a class="dqlink" href="d3-redis-down.html">打开这一页</a></td></tr>
+        <tr><td>热 key 打到一个分片怎么办？</td><td>本地缓存，再把 key 加随机后缀打散。</td><td><a class="dqlink" href="d3-hot-key.html">打开这一页</a></td></tr>
+        <tr><td>发布后要不要预热？</td><td>要，启动加载 Top N，否则第一分钟就是雪崩。</td><td><a class="dqlink" href="d3-warm-up.html">打开这一页</a></td></tr>
+        <tr><td>缓的是页面还是对象？</td><td>对象；整页缓存一改就失效。</td><td><a class="dqlink" href="d3-page-or-object.html">打开这一页</a></td></tr>
+      </tbody>
+    </table>
+  </section>
 
   <p class="log-tip"><a href="pay-callback.html"><span class="in-en">← Question 2: payment callback</span><span class="in-zh">← 第 2 题：支付回调</span></a></p>
 </main>

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="zh-CN" data-lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How JDK 7 turned a resize into a ring. · Java Notes</title>
+<meta name="description" content="How JDK 7 turned a resize into a ring.">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="masthead">
+  <div class="mh-left">
+    <a class="mh-mark" href="../index.html">Java Notes</a>
+    <nav class="mh-nav">
+      <a href="../questions/index.html" class="on"><span class="in-en">Questions</span><span class="in-zh">题目</span></a>
+      <a href="../basics/array.html"><span class="in-en">Basics</span><span class="in-zh">基础</span></a>
+      <a href="../glossary.html"><span class="in-en">Words</span><span class="in-zh">词表</span></a>
+      <a href="../terms.html"><span class="in-en">Terms</span><span class="in-zh">术语</span></a>
+      <a href="../speak.html"><span class="in-en">Phrasing</span><span class="in-zh">话术</span></a>
+    </nav>
+  </div>
+  <div class="mh-right">
+    <span class="langswitch">
+      <button type="button" data-lang-set="zh">中文</button>
+      <button type="button" data-lang-set="both">中英</button>
+      <button type="button" data-lang-set="en">English</button>
+    </span>
+  </div>
+</header>
+
+<main>
+  <p class="crumb"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a> / <a href="java-hashmap.html"><span class="in-en">Q1</span><span class="in-zh">第 1 题</span></a> / <span class="in-en">JDK 7 infinite loop</span><span class="in-zh">JDK 7 死循环</span></p>
+
+  <div class="qhead">
+    <p class="kicker"><span class="in-en">Follow-up 06</span><span class="in-zh">追问 06</span></p>
+    <h1><span class="in-en">How JDK 7 turned a resize into a ring.</span><span class="in-zh">JDK 7 是怎么把一次扩容变成环的。</span></h1>
+    <p class="lede"><span class="in-en">Head insertion plus concurrent resize can make two nodes point at each other forever.</span><span class="in-zh">头插法碰上并发扩容，可能让两个节点互相指向，永远转不出来。</span></p>
+    <div class="answerbox"><b><span class="in-en">Short answer</span><span class="in-zh">先给答案</span></b><span class="bi-en">JDK 7 linked new nodes at the head of the chain. Two threads resizing at once could interleave so that A.next = B and B.next = A. Any later get() into that bucket loops forever, burning 100% CPU.</span><span class="bi-zh">JDK 7 用头插法挂新节点。两个线程同时扩容时，可能交错成 A.next = B 且 B.next = A。之后任何 get 落到这个桶，就会在环里死转，CPU 打满。</span></div>
+    <p class="tags"><span class="tag"><span class="in-en">must know</span><span class="in-zh">必背</span></span><span class="tag"><span class="in-en">3 min</span><span class="in-zh">3 分钟</span></span></p>
+    <button class="listen" data-listen type="button">🔊</button>
+  </div>
+
+  <section class="sec">
+    <h2><span class="num">01</span><span class="in-en">Why head insertion is the problem</span><span class="in-zh">为什么问题出在头插法</span></h2>
+    <pre><code>// 头插：新节点总插到链头
+for (Entry e : oldTable[i]) {
+    Entry next = e.next;   // 记住下一个
+    e.next = newTable[j];  // 插到新表链头
+    newTable[j] = e;       // 成为新的头
+    e = next;
+}
+
+// 两个线程交错执行时，e.next 可能指回已经搬过的节点</code></pre>
+    <p><span class="bi-en">JDK 8 keeps the relative order (tail insertion + lo/hi split), so a ring cannot form. It still loses updates under concurrency — just without the infinite loop.</span><span class="bi-zh">JDK 8 保持相对顺序（尾插 + lo/hi 拆分），不会成环。但并发下依然会丢更新——只是不再死循环。</span></p>
+  </section>
+  <section class="sec">
+    <h2><span class="num">02</span><span class="in-en">What to say about it</span><span class="in-zh">面试怎么用这条</span></h2>
+    <p class="note"><span class="bi-en">Question is usually “is HashMap thread safe?”. Answer: no; JDK 7 could hang, JDK 8 loses data. Either way the fix is the same: use ConcurrentHashMap.</span><span class="bi-zh">这题通常问“HashMap 线程安全吗”。答：不安全；JDK 7 会挂死，JDK 8 会丢数据。不管哪种，解法都一样：换 ConcurrentHashMap。</span></p>
+  </section>
+  <section class="sec">
+    <h2><span class="num">03</span><span class="in-en">Say it like this</span><span class="in-zh">面试这么说</span></h2>
+    <blockquote class="read"><span class="lbl"><span class="in-en">Say it like this</span><span class="in-zh">面试就这么说</span></span>
+      <p><span class="bi-en">JDK 7 头插法 + 并发扩容会成环，get 永远转不出来，CPU 打满——这是最有名的 HashMap 事故。JDK 8 改成尾插 + 拆成 lo/hi 两条链，不会成环了，但并发 put 依然会丢数据。</span><span class="bi-zh">JDK 7 头插法 + 并发扩容会成环，get 永远转不出来，CPU 打满——这是最有名的 HashMap 事故。JDK 8 改成尾插 + 拆成 lo/hi 两条链，不会成环了，但并发 put 依然会丢数据。</span></p>
+    </blockquote>
+  </section>
+
+  <p class="log-tip"><a href="java-hashmap.html"><span class="in-en">&#8592; Back to question 1</span><span class="in-zh">&#8592; 回到第 1 题</span></a></p>
+</main>
+
+<footer>
+  <div class="f-left"><span class="in-en">Written for learning English · Wang Tianyu</span><span class="in-zh">为学英语而写 · 王天宇</span></div>
+  <div class="f-right"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a><span class="sep">·</span><a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a></div>
+</footer>
+<script src="../assets/terms.js"></script>
+<script src="../assets/app.js"></script>
+</body>
+</html>

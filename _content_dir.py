@@ -126,3 +126,36 @@ DERIVED["questions/pay-callback.html"] = [
     ("数据库里除了唯一索引，还有哪些索引？",
      "按作用七种：主键/唯一/普通/联合/覆盖/前缀/全文；结构基本 B+ 树。", "d2-index-types.html"),
 ]
+
+# 第 1 题：9 个追问各自成页
+DERIVED["questions/java-hashmap.html"] = [
+    ("为什么容量必须是 2 的幂？", "因为 h & (n-1) 等价于取模，只有 n 是 2 的幂时才成立。", "d1-capacity-power-of-two.html"),
+    ("为什么要先用 hash 的高 16 位异或一次？", "让高位也参与定位，减少碰撞；否则高位信息浪费。", "d1-hash-spread.html"),
+    ("为什么链表到 8 才转红黑树，而不是 4？", "泊松分布下 8 的概率约千万分之六；树节点更贵，够坏才划算。", "d1-treeify-8.html"),
+    ("为什么退化阈值是 6，不是 7？", "留一格缓冲，避免在 7–8 之间来回转换。", "d1-untreeify-6.html"),
+    ("为什么负载因子是 0.75？", "空间和冲突的折中：太低浪费内存，太高链变长。", "d1-load-factor.html"),
+    ("JDK 7 的死循环具体怎么成的？", "头插法 + 并发扩容，两条链互相指向，get 时永远转不出来。", "d1-jdk7-infinite-loop.html"),
+    ("并发场景到底用哪个？", "ConcurrentHashMap：桶级锁 + CAS，读不加锁。", "d1-concurrent-map.html"),
+    ("它能当缓存用吗？", "本机临时可以，但没上限、没过期、非线程安全——正经缓存用 Caffeine 或 Redis。", "d1-as-cache.html"),
+    ("缓存会出什么问题？", "穿透、击穿、雪崩，三种根因不同、治法不同。", "d1-cache-problems.html"),
+]
+
+# 第 3 题：6 个追问各自成页
+DERIVED["questions/redis-cache.html"] = [
+    ("缓存和数据库怎么保持一致？", "Cache Aside：写完删缓存，500 毫秒后再删一次。", "d3-cache-consistency.html"),
+    ("穿透和击穿到底差在哪？", "穿透是数据不存在；击穿是一个热 key 过期被同时重建。", "d3-penetration-vs-breakdown.html"),
+    ("Redis 挂了怎么办？", "本地缓存 + 熔断限流，只读页降级。", "d3-redis-down.html"),
+    ("热 key 打到一个分片怎么办？", "本地缓存，再把 key 加随机后缀打散。", "d3-hot-key.html"),
+    ("发布后要不要预热？", "要，启动加载 Top N，否则第一分钟就是雪崩。", "d3-warm-up.html"),
+    ("缓的是页面还是对象？", "对象；整页缓存一改就失效。", "d3-page-or-object.html"),
+]
+
+# 第 4 题：6 个追问各自成页
+DERIVED["questions/order-timeout.html"] = [
+    ("为什么 ZSet 能做延时队列？", "score 就是到期时间戳，范围查询天然按时间有序。", "d4-zset-as-delay-queue.html"),
+    ("两个实例会不会重复关单？", "按单加锁 + 状态 CAS，锁丢了 CAS 也让重复变空操作。", "d4-two-instances.html"),
+    ("关单和支付回调撞上怎么办？", "谁先改到状态谁赢，后到的走退款或直接退出。", "d4-race-with-callback.html"),
+    ("ZSet 里十万条会慢吗？", "按分钟分桶建 key，每批 LIMIT，空分片删掉。", "d4-zset-size.html"),
+    ("RabbitMQ 做延迟队列有哪两种方式？", "消息 TTL + 死信交换机；或 delayed-message 插件。", "d4-rabbitmq-ttl.html"),
+    ("消息丢了怎么兜底？", "每日补偿扫描 PENDING 超时单，配合幂等。", "d4-message-loss.html"),
+]
