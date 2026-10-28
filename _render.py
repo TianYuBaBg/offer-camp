@@ -7,6 +7,22 @@ import _annotate as T
 BASE = "https://tianyubabg.github.io/offer-camp/"
 
 CSS_EXTRA = """
+/* ===== 题页末尾「新问题」：点开即看答案 ===== */
+.dqlist{ margin-top:14px; border-top:1px solid var(--line); }
+.dqa{ border-bottom:1px solid var(--line); }
+.dqa summary{ list-style:none; cursor:pointer; display:flex; align-items:baseline; gap:10px;
+  padding:14px 2px; font-size:15px; font-family:var(--serif); font-weight:600; }
+.dqa summary::-webkit-details-marker{ display:none; }
+.dqa summary:before{ content:"+"; color:#A33; font-family:var(--mono); font-size:13px; width:12px; }
+.dqa[open] summary:before{ content:"–"; }
+.dqa summary .qt{ flex:1; }
+.dqa summary .dqt{ font-size:11px; color:var(--ink-faint); letter-spacing:.06em; white-space:nowrap; }
+.dqa .dqb{ padding:0 0 16px 22px; font-size:14.5px; line-height:1.95; color:var(--ink-soft); }
+.dqa .dqb p{ margin:0 0 8px; }
+.dqlink{ font-family:var(--mono); font-size:12px; color:#A33; border-bottom:1px solid rgba(163,51,51,.4); }
+main .ledger a.dqrow{ color:inherit; text-decoration:none; border-bottom:0; display:inline; }
+main .ledger a.dqrow:hover{ color:#A33; }
+
 /* ===== 术语表：五列（词 / 谐音 / 音标 / 含义 / 发音） ===== */
 .word.five{ grid-template-columns: 1.05fr .6fr .82fr 2.1fr auto; }
 .word.four{ grid-template-columns: 240px 1fr auto; }
@@ -593,6 +609,21 @@ def write_assets():
 
 
 JS_EXTRA = r"""
+/* 题页「新问题」：带 hash 打开对应折叠块 */
+(function(){
+  function openHash(){
+    var h = (location.hash || "").slice(1);
+    if(!h) return;
+    var el = document.getElementById(h);
+    if(el && el.tagName === 'DETAILS'){
+      el.open = true;
+      setTimeout(function(){ el.scrollIntoView({block:'center'}); }, 60);
+    }
+  }
+  window.addEventListener('hashchange', openHash);
+  window.addEventListener('load', openHash);
+})();
+
 /* ===== 术语注解：点一下看谐音和含义 ===== */
 (function(){
   var T = window.TERMS || {};

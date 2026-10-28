@@ -103,17 +103,38 @@ GAME_CARD = """    <p class="lnline">
 
 
 def derived_section(path, number):
+    """题页末尾：这张表是"又长出了哪些问题"，有答案的做成可展开块。"""
     items = DERIVED.get(path) or []
     if not items:
         return None
-    rows = []
-    for q, a, href in items:
-        where = ('<a href="%s">打开</a>' % href) if href else '<span class="todoq">待写</span>'
-        rows.append([(q, q), (a, a), (where, where)])
-    return ("h2", number, "New questions this one opened", "这道题又长出了哪些新问题",
-            [("note", "A good answer opens the next question. That is the whole method.",
-              "一个答案会生出下一个问题——方法就是这个。"),
-             ("table", [("Question", "新问题"), ("One line", "一句话"), ("", "")], rows)])
+    rows, blocks = [], []
+    for i, it in enumerate(items, 1):
+        q, a = it[0], it[1]
+        href = it[2] if len(it) > 2 else ""
+        ans = it[3:] if len(it) > 4 else ()
+        q_html, a_html = q, a
+        if ans:
+            where = '<a class="dqlink" href="%s">展开</a>' % href
+            q_html = '<a class="dqrow" href="%s">%s</a>' % (href, q)
+            a_html = '<a class="dqrow" href="%s">%s</a>' % (href, a)
+            en_t, zh_t = ans[0], ans[1]
+            blocks.append(
+                '      <details class="dqa" id="%s">'
+                '<summary><span class="qn">%02d</span><span class="qt">%s</span><span class="dqt">点开看答案</span></summary>'
+                '<div class="dqb"><p class="bi-en">%s</p><p class="bi-zh">%s</p></div></details>'
+                % (href.lstrip("#"), i, q, en_t, zh_t))
+        elif href:
+            where = '<a class="dqlink" href="%s">打开</a>' % href
+        else:
+            where = '<span class="todoq">待写</span>'
+        rows.append([(q_html, q_html), (a_html, a_html), (where, where)])
+    body = [("note", "A good answer opens the next question. Click any row to unfold the answer.",
+             "一个答案会生出下一个问题。点任意一行，答案就在原地展开。"),
+            ("table", [("Question", "新问题"), ("One line", "一句话"), ("", "")], rows)]
+    if blocks:
+        joined = chr(10).join(blocks)
+        body.append(("html", "    <div class=\"dqlist\">" + chr(10) + joined + chr(10) + "    </div>"))
+    return ("h2", number, "New questions this one opened", "这道题又长出了哪些新问题", body)
 
 
 # ============ 高级程序员话术语录 ============

@@ -106,6 +106,21 @@
   });
 })();
 
+/* 题页「新问题」：带 hash 打开对应折叠块 */
+(function(){
+  function openHash(){
+    var h = (location.hash || "").slice(1);
+    if(!h) return;
+    var el = document.getElementById(h);
+    if(el && el.tagName === 'DETAILS'){
+      el.open = true;
+      setTimeout(function(){ el.scrollIntoView({block:'center'}); }, 60);
+    }
+  }
+  window.addEventListener('hashchange', openHash);
+  window.addEventListener('load', openHash);
+})();
+
 /* ===== 术语注解：点一下看谐音和含义 ===== */
 (function(){
   var T = window.TERMS || {};

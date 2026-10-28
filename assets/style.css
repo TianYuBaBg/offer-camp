@@ -1052,6 +1052,204 @@ pre code{background:none; padding:0; font-size:inherit}
      border:1px solid #C9BEAA;background:transparent;color:var(--ink);padding:4px 8px;cursor:pointer;text-decoration:none}
 #pop .act a:hover,#pop .act button:hover{border-color:#A33;color:#A33}
 
+/* ===== 题页末尾「新问题」：点开即看答案 ===== */
+.dqlist{ margin-top:14px; border-top:1px solid var(--line); }
+.dqa{ border-bottom:1px solid var(--line); }
+.dqa summary{ list-style:none; cursor:pointer; display:flex; align-items:baseline; gap:10px;
+  padding:14px 2px; font-size:15px; font-family:var(--serif); font-weight:600; }
+.dqa summary::-webkit-details-marker{ display:none; }
+.dqa summary:before{ content:"+"; color:#A33; font-family:var(--mono); font-size:13px; width:12px; }
+.dqa[open] summary:before{ content:"2"; }
+.dqa summary .qt{ flex:1; }
+.dqa summary .dqt{ font-size:11px; color:var(--ink-faint); letter-spacing:.06em; white-space:nowrap; }
+.dqa .dqb{ padding:0 0 16px 22px; font-size:14.5px; line-height:1.95; color:var(--ink-soft); }
+.dqa .dqb p{ margin:0 0 8px; }
+.dqlink{ font-family:var(--mono); font-size:12px; color:#A33; border-bottom:1px solid rgba(163,51,51,.4); }
+
+/* ===== 术语表：五列（词 / 谐音 / 音标 / 含义 / 发音） ===== */
+.word.five{ grid-template-columns: 1.05fr .6fr .82fr 2.1fr auto; }
+.word.four{ grid-template-columns: 240px 1fr auto; }
+.read{ font-family: var(--sans); font-size: 12.5px; color: #8E2B2B; letter-spacing: .02em; }
+.word.five .w{ overflow-wrap: anywhere; }
+/* ===== 术语注解 ===== */
+.tm{background:rgba(163,51,51,.12);border-radius:2px;padding:1px 2px 0;cursor:help;
+    text-decoration:underline solid rgba(163,51,51,.85);text-decoration-thickness:2px;
+    text-underline-offset:3px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.tm:hover{background:rgba(163,51,51,.26);text-decoration-color:#8E2B2B}
+#pop{position:fixed;z-index:80;width:330px;max-width:calc(100vw - 32px);display:none;
+     background:#FBF7EC;border:1px solid #C9BEAA;border-radius:3px;padding:13px 15px;
+     box-shadow:0 12px 32px rgba(40,30,10,.16)}
+#pop .hd{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+#pop .k{font-family:var(--mono);font-size:15px;letter-spacing:.02em;color:var(--ink)}
+#pop .r{color:#A33;font-size:13.5px;letter-spacing:.04em}
+#pop .ipa{font-family:var(--mono);font-size:11px;color:#8a8378}
+#pop .zh{margin-top:9px;font-size:13px;line-height:1.75;color:var(--ink)}
+#pop .en{margin-top:7px;font-size:11.5px;line-height:1.6;color:#6b6459;font-family:var(--mono)}
+#pop .act{margin-top:11px;display:flex;gap:8px;flex-wrap:wrap}
+#pop .act a,#pop .act button{font-family:var(--mono);font-size:10px;letter-spacing:.08em;
+     border:1px solid #C9BEAA;background:transparent;color:var(--ink);padding:4px 8px;cursor:pointer;text-decoration:none}
+#pop .act a:hover,#pop .act button:hover{border-color:#A33;color:#A33}
+
+/* ===== 题页末尾「新问题」：点开即看答案 ===== */
+.dqlist{ margin-top:14px; border-top:1px solid var(--line); }
+.dqa{ border-bottom:1px solid var(--line); }
+.dqa summary{ list-style:none; cursor:pointer; display:flex; align-items:baseline; gap:10px;
+  padding:14px 2px; font-size:15px; font-family:var(--serif); font-weight:600; }
+.dqa summary::-webkit-details-marker{ display:none; }
+.dqa summary:before{ content:"+"; color:#A33; font-family:var(--mono); font-size:13px; width:12px; }
+.dqa[open] summary:before{ content:"2"; }
+.dqa summary .qt{ flex:1; }
+.dqa summary .dqt{ font-size:11px; color:var(--ink-faint); letter-spacing:.06em; white-space:nowrap; }
+.dqa .dqb{ padding:0 0 16px 22px; font-size:14.5px; line-height:1.95; color:var(--ink-soft); }
+.dqa .dqb p{ margin:0 0 8px; }
+.dqlink{ font-family:var(--mono); font-size:12px; color:#A33; border-bottom:1px solid rgba(163,51,51,.4); }
+a.dqrow{ color:inherit; border:0; display:block; }
+a.dqrow:hover{ color:#A33; }
+
+/* ===== 术语表：五列（词 / 谐音 / 音标 / 含义 / 发音） ===== */
+.word.five{ grid-template-columns: 1.05fr .6fr .82fr 2.1fr auto; }
+.word.four{ grid-template-columns: 240px 1fr auto; }
+.read{ font-family: var(--sans); font-size: 12.5px; color: #8E2B2B; letter-spacing: .02em; }
+.word.five .w{ overflow-wrap: anywhere; }
+/* ===== 术语注解 ===== */
+.tm{background:rgba(163,51,51,.12);border-radius:2px;padding:1px 2px 0;cursor:help;
+    text-decoration:underline solid rgba(163,51,51,.85);text-decoration-thickness:2px;
+    text-underline-offset:3px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.tm:hover{background:rgba(163,51,51,.26);text-decoration-color:#8E2B2B}
+#pop{position:fixed;z-index:80;width:330px;max-width:calc(100vw - 32px);display:none;
+     background:#FBF7EC;border:1px solid #C9BEAA;border-radius:3px;padding:13px 15px;
+     box-shadow:0 12px 32px rgba(40,30,10,.16)}
+#pop .hd{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+#pop .k{font-family:var(--mono);font-size:15px;letter-spacing:.02em;color:var(--ink)}
+#pop .r{color:#A33;font-size:13.5px;letter-spacing:.04em}
+#pop .ipa{font-family:var(--mono);font-size:11px;color:#8a8378}
+#pop .zh{margin-top:9px;font-size:13px;line-height:1.75;color:var(--ink)}
+#pop .en{margin-top:7px;font-size:11.5px;line-height:1.6;color:#6b6459;font-family:var(--mono)}
+#pop .act{margin-top:11px;display:flex;gap:8px;flex-wrap:wrap}
+#pop .act a,#pop .act button{font-family:var(--mono);font-size:10px;letter-spacing:.08em;
+     border:1px solid #C9BEAA;background:transparent;color:var(--ink);padding:4px 8px;cursor:pointer;text-decoration:none}
+#pop .act a:hover,#pop .act button:hover{border-color:#A33;color:#A33}
+
+/* ===== 题页末尾「新问题」：点开即看答案 ===== */
+.dqlist{ margin-top:14px; border-top:1px solid var(--line); }
+.dqa{ border-bottom:1px solid var(--line); }
+.dqa summary{ list-style:none; cursor:pointer; display:flex; align-items:baseline; gap:10px;
+  padding:14px 2px; font-size:15px; font-family:var(--serif); font-weight:600; }
+.dqa summary::-webkit-details-marker{ display:none; }
+.dqa summary:before{ content:"+"; color:#A33; font-family:var(--mono); font-size:13px; width:12px; }
+.dqa[open] summary:before{ content:"2"; }
+.dqa summary .qt{ flex:1; }
+.dqa summary .dqt{ font-size:11px; color:var(--ink-faint); letter-spacing:.06em; white-space:nowrap; }
+.dqa .dqb{ padding:0 0 16px 22px; font-size:14.5px; line-height:1.95; color:var(--ink-soft); }
+.dqa .dqb p{ margin:0 0 8px; }
+.dqlink{ font-family:var(--mono); font-size:12px; color:#A33; border-bottom:1px solid rgba(163,51,51,.4); }
+main .ledger a.dqrow{ color:inherit; text-decoration:none; border-bottom:0; display:inline; }
+main .ledger a.dqrow:hover{ color:#A33; }
+
+/* ===== 术语表：五列（词 / 谐音 / 音标 / 含义 / 发音） ===== */
+.word.five{ grid-template-columns: 1.05fr .6fr .82fr 2.1fr auto; }
+.word.four{ grid-template-columns: 240px 1fr auto; }
+.read{ font-family: var(--sans); font-size: 12.5px; color: #8E2B2B; letter-spacing: .02em; }
+.word.five .w{ overflow-wrap: anywhere; }
+/* ===== 术语注解 ===== */
+.tm{background:rgba(163,51,51,.12);border-radius:2px;padding:1px 2px 0;cursor:help;
+    text-decoration:underline solid rgba(163,51,51,.85);text-decoration-thickness:2px;
+    text-underline-offset:3px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.tm:hover{background:rgba(163,51,51,.26);text-decoration-color:#8E2B2B}
+#pop{position:fixed;z-index:80;width:330px;max-width:calc(100vw - 32px);display:none;
+     background:#FBF7EC;border:1px solid #C9BEAA;border-radius:3px;padding:13px 15px;
+     box-shadow:0 12px 32px rgba(40,30,10,.16)}
+#pop .hd{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+#pop .k{font-family:var(--mono);font-size:15px;letter-spacing:.02em;color:var(--ink)}
+#pop .r{color:#A33;font-size:13.5px;letter-spacing:.04em}
+#pop .ipa{font-family:var(--mono);font-size:11px;color:#8a8378}
+#pop .zh{margin-top:9px;font-size:13px;line-height:1.75;color:var(--ink)}
+#pop .en{margin-top:7px;font-size:11.5px;line-height:1.6;color:#6b6459;font-family:var(--mono)}
+#pop .act{margin-top:11px;display:flex;gap:8px;flex-wrap:wrap}
+#pop .act a,#pop .act button{font-family:var(--mono);font-size:10px;letter-spacing:.08em;
+     border:1px solid #C9BEAA;background:transparent;color:var(--ink);padding:4px 8px;cursor:pointer;text-decoration:none}
+#pop .act a:hover,#pop .act button:hover{border-color:#A33;color:#A33}
+
+/* ===== 题页末尾「新问题」：点开即看答案 ===== */
+.dqlist{ margin-top:14px; border-top:1px solid var(--line); }
+.dqa{ border-bottom:1px solid var(--line); }
+.dqa summary{ list-style:none; cursor:pointer; display:flex; align-items:baseline; gap:10px;
+  padding:14px 2px; font-size:15px; font-family:var(--serif); font-weight:600; }
+.dqa summary::-webkit-details-marker{ display:none; }
+.dqa summary:before{ content:"+"; color:#A33; font-family:var(--mono); font-size:13px; width:12px; }
+.dqa[open] summary:before{ content:"2"; }
+.dqa summary .qt{ flex:1; }
+.dqa summary .dqt{ font-size:11px; color:var(--ink-faint); letter-spacing:.06em; white-space:nowrap; }
+.dqa .dqb{ padding:0 0 16px 22px; font-size:14.5px; line-height:1.95; color:var(--ink-soft); }
+.dqa .dqb p{ margin:0 0 8px; }
+.dqlink{ font-family:var(--mono); font-size:12px; color:#A33; border-bottom:1px solid rgba(163,51,51,.4); }
+main .ledger a.dqrow{ color:inherit; text-decoration:none; border-bottom:0; display:inline; }
+main .ledger a.dqrow:hover{ color:#A33; }
+
+/* ===== 术语表：五列（词 / 谐音 / 音标 / 含义 / 发音） ===== */
+.word.five{ grid-template-columns: 1.05fr .6fr .82fr 2.1fr auto; }
+.word.four{ grid-template-columns: 240px 1fr auto; }
+.read{ font-family: var(--sans); font-size: 12.5px; color: #8E2B2B; letter-spacing: .02em; }
+.word.five .w{ overflow-wrap: anywhere; }
+/* ===== 术语注解 ===== */
+.tm{background:rgba(163,51,51,.12);border-radius:2px;padding:1px 2px 0;cursor:help;
+    text-decoration:underline solid rgba(163,51,51,.85);text-decoration-thickness:2px;
+    text-underline-offset:3px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.tm:hover{background:rgba(163,51,51,.26);text-decoration-color:#8E2B2B}
+#pop{position:fixed;z-index:80;width:330px;max-width:calc(100vw - 32px);display:none;
+     background:#FBF7EC;border:1px solid #C9BEAA;border-radius:3px;padding:13px 15px;
+     box-shadow:0 12px 32px rgba(40,30,10,.16)}
+#pop .hd{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+#pop .k{font-family:var(--mono);font-size:15px;letter-spacing:.02em;color:var(--ink)}
+#pop .r{color:#A33;font-size:13.5px;letter-spacing:.04em}
+#pop .ipa{font-family:var(--mono);font-size:11px;color:#8a8378}
+#pop .zh{margin-top:9px;font-size:13px;line-height:1.75;color:var(--ink)}
+#pop .en{margin-top:7px;font-size:11.5px;line-height:1.6;color:#6b6459;font-family:var(--mono)}
+#pop .act{margin-top:11px;display:flex;gap:8px;flex-wrap:wrap}
+#pop .act a,#pop .act button{font-family:var(--mono);font-size:10px;letter-spacing:.08em;
+     border:1px solid #C9BEAA;background:transparent;color:var(--ink);padding:4px 8px;cursor:pointer;text-decoration:none}
+#pop .act a:hover,#pop .act button:hover{border-color:#A33;color:#A33}
+
+/* ===== 题页末尾「新问题」：点开即看答案 ===== */
+.dqlist{ margin-top:14px; border-top:1px solid var(--line); }
+.dqa{ border-bottom:1px solid var(--line); }
+.dqa summary{ list-style:none; cursor:pointer; display:flex; align-items:baseline; gap:10px;
+  padding:14px 2px; font-size:15px; font-family:var(--serif); font-weight:600; }
+.dqa summary::-webkit-details-marker{ display:none; }
+.dqa summary:before{ content:"+"; color:#A33; font-family:var(--mono); font-size:13px; width:12px; }
+.dqa[open] summary:before{ content:"–"; }
+.dqa summary .qt{ flex:1; }
+.dqa summary .dqt{ font-size:11px; color:var(--ink-faint); letter-spacing:.06em; white-space:nowrap; }
+.dqa .dqb{ padding:0 0 16px 22px; font-size:14.5px; line-height:1.95; color:var(--ink-soft); }
+.dqa .dqb p{ margin:0 0 8px; }
+.dqlink{ font-family:var(--mono); font-size:12px; color:#A33; border-bottom:1px solid rgba(163,51,51,.4); }
+main .ledger a.dqrow{ color:inherit; text-decoration:none; border-bottom:0; display:inline; }
+main .ledger a.dqrow:hover{ color:#A33; }
+
+/* ===== 术语表：五列（词 / 谐音 / 音标 / 含义 / 发音） ===== */
+.word.five{ grid-template-columns: 1.05fr .6fr .82fr 2.1fr auto; }
+.word.four{ grid-template-columns: 240px 1fr auto; }
+.read{ font-family: var(--sans); font-size: 12.5px; color: #8E2B2B; letter-spacing: .02em; }
+.word.five .w{ overflow-wrap: anywhere; }
+/* ===== 术语注解 ===== */
+.tm{background:rgba(163,51,51,.12);border-radius:2px;padding:1px 2px 0;cursor:help;
+    text-decoration:underline solid rgba(163,51,51,.85);text-decoration-thickness:2px;
+    text-underline-offset:3px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.tm:hover{background:rgba(163,51,51,.26);text-decoration-color:#8E2B2B}
+#pop{position:fixed;z-index:80;width:330px;max-width:calc(100vw - 32px);display:none;
+     background:#FBF7EC;border:1px solid #C9BEAA;border-radius:3px;padding:13px 15px;
+     box-shadow:0 12px 32px rgba(40,30,10,.16)}
+#pop .hd{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+#pop .k{font-family:var(--mono);font-size:15px;letter-spacing:.02em;color:var(--ink)}
+#pop .r{color:#A33;font-size:13.5px;letter-spacing:.04em}
+#pop .ipa{font-family:var(--mono);font-size:11px;color:#8a8378}
+#pop .zh{margin-top:9px;font-size:13px;line-height:1.75;color:var(--ink)}
+#pop .en{margin-top:7px;font-size:11.5px;line-height:1.6;color:#6b6459;font-family:var(--mono)}
+#pop .act{margin-top:11px;display:flex;gap:8px;flex-wrap:wrap}
+#pop .act a,#pop .act button{font-family:var(--mono);font-size:10px;letter-spacing:.08em;
+     border:1px solid #C9BEAA;background:transparent;color:var(--ink);padding:4px 8px;cursor:pointer;text-decoration:none}
+#pop .act a:hover,#pop .act button:hover{border-color:#A33;color:#A33}
+
 /* ===== 语言切换 ===== */
 html[data-lang="zh"] .bi-en, html[data-lang="zh"] .in-en { display: none !important; }
 html[data-lang="en"] .bi-zh, html[data-lang="en"] .in-zh { display: none !important; }
