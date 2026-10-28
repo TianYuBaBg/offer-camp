@@ -11,19 +11,28 @@ INDEX = {
              "So every page gives one idea, five new words, and three questions I answer out loud.",
              "我不懂 Java，而且我想用英文学，不是用中文背。所以每一页只讲一个概念、"
              "给五个新词、三道要出声回答的题。"),
-    "tags": [("8 questions", "8 个问题"), ("7 lessons", "7 节课"), ("3 tools", "3 个工具")],
+    "tags": [("8 questions", "8 道题"), ("7 lessons", "7 节课"), ("4 tools", "4 个工具")],
     "blocks": [
-        ("h2", "01", "Directory: pick one question",
-         "目录：挑一个问题进去学",
+        ("h2", "01", "Pick a question", "挑一道题进去学",
          [
-             ("p", "Every row is one question and its own page. Read top to bottom if you are new; "
-                   "jump to any row if you already know the answer.",
-              "每一行就是一个问题、一个独立页面。刚开始就从上往下读；已经会了就直接跳。"),
-             ("html", "__DIRECTORY__"),
-             ("note", "Grey rows are not written yet. The list grows; nothing is removed.",
-              "灰色的是还没写的。这张表只会变长，不会删。"),
+             ("p", "Every row is one question with its own page. Start at the top if you are new; "
+                   "each page ends with the new questions it opened.",
+              "每一行是一道题，各自一页。刚从上往下读；每页最后会列出“这道题又长出了哪些新问题”。"),
+             ("html", "__QLIST__"),
+             ("note", "Grey rows are not written yet. The list only grows.",
+              "灰色的是还没写的。这张表只会变长。"),
          ]),
-        ("h2", "02", "How to read a page", "怎么读一页",
+        ("h2", "02", "The ground: seven lessons", "地基：七节课",
+         [
+             ("p", "The questions above are answered in about 600 English words each; the lessons are the pieces they are built from.",
+              "上面每道题的答案大约 600 个英文词；七节课是它们脚下的零件。"),
+             ("html", "__LESSONS__"),
+         ]),
+        ("h2", "03", "Tools", "工具与练习",
+         [
+             ("html", "__TOOLS__"),
+         ]),
+        ("h2", "04", "How to read a page", "怎么读一页",
          [
              ("ol", [
                  ("Press <b>🔊</b> at the top. Follow the words with your eyes. Twice is enough.",
@@ -34,13 +43,13 @@ INDEX = {
                   "在新词里点 <b>▶ hear it</b>，听真人发音，每个词大声说三遍。"),
                  ("Answer the three questions at the bottom <b>out loud</b>, not in your head.",
                   "页面底部三道题要<b>出声</b>回答，不要只在心里想。"),
-                 ("Then go back to the directory. One row a day is enough.",
-                  "然后回目录。一天一行就够。"),
+                 ("Then open the <b>new questions</b> section at the end of the page — that is where the next step is.",
+                  "然后看页面最后的<b>新问题</b>——下一步就在那里。"),
              ]),
-             ("note", "Twenty minutes a row. The directory is the plan — do not hold it in your head.",
-              "一行二十分钟。计划就在目录里，不用记在脑子里。"),
+             ("note", "Twenty minutes a page. The list is the plan; do not hold it in your head.",
+              "一页二十分钟。计划就在列表里，不用记在脑子里。"),
          ]),
-        ("h2", "03", "Why English, and why so slow", "为什么要英文、为什么这么慢",
+        ("h2", "05", "Why English, and why so slow", "为什么要英文、为什么这么慢",
          [
              ("p", "In an interview the words are English: <i>bucket</i>, <i>collision</i>, <i>resize</i>. "
                    "If I only know the Chinese word, I hear a sound I cannot follow.",

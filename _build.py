@@ -7,7 +7,7 @@ from _content_b import L5, L6, L7, QUESTION, ABOUT, GLOSSARY
 from _content_a import SPINE
 from _content_q2 import QUESTION2, QINDEX
 from _content_speak import SPEAK
-from _content_dir import DIRECTORY, LESSONS, TOOLS
+from _content_dir import QLIST, DERIVED, LESSONS, TOOLS
 from _answers import ANSWERS, INDEX_QA_HEAD, INDEX_QA
 
 R.write_assets()
@@ -49,36 +49,61 @@ def spine_html():
 
 
 
-# ============ 首页目录 ============
-def directory_html():
+# ============ 首页：题目列表 ============
+QTPL = """    <div class="qlist2">
+      <a href="{href}">
+        <span class="num">{n}</span>
+        <span class="t">{t}<span class="a">{a}</span></span>
+        <span class="m">{m}</span>
+      </a>
+    </div>"""
+
+SOONTPL = """    <div class="qlist2 soon">
+      <span class="row">
+        <span class="num">{n}</span>
+        <span class="t">{t}<span class="a">{a}</span></span>
+        <span class="m">{m}</span>
+      </span>
+    </div>"""
+
+
+def qlist_html(rows):
     out = []
-    for zh, en, rows in DIRECTORY:
-        out.append('    <div class="dir">')
-        out.append('    <div class="grp"><div class="gt"><span class="zh">%s</span><span>%s</span></div>' % (zh, en))
-        for r in rows:
-            row = ('<span class="n">%s</span>'
-                   '<span class="t">%s<span class="a">%s</span></span>'
-                   '<span class="m">%s</span>' % (r["n"], r["t"], r["a"], r["m"]))
-            if r["href"]:
-                out.append('    <a href="%s">%s</a>' % (r["href"], row))
-            else:
-                out.append('    <div class="row soon">%s</div>' % row)
-        out.append('    </div>')
-    # 七节课
+    for r in rows:
+        if r["href"]:
+            out.append(QTPL.format(**r))
+        else:
+            out.append(SOONTPL.format(**r))
+    return "\n".join(out)
+
+
+def lessons_html():
     links = " · ".join('<a href="%s">%s %s</a>' % (h, n, t) for n, t, h in LESSONS)
-    out.append('    <div class="grp"><div class="gt"><span class="zh">地基：七节课</span><span>Lessons</span></div>')
-    out.append('    <div class="row"><span class="n">L</span><span class="t" style="font-size:14px;font-weight:400"'
-               '><span class="ln">%s</span></span><span class="m">7 页</span></div>' % links)
-    out.append('    </div>')
-    # 工具
-    out.append('    <div class="grp"><div class="gt"><span class="zh">工具与练习</span><span>Tools</span></div>')
+    return '    <p class="lnline">%s</p>' % links
+
+
+def tools_html():
+    out = ['    <div class="qlist2">']
     for t, a, h, m in TOOLS:
-        out.append('    <a href="%s"><span class="n">T</span>'
+        out.append('      <a href="%s"><span class="num">T</span>'
                    '<span class="t">%s<span class="a">%s</span></span>'
                    '<span class="m">%s</span></a>' % (h, t, a, m))
     out.append('    </div>')
-    out.append('    </div>')
     return "\n".join(out)
+
+
+def derived_section(path, number):
+    items = DERIVED.get(path) or []
+    if not items:
+        return None
+    rows = []
+    for q, a, href in items:
+        where = ('<a href="%s">打开</a>' % href) if href else '<span class="todoq">待写</span>'
+        rows.append([(q, q), (a, a), (where, where)])
+    return ("h2", number, "New questions this one opened", "这道题又长出了哪些新问题",
+            [("note", "A good answer opens the next question. That is the whole method.",
+              "一个答案会生出下一个问题——方法就是这个。"),
+             ("table", [("Question", "新问题"), ("One line", "一句话"), ("", "")], rows)])
 
 
 # ============ 高级程序员话术语录 ============
@@ -163,8 +188,22 @@ for lesson in (L1, L2, L3, L4, L5, L6, L7):
     R.page(lesson["path"], lesson, on="b")
 
 # 题目
-R.page(QUESTION["path"], QUESTION, on="q")
-R.page(QUESTION2["path"], QUESTION2, on="q")
+def _with_derived(page):
+    sec = derived_section(page["path"], "%02d" % (len([b for b in page["blocks"] if b[0] == "h2"]) + 1))
+    if sec:
+        page["blocks"] = list(page["blocks"]) + [sec]
+    return page
+
+
+R.page(QUESTION["path"], _with_derived(QUESTION), on="q")
+R.page(QUESTION2["path"], _with_derived(QUESTION2), on="q")
+QINDEX["blocks"] = [("h2", "01", "All questions", "全部题目", [
+    ("p", "Same list as the home page. Each page ends with the new questions it opened.",
+     "和首页同一张表。每页最后会列出“这道题又长出了哪些新问题”。"),
+    ("html", qlist_html(QLIST)),
+    ("note", "Grey rows are not written yet.",
+     "灰色的是还没写的。"),
+])]
 R.page(QINDEX["path"], QINDEX, on="q")
 _speak = speak_html(SPEAK)
 _sb = []
@@ -197,12 +236,23 @@ print("all pages built")
 
 
 # ============ 首页（必须在 directory_html 定义之后） ============
-_dir = directory_html()
+_ql = qlist_html(QLIST)
+_les = lessons_html()
+_tls = tools_html()
 _fixed = []
 for b in INDEX["blocks"]:
     if b[0] == "h2":
         body = list(b[4])
-        body = [("html", _dir) if (x[0] == "html" and x[1] == "__DIRECTORY__") else x for x in body]
+        body = []
+        for x in b[4]:
+            if x[0] == "html" and x[1] == "__QLIST__":
+                body.append(("html", _ql))
+            elif x[0] == "html" and x[1] == "__LESSONS__":
+                body.append(("html", _les))
+            elif x[0] == "html" and x[1] == "__TOOLS__":
+                body.append(("html", _tls))
+            else:
+                body.append(x)
         b = (b[0], b[1], b[2], b[3], body)
     _fixed.append(b)
 INDEX["blocks"] = _fixed

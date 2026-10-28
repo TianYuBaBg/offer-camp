@@ -133,6 +133,23 @@
     <p class="note"><span class="bi-en">When you do not know a piece, say how you would check: “I would confirm whether the retry body is re-signed…” Honest with a direction beats guessing.</span><span class="bi-zh">真不会的时候，说你会怎么确认：“我会先确认重试报文是否重新签名……”诚实加方向，比硬编强。</span></p>
   </section>
   <section class="sec">
+    <h2><span class="num">09</span><span class="in-en">New questions this one opened</span><span class="in-zh">这道题又长出了哪些新问题</span></h2>
+    <p class="note"><span class="bi-en">A good answer opens the next question. That is the whole method.</span><span class="bi-zh">一个答案会生出下一个问题——方法就是这个。</span></p>
+    <table class="ledger">
+      <thead><tr><th><span class="in-en">Question</span><span class="in-zh">新问题</span></th><th><span class="in-en">One line</span><span class="in-zh">一句话</span></th><th></th></tr></thead>
+      <tbody>
+        <tr><td>为什么用唯一索引当锁，而不是先查再插？</td><td>两个线程能同时查出“不存在”；唯一索引是数据库自己把门的。</td><td><span class="todoq">待写</span></td></tr>
+        <tr><td>幂等记录插进去了，但业务崩了怎么办？</td><td>靠状态 CAS 兜底：只允许 PENDING → PAID，重试时影响 0 行就按已处理返回。</td><td><span class="todoq">待写</span></td></tr>
+        <tr><td>钱到了但订单已经关闭，怎么处理？</td><td>CAS 影响 0 行且状态是 CLOSED → 走退款，不能悄悄吞掉。</td><td><span class="todoq">待写</span></td></tr>
+        <tr><td>Redisson 的 watchdog 到底在续什么？</td><td>续的是锁的租约；线程活着才续，进程挂掉租约自动过期。</td><td><span class="todoq">待写</span></td></tr>
+        <tr><td>主从切换把锁丢了怎么办？</td><td>靠数据库兜底：唯一索引 + CAS 仍然守得住。</td><td><span class="todoq">待写</span></td></tr>
+        <tr><td>MQ 消费重复，和这个是一回事吗？</td><td>机制一样：消费端幂等（业务唯一键 / 状态机），别指望队列只投一次。</td><td><span class="todoq">待写</span></td></tr>
+        <tr><td>那库存怎么保证只扣一次、还不超卖？</td><td>预扣 + 条件更新（qty >= 1）+ 延时关单回滚。</td><td><span class="todoq">待写</span></td></tr>
+        <tr><td>缓存和数据库不一致怎么办？</td><td>Cache Aside：写库后删缓存，加延迟补偿与过期兜底。</td><td><span class="todoq">待写</span></td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="sec">
     <h2><span class="num">→</span><span class="in-en">New words</span><span class="in-zh">新词</span></h2>
     <div class="wordlist">
       <div class="word">

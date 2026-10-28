@@ -43,20 +43,65 @@
   </div>
 
   <section class="sec">
-    <h2><span class="num">01</span><span class="in-en">Pick one</span><span class="in-zh">选一道</span></h2>
-<ul class="qlist">
-  <li><a href="java-hashmap.html">
-    <span class="num">Question 01 · live</span>
-    <span class="t"><span class="in-en">How does HashMap work?</span><span class="in-zh">HashMap 是怎么工作的？</span></span>
-    <span class="m"><span class="in-en">Buckets, collisions, resize, thread safety — the opening question.</span><span class="in-zh">桶数组、冲突、扩容、线程安全——开场最常问的那道。</span></span>
-  </a></li>
-  <li><a href="pay-callback.html">
-    <span class="num">Question 02 · live</span>
-    <span class="t"><span class="in-en">Same callback three times: ship once, deduct once</span><span class="in-zh">回调来三条：只发一次货、库存只扣一次</span></span>
-    <span class="m"><span class="in-en">Idempotent table, status CAS, distributed lock — the payment question.</span><span class="in-zh">幂等表、状态 CAS、分布式锁——支付链路那道。</span></span>
-  </a></li>
-</ul>
-    <p class="note"><span class="bi-en">New questions are added to the line on the home page. A question gets a page only when it can be said out loud in 60 seconds.</span><span class="bi-zh">新题会挂到首页那条线上。能 60 秒出声讲完，才配一页。</span></p>
+    <h2><span class="num">01</span><span class="in-en">All questions</span><span class="in-zh">全部题目</span></h2>
+    <p><span class="bi-en">Same list as the home page. Each page ends with the new questions it opened.</span><span class="bi-zh">和首页同一张表。每页最后会列出“这道题又长出了哪些新问题”。</span></p>
+    <div class="qlist2">
+      <a href="questions/java-hashmap.html">
+        <span class="num">01</span>
+        <span class="t">HashMap 到底是个什么东西？<span class="a">一个桶数组，每个桶挂一条短链；冲突就排队，满了就扩容。</span></span>
+        <span class="m">第 1 题</span>
+      </a>
+    </div>
+    <div class="qlist2">
+      <a href="basics/hash.html">
+        <span class="num">02</span>
+        <span class="t">一个 key 怎么就跑到某个桶里？<span class="a">先算 hash，再 h & (n-1) 取下标——所以容量必须是 2 的幂。</span></span>
+        <span class="m">第 4 课</span>
+      </a>
+    </div>
+    <div class="qlist2">
+      <a href="basics/tree.html">
+        <span class="num">03</span>
+        <span class="t">两个 key 撞进同一个桶，怎么办？<span class="a">排队挂成链表；到 8 个、容量够 64 就转红黑树。</span></span>
+        <span class="m">第 2–3 课</span>
+      </a>
+    </div>
+    <div class="qlist2">
+      <a href="basics/big-o.html">
+        <span class="num">04</span>
+        <span class="t">桶快满了呢？<span class="a">装到 75% 翻倍，每个 key 要么原位、要么 +n，不用重算 hash。</span></span>
+        <span class="m">第 5 课</span>
+      </a>
+    </div>
+    <div class="qlist2">
+      <a href="basics/threads.html">
+        <span class="num">05</span>
+        <span class="t">两个线程同时 put 会怎样？<span class="a">丢数据；JDK 7 还会成环把 CPU 打满。换 ConcurrentHashMap。</span></span>
+        <span class="m">第 7 课</span>
+      </a>
+    </div>
+    <div class="qlist2 soon">
+      <span class="row">
+        <span class="num">06</span>
+        <span class="t">工作中怎么拿它当缓存用？<span class="a">Redis 挡在数据库前面——以及缓存咬你的三种方式。</span></span>
+        <span class="m">待写</span>
+      </span>
+    </div>
+    <div class="qlist2">
+      <a href="questions/pay-callback.html">
+        <span class="num">07</span>
+        <span class="t">微信回调同时来三条，怎么办？<span class="a">幂等表 → 状态 CAS → 再上锁，三层顺序不能反。</span></span>
+        <span class="m">第 2 题</span>
+      </a>
+    </div>
+    <div class="qlist2 soon">
+      <span class="row">
+        <span class="num">08</span>
+        <span class="t">一万人抢一千件，怎么不超卖？<span class="a">先在 Redis 预扣，数据库做最后一道闸，再拿延时队列关单。</span></span>
+        <span class="m">待写</span>
+      </span>
+    </div>
+    <p class="note"><span class="bi-en">Grey rows are not written yet.</span><span class="bi-zh">灰色的是还没写的。</span></p>
   </section>
 
   <p class="log-tip"><a href="../index.html"><span class="in-en">See the whole line →</span><span class="in-zh">回到首页那条线 →</span></a></p>
