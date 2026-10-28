@@ -11,13 +11,41 @@ INDEX = {
              "So every page gives one idea, five new words, and three questions I answer out loud.",
              "我不懂 Java，而且我想用英文学，不是用中文背。所以每一页只讲一个概念、"
              "给五个新词、三道要出声回答的题。"),
-    "tags": [("7 lessons", "7 节课"), ("1 question", "1 道题"), ("47 words", "47 个词")],
+    "tags": [("7 lessons", "7 节课"), ("2 questions", "2 道题"), ("8 stations", "8 站")],
     "blocks": [
-        ("h2", "01", "Start here, in this order",
-         "从这里开始，按这个顺序读", [
-             ("p", "Each lesson is about 600 English words. Read it once with the page read aloud, "
-                   "then answer the three questions at the bottom.",
-              "每节课大约 600 个英文词。先点朗读跟一遍，再回答页面底部的三道题。"),
+        ("h2", "01", "The line: one question, many branches",
+         "主线：从一个问题长出去",
+         [
+             ("p", "Everything starts from one question. Each station below is a place the answer opens "
+                   "a new question. Read down the line, not across the table.",
+              "所有内容都从一个问题长出来。线上一站就是一处“答案又生出一个新问题”的地方。"
+              "顺着线往下读，不要横着扫。"),
+             ("html", "__SPINE__"),
+             ("note", "Grey stations are not written yet. The line grows as we go — that is the point.",
+              "灰色的站还没写。线会一直长下去，这本来就是重点。"),
+         ]),
+        ("h2", "02", "Five minutes with your hands", "动手 5 分钟：把 key 放进桶里",
+         [
+             ("p", "Reading gives you the words. Playing gives you the mechanics. Three levels, about five minutes.",
+              "读是把话记住，玩是把机制记住。三关，大约 5 分钟。"),
+             ("ul", [
+                 ("Level 1 — place 5 keys, and watch <code>order</code> and <code>node</code> collide in bucket 15.",
+                  "第一关：放 5 个 key，看 <code>order</code> 和 <code>node</code> 在桶 15 撞成一条链。"),
+                 ("Level 2 — fill 12 of 16 (that is 75%), then watch the array double and every key either stay or move by 16.",
+                  "第二关：装满 12 个（16 的 75%），看数组翻倍，每个 key 要么原位、要么 +16。"),
+                 ("Level 3 — the 8th key in one bucket turns the chain into a red-black tree: 8 steps become 3.",
+                  "第三关：同一个桶放第 8 个，链子变成红黑树，8 次比较变成 3 次。"),
+                 ("Every word on a card can be clicked to hear it read aloud (five sites to choose from).",
+                  "卡片上的每个单词都能点开听真人发音（右上角可选 5 个站）。"),
+             ]),
+             ("p", '<a class="playbtn" href="game/hashmap.html">Play the bucket game →</a>',
+                    '<a class="playbtn" href="game/hashmap.html">玩装桶小游戏 →</a>'),
+         ]),
+        ("h2", "03", "The seven lessons: the ground under the line",
+         "七节课：这条线脚下的地基",
+         [
+             ("p", "Each lesson is about 600 English words. They are the small pieces the line is built from.",
+              "每节课大约 600 个英文词，是这条线用到的零件。"),
              ("table",
               [("Lesson", "第几课"), ("Title", "标题"), ("What it answers", "讲什么内容")],
               [
@@ -29,11 +57,9 @@ INDEX = {
                   [("6", "6"), ('<a href="basics/hashmap-methods.html">HashMap methods in real code</a>', '方法'), ("HashMap 的常用方法和真实用法", "HashMap 的常用方法和真实用法")],
                   [("7", "7"), ('<a href="basics/threads.html">Why is HashMap not thread-safe?</a>', '线程'), ("为什么 HashMap 线程不安全", "为什么 HashMap 线程不安全")],
               ]),
-             ("note", "After lesson 7, read the <a href=\"questions/java-hashmap.html\">HashMap question</a> — "
-                      "it puts all seven lessons into one 60-second answer.",
-              "七课上完，去读 <a href=\"questions/java-hashmap.html\">HashMap 那道题</a>——它把七课合成一个 60 秒的回答。"),
          ]),
-        ("h2", "02", "How to read a page", "怎么读一页", [
+        ("h2", "04", "How to read a page", "怎么读一页",
+         [
              ("ol", [
                  ("Press <b>🔊</b> at the top. Follow the words with your eyes. Twice is enough.",
                   "点页面顶部的 <b>🔊</b>，眼睛跟着字走。两遍就够。"),
@@ -44,10 +70,11 @@ INDEX = {
                  ("Answer the three questions at the bottom <b>out loud</b>, not in your head.",
                   "页面底部三道题要<b>出声</b>回答，不要只在心里想。"),
              ]),
-             ("note", "Twenty minutes is enough. One page a day, seven days, then you can explain HashMap.",
-              "二十分钟就够。一天一页，七天之后你就能讲清 HashMap。"),
+             ("note", "Twenty minutes is enough. One station a day, and the line keeps growing.",
+              "二十分钟就够。一天一站，线就一直在长。"),
          ]),
-        ("h2", "03", "Why English, and why so slow", "为什么要英文、为什么这么慢", [
+        ("h2", "05", "Why English, and why so slow", "为什么要英文、为什么这么慢",
+         [
              ("p", "In an interview the words are English: <i>bucket</i>, <i>collision</i>, <i>resize</i>. "
                    "If I only know the Chinese word, I hear a sound I cannot follow.",
               "面试里蹦出来的是英文词：bucket、collision、resize。如果我只知道中文说法，听到的就是一串抓不住的声音。"),
@@ -369,3 +396,56 @@ L4 = {
     "next": '<a href="big-o.html"><span class="in-en">Next: Lesson 5, Big O →</span>'
             '<span class="in-zh">下一课：第 5 课，复杂度 →</span></a>',
 }
+
+
+# 主线（首页那条线）：从一个问题长出去
+SPINE = [
+    dict(n="01", q_en="What is a HashMap, really?",
+         q_zh="HashMap 到底是个什么东西？",
+         a_en="An array of buckets; each bucket holds a short list.",
+         a_zh="一个桶数组，每个桶挂一条短链。",
+         href="questions/java-hashmap.html",
+         tag_en="Question 1 · live", tag_zh="第 1 题 · 已上线"),
+    dict(n="02", q_en="How does a key end up in one bucket?",
+         q_zh="一个 key 怎么就跑到某个桶里？",
+         a_en="hash it, then <code>h &amp; (n - 1)</code>.",
+         a_zh="先算 hash，再 <code>h &amp; (n-1)</code> 取下标。",
+         href="basics/hash.html",
+         tag_en="Lesson 4", tag_zh="第 4 课"),
+    dict(n="03", q_en="Two keys, one bucket. Now what?",
+         q_zh="两个 key 撞进同一个桶，怎么办？",
+         a_en="Stand in a line — a linked list; after 8, a tree.",
+         a_zh="排队——挂成链表；到 8 个就转成红黑树。",
+         href="basics/tree.html",
+         tag_en="Lessons 2–3", tag_zh="第 2–3 课"),
+    dict(n="04", q_en="The buckets are getting full. Then?",
+         q_zh="桶快满了呢？",
+         a_en="At 75% the array doubles; each key stays or moves +n.",
+         a_zh="装到 75% 翻倍；每个 key 要么原位、要么 +n。",
+         href="basics/big-o.html",
+         tag_en="Lesson 5", tag_zh="第 5 课"),
+    dict(n="05", q_en="Two threads put at the same time?",
+         q_zh="两个线程同时 put 会怎样？",
+         a_en="Lost data, or a loop in JDK 7. Use ConcurrentHashMap.",
+         a_zh="丢数据，JDK 7 还会成环。换 ConcurrentHashMap。",
+         href="basics/threads.html",
+         tag_en="Lesson 7", tag_zh="第 7 课"),
+    dict(n="06", q_en="So how is it used as a cache at work?",
+         q_zh="那工作中怎么拿它当缓存用？",
+         a_en="Redis in front of the DB — and three ways the cache bites back.",
+         a_zh="Redis 挡在数据库前面——以及缓存咬你的三种方式。",
+         href="", href_en="", href_zh="",
+         tag_en="Not written yet", tag_zh="待写"),
+    dict(n="07", q_en="WeChat sends the same callback three times. Then?",
+         q_zh="微信同时回调三条，怎么办？",
+         a_en="Idempotent table, then status CAS, then a lock.",
+         a_zh="幂等表 → 状态 CAS → 再上锁。",
+         href="questions/pay-callback.html",
+         tag_en="Question 2 · live", tag_zh="第 2 题 · 已上线"),
+    dict(n="08", q_en="Ten thousand people, one thousand items. No oversell?",
+         q_zh="一万人抢一千件，怎么不超卖？",
+         a_en="Pre-deduct in Redis, then let the DB be the last check.",
+         a_zh="先在 Redis 预扣，数据库做最后一道闸。",
+         href="", href_en="", href_zh="",
+         tag_en="Not written yet", tag_zh="待写"),
+]

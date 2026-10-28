@@ -583,3 +583,4 @@ GLOSSARY = {
             '<span class="in-zh">从第 1 课开始</span></a>',
     "groups": GLOSSARY_GROUPS,
 }
+

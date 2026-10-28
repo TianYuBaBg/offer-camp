@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="zh-CN" data-lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Same callback, three times · Java Notes</title>
+<meta name="description" content="Same callback, three times">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="masthead">
+  <div class="mh-left">
+    <a class="mh-mark" href="../index.html">Java Notes</a>
+    <nav class="mh-nav">
+      <a href="../questions/index.html" class="on"><span class="in-en">Questions</span><span class="in-zh">题目</span></a>
+      <a href="../basics/array.html"><span class="in-en">Basics</span><span class="in-zh">基础</span></a>
+      <a href="../glossary.html"><span class="in-en">Words</span><span class="in-zh">词表</span></a>
+      <a class="nav-game" href="../game/hashmap.html"><span class="in-en">Play</span><span class="in-zh">游戏</span></a>
+    </nav>
+  </div>
+  <div class="mh-right">
+    <span class="langswitch">
+      <button type="button" data-lang-set="zh">中文</button>
+      <button type="button" data-lang-set="both">中英</button>
+      <button type="button" data-lang-set="en">English</button>
+    </span>
+  </div>
+</header>
+
+<main>
+  <p class="crumb"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a> / <span class="in-en">Question 2: payment callback</span><span class="in-zh">第 2 题：支付回调</span></p>
+
+  <div class="qhead">
+    <p class="kicker"><span class="in-en">Question 2 · must know · payments</span><span class="in-zh">第 2 题 · 必背 · 支付链路</span></p>
+    <h1><span class="in-en">WeChat fires the callback three times: ship once, deduct once.</span><span class="in-zh">微信回调同时来三条：只发一次货、库存只扣一次。</span></h1>
+    <p class="lede"><span class="in-en">One payment, three callbacks. Two of them must do nothing — and must still answer OK.</span><span class="in-zh">一次支付，三条回调。其中两条必须什么都不做，而且还得回“成功”。</span></p>
+    <div class="answerbox"><b><span class="in-en">Short answer</span><span class="in-zh">先给答案</span></b><span class="bi-en">Three layers, in this order: a unique-index idempotent table catches the duplicate, a status CAS makes the order move forward exactly once, and a distributed lock only covers the small critical section that touches stock.</span><span class="bi-zh">三层，顺序不能反：唯一索引的幂等表拦住重复；状态 CAS 让订单只能往前走一次；分布式锁只包住动库存的那一小段。</span></div>
+    <p class="tags"><span class="tag"><span class="in-en">Must know</span><span class="in-zh">必背</span></span><span class="tag"><span class="in-en">payments</span><span class="in-zh">支付</span></span><span class="tag"><span class="in-en">speak 60s</span><span class="in-zh">60 秒口播</span></span><span class="tag"><span class="in-en">4 follow-ups</span><span class="in-zh">追问 4 个</span></span></p>
+    <button class="listen" data-listen type="button">🔊</button>
+  </div>
+
+  <section class="sec">
+    <h2><span class="num">01</span><span class="in-en">Why three callbacks at all</span><span class="in-zh">为什么会来三条</span></h2>
+    <p><span class="bi-en">The payment platform is not rude — it is <b>built to be unreliable</b>. If it does not hear an OK, it keeps knocking.</span><span class="bi-zh">支付平台不是没礼貌，它是<b>按不可靠来设计的</b>：没收到成功应答就一直敲。</span></p>
+    <ul>
+      <li><span class="bi-en">WeChat retries on a schedule: 15s, 15s, 30s, 3m, 10m, 20m, 30m … until it hears success.</span><span class="bi-zh">微信按节奏重试：15 秒、15 秒、30 秒、3 分、10 分……一直敲到你说成功。</span></li>
+      <li><span class="bi-en">Our own gateway may resend when the response times out.</span><span class="bi-zh">我们回包超时，自己的网关也会再发一次。</span></li>
+      <li><span class="bi-en">A message queue redelivers when the consumer never acknowledged.</span><span class="bi-zh">消息队列没收到 ack，会重投。</span></li>
+      <li><span class="bi-en">Two app instances can receive it at the same moment — that is a real race, not a retry.</span><span class="bi-zh">两台机器同时收到，这不是重试，是并发。</span></li>
+    </ul>
+    <p class="note"><span class="bi-en">So “it will not come twice” is never true. The only useful question is: what happens the second time?</span><span class="bi-zh">所以“不会来两次”永远不成立。唯一有用的问题是：第二次来的时候，会发生什么？</span></p>
+  </section>
+  <section class="sec">
+    <h2><span class="num">02</span><span class="in-en">Layer one: the idempotent table</span><span class="in-zh">第一层：幂等表（拿唯一索引当锁）</span></h2>
+    <p><span class="bi-en">Before doing any work, try to <b>insert a row</b> keyed by the platform trade number. The database rejects the second insert — and that rejection <i>is</i> the lock.</span><span class="bi-zh">干活之前，先拿平台流水号<b>插一行记录</b>。第二次插会被数据库拒掉——这个“拒掉”就是锁。</span></p>
+    <pre><code>create table pay_idempotent (
+  id           bigint auto_increment primary key,
+  out_trade_no varchar(64) not null,   -- 微信/支付宝流水号
+  source       varchar(16) not null,   -- wechat / alipay
+  created_at   datetime    not null,
+  unique key uk_trade (out_trade_no, source)
+);</code></pre>
+    <p><span class="bi-en">In code it is just <code>insert</code>, and on <code>DuplicateKeyException</code> return success. The second callback <b>does no work</b> and still tells the platform “done”.</span><span class="bi-zh">代码里就是 insert，撞到 <code>DuplicateKeyException</code> 就直接回成功：第二条回调<b>不干活</b>，却仍然告诉平台“已处理”。</span></p>
+    <p class="note"><span class="bi-en">Why not <code>select</code> then <code>insert</code>: two threads can both see “not there”. The unique index is the only thing the database itself polices.</span><span class="bi-zh">为什么不用 <code>select</code> 再 <code>insert</code>：两个线程能同时查出“不存在”。唯一索引是数据库自己把门的东西。</span></p>
+  </section>
+  <section class="sec">
+    <h2><span class="num">03</span><span class="in-en">Layer two: status CAS</span><span class="in-zh">第二层：状态 CAS（比较再交换）</span></h2>
+    <p><span class="bi-en">The idempotent row stops duplicates, but it cannot stop a crash halfway. The order state machine is the second guard:</span><span class="bi-zh">幂等表拦得住重复，拦不住“做到一半崩了”。订单状态机是第二道闸：</span></p>
+    <pre><code>update orders
+   set status = 'PAID', pay_time = now()
+ where order_no = ? and status = 'PENDING';   -- 只有待支付才能改成已支付</code></pre>
+    <table class="ledger">
+      <thead><tr><th><span class="in-en">Rows updated</span><span class="in-zh">影响行数</span></th><th><span class="in-en">What it means</span><span class="in-zh">说明</span></th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td><span class="bi-en">I won — deduct stock, then ship</span><span class="bi-zh">我抢到了：扣库存、发货</span></td></tr>
+        <tr><td>0</td><td><span class="bi-en">Someone already did it — just return OK</span><span class="bi-zh">别人处理过：直接回成功</span></td></tr>
+        <tr><td><span class="bi-en">0, and status is CLOSED</span><span class="bi-zh">0，且状态是已关闭</span></td><td><span class="bi-en">Money arrived but the order closed — refund</span><span class="bi-zh">钱到了但单子关了：走退款</span></td></tr>
+      </tbody>
+    </table>
+    <p class="note"><span class="bi-en">Check and change live in one statement, so there is no gap for another thread. That is also why retrying after a crash is safe.</span><span class="bi-zh">判断和修改在同一条语句里，中间没有缝给别人插进来。这也是“崩了以后重试是安全的”的原因。</span></p>
+  </section>
+  <section class="sec">
+    <h2><span class="num">04</span><span class="in-en">Layer three: the lock, only where it is needed</span><span class="in-zh">第三层：锁，只加在该加的地方</span></h2>
+    <p><span class="bi-en">A Redisson lock is <b>not</b> the first line of defence. It protects the critical section: read stock, check, deduct, write back.</span><span class="bi-zh">Redisson 锁<b>不是</b>第一道防线，它护的是临界区：读库存、判断、扣减、写回。</span></p>
+    <ul>
+      <li><span class="bi-en">The lock key is the <b>business</b> key: <code>lock:stock:{skuId}</code>, not the order number.</span><span class="bi-zh">锁的 key 是<b>业务</b>维度：<code>lock:stock:{skuId}</code>，不是订单号。</span></li>
+      <li><span class="bi-en">It is held for a few milliseconds of database work — never across an HTTP call.</span><span class="bi-zh">只包几毫秒的数据库操作，绝不横跨一次 HTTP 调用。</span></li>
+      <li><span class="bi-en">watchdog renews the lease while the thread lives; if the JVM dies, the lease expires.</span><span class="bi-zh">watchdog 在线程活着时自动续期；JVM 挂了，租约自然过期。</span></li>
+      <li><span class="bi-en">A distributed lock is not free — if one transaction can do it, skip the lock.</span><span class="bi-zh">分布式锁不是免费的：一个事务能搞定的事，就别上锁。</span></li>
+    </ul>
+  </section>
+  <section class="sec">
+    <h2><span class="num">05</span><span class="in-en">Four follow-ups, one line each</span><span class="in-zh">四个追问，一句话一个</span></h2>
+    <table class="ledger">
+      <thead><tr><th><span class="in-en">Follow-up</span><span class="in-zh">追问</span></th><th><span class="in-en">One-line answer</span><span class="in-zh">一句话答</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="bi-en">Where is the lock, and what is the key?</span><span class="bi-zh">锁加在哪，key 是什么？</span></td><td><span class="bi-en">Around the stock deduction only; the key is the sku id.</span><span class="bi-zh">只包扣库存那段；key 是 sku id。</span></td></tr>
+        <tr><td><span class="bi-en">What if the holder dies?</span><span class="bi-zh">持锁的进程挂了怎么办？</span></td><td><span class="bi-en">The lease expires; watchdog stops renewing. Never rely on a bare expire.</span><span class="bi-zh">租约自动过期，watchdog 不再续期。别用裸的 expire。</span></td></tr>
+        <tr><td><span class="bi-en">Master fails over and the lock is lost?</span><span class="bi-zh">主从切换丢锁怎么办？</span></td><td><span class="bi-en">Fall back on the database: unique key and CAS still hold.</span><span class="bi-zh">靠数据库兜底：唯一键和 CAS 仍然守得住。</span></td></tr>
+        <tr><td><span class="bi-en">Could you do it without a lock?</span><span class="bi-zh">能不能不上锁？</span></td><td><span class="bi-en">Yes: <code>update stock set qty = qty - 1 where qty &gt; 0</code>, then check the rows.</span><span class="bi-zh">能：<code>update ... where qty &gt; 0</code>，看影响行数。</span></td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="sec">
+    <h2><span class="num">06</span><span class="in-en">The 60-second answer</span><span class="in-zh">60 秒照念稿</span></h2>
+    <blockquote class="read"><span class="lbl"><span class="in-en">Say it in this order</span><span class="in-zh">照着念，再换成自己的话</span></span>
+      <p><span class="bi-en">First: duplicates are normal. The platform retries until it hears success, and two instances can get it at once.</span><span class="bi-zh">先说重复是常态：平台没收到成功就一直重试，两台机器也可能同时收到。</span></p>
+      <p><span class="bi-en">Layer one: insert the trade number into a table with a unique index; a duplicate key just returns success.</span><span class="bi-zh">第一层：拿流水号往唯一索引的幂等表里插，撞键就直接回成功。</span></p>
+      <p><span class="bi-en">Layer two: a status CAS — only PENDING may become PAID; zero rows means someone else already did it.</span><span class="bi-zh">第二层：状态 CAS，只有待支付能改成已支付；影响 0 行说明别人做过了。</span></p>
+      <p><span class="bi-en">Layer three: a Redisson lock keyed by sku id around the deduct and write-back; if it is lost on failover, the first two layers still hold.</span><span class="bi-zh">第三层：Redisson 按 sku 加锁护住扣减写回；就算主从切换丢锁，前两层还兜着。</span></p>
+      <p><span class="bi-en">Stock is deducted once because the CAS decides which callback owns the order, and the idempotent row turns the rest into cheap no-ops.</span><span class="bi-zh">库存只扣一次，是因为 CAS 决定这条回调归谁，幂等表把其余的变成廉价空转。</span></p>
+    </blockquote>
+  </section>
+  <section class="sec">
+    <h2><span class="num">07</span><span class="in-en">How to say it as mine</span><span class="in-zh">怎么挂到我自己的项目上</span></h2>
+    <p><span class="bi-en">Only use what is really on the resume — this hangs on the order system, WeChat Native pay, and Redisson:</span><span class="bi-zh">只挑简历上真有的。这题挂在订单系统、微信 Native 支付、Redisson 上：</span></p>
+    <ul>
+      <li><span class="bi-en">Order system: the state machine plus the unique index on <code>out_trade_no</code>.</span><span class="bi-zh">订单系统：状态机 + <code>out_trade_no</code> 唯一索引。</span></li>
+      <li><span class="bi-en">WeChat Native pay: the callback is the only place that marks an order paid.</span><span class="bi-zh">微信 Native 支付：回调是唯一把订单改成已支付的地方。</span></li>
+      <li><span class="bi-en">Redisson: used for the stock critical section, not for the callback entry.</span><span class="bi-zh">Redisson：用在库存临界区，不用在回调入口。</span></li>
+    </ul>
+  </section>
+  <section class="sec">
+    <h2><span class="num">08</span><span class="in-en">Three things not to say</span><span class="in-zh">三句别说</span></h2>
+    <ul>
+      <li><span class="bi-en">“I add a lock, done.” — A lock does not survive a crash or a failover.</span><span class="bi-zh">“加个锁就完事了。”——锁挡不住崩溃和主从切换。</span></li>
+      <li><span class="bi-en">“I check the order status first, then ship.” — That is the race itself.</span><span class="bi-zh">“我先查订单状态，再发货。”——这就是竞态本身。</span></li>
+      <li><span class="bi-en">“MQ guarantees no duplicates.” — Most queues give at-least-once, not exactly-once.</span><span class="bi-zh">“MQ 能保证不重复。”——多数队列是至少一次，不是恰好一次。</span></li>
+    </ul>
+    <p class="note"><span class="bi-en">When you do not know a piece, say how you would check: “I would confirm whether the retry body is re-signed…” Honest with a direction beats guessing.</span><span class="bi-zh">真不会的时候，说你会怎么确认：“我会先确认重试报文是否重新签名……”诚实加方向，比硬编强。</span></p>
+  </section>
+  <section class="sec">
+    <h2><span class="num">→</span><span class="in-en">New words</span><span class="in-zh">新词</span></h2>
+    <div class="wordlist">
+      <div class="word">
+        <span class="w">idempotent</span>
+        <span class="ipa">/ˌaɪdemˈpoʊtnt/</span>
+        <span class="mean"><span class="bi-en">Running it twice is the same as running it once.</span><span class="bi-zh">幂等：执行两次和执行一次一样</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/idempotent/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="idempotent" type="button" aria-label="say idempotent">🔊</button></span>
+      </div>
+      <div class="word">
+        <span class="w">callback</span>
+        <span class="ipa">/ˈkɔːlbæk/</span>
+        <span class="mean"><span class="bi-en">The platform calls us back to say it is paid.</span><span class="bi-zh">回调：平台回头通知“已付款”</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/callback/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="callback" type="button" aria-label="say callback">🔊</button></span>
+      </div>
+      <div class="word">
+        <span class="w">duplicate</span>
+        <span class="ipa">/ˈduːplɪkət/</span>
+        <span class="mean"><span class="bi-en">The same thing arriving again.</span><span class="bi-zh">重复：同一件事又来了</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/duplicate/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="duplicate" type="button" aria-label="say duplicate">🔊</button></span>
+      </div>
+      <div class="word">
+        <span class="w">unique index</span>
+        <span class="ipa">/juˈniːk ˈɪndeks/</span>
+        <span class="mean"><span class="bi-en">The database refuses a second copy.</span><span class="bi-zh">唯一索引：数据库拒绝第二份</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/unique%2520index/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="unique index" type="button" aria-label="say unique index">🔊</button></span>
+      </div>
+      <div class="word">
+        <span class="w">compare-and-swap</span>
+        <span class="ipa">/kəmˈper ən swɑːp/</span>
+        <span class="mean"><span class="bi-en">Change it only if it still looks like this.</span><span class="bi-zh">CAS：还是这个样子才允许改</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/compare-and-swap/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="compare-and-swap" type="button" aria-label="say compare-and-swap">🔊</button></span>
+      </div>
+      <div class="word">
+        <span class="w">oversell</span>
+        <span class="ipa">/ˌoʊvərˈsel/</span>
+        <span class="mean"><span class="bi-en">Selling more than you have.</span><span class="bi-zh">超卖：卖出去的比库存还多</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/oversell/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="oversell" type="button" aria-label="say oversell">🔊</button></span>
+      </div>
+    </div>
+    <p class="note"><span class="bi-en">Click <b>▶ hear it</b> for real people on YouGlish; <b>🔊</b> for the computer voice.</span><span class="bi-zh">点 <b>▶ hear it</b> 听真人发音（YouGlish）；点 <b>🔊</b> 听电脑朗读。</span></p>
+  </section>
+
+  <section class="sec">
+    <h2><span class="num">✓</span><span class="in-en">Check yourself</span><span class="in-zh">自测</span></h2>
+    <ol class="checks">
+      <li><span class="bi-en">Why must the second callback still answer success?</span><span class="bi-zh">第二条回调为什么必须回成功？</span></li>
+      <li><span class="bi-en">What does “0 rows updated” mean in the CAS?</span><span class="bi-zh">CAS 影响 0 行是什么意思？</span></li>
+      <li><span class="bi-en">Name two things that make a retry after a crash safe.</span><span class="bi-zh">崩了以后重试为什么安全？说出两个兜底。</span></li>
+    </ol>
+    <p class="note"><span class="bi-en">Answer out loud first. Only then open the answers below.</span><span class="bi-zh">先自己出声答，再看下面的答案。</span></p>
+  </section>
+
+  <section class="sec">
+    <details class="answers">
+      <summary><span class="in-en">Answers</span><span class="in-zh">参考答案</span></summary>
+
+    </details>
+  </section>
+
+
+  <p class="log-tip"><a href="java-hashmap.html"><span class="in-en">← Question 1: HashMap</span><span class="in-zh">← 第 1 题：HashMap</span></a></p>
+</main>
+
+<footer>
+  <div class="f-left"><span class="in-en">Written for learning English · Wang Tianyu</span><span class="in-zh">为学英语而写 · 王天宇</span></div>
+  <div class="f-right"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a><span class="sep">·</span><a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a></div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

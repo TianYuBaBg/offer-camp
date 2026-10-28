@@ -73,6 +73,41 @@ details.answers[open] summary::before{ content:"－ " }
          text-decoration:none;border-radius:2px}
 .playbtn:hover{background:#3a342c;border-color:#3a342c;color:#fff}
 
+
+
+/* 照念稿（blockquote.read） */
+blockquote.read{margin:0; padding:20px 24px; background:var(--paper-2);
+  border-left:3px solid var(--red); font-family:var(--serif); font-size:16.5px;
+  line-height:1.95; color:var(--ink)}
+blockquote.read .lbl{display:block; margin-bottom:10px; font-family:var(--mono);
+  font-size:10px; letter-spacing:.18em; color:var(--red)}
+blockquote.read p{margin:0 0 14px}
+blockquote.read p:last-child{margin-bottom:0}
+/* 首页主线（一个问题的分支） */
+.spine{list-style:none;margin:12px 0 0;padding:0;position:relative}
+.spine:before{content:"";position:absolute;left:14px;top:12px;bottom:18px;width:1px;background:#D6CDBA}
+.spine li{position:relative;padding-left:44px}
+.spine .dot{position:absolute;left:6px;top:17px;width:17px;height:17px;border-radius:50%;
+            border:1px solid var(--line);background:#F4EFE3;display:flex;align-items:center;
+            justify-content:center;font-family:var(--mono);font-size:8.5px;color:var(--ink-3)}
+.spine li.live .dot{border-color:#A33;color:#A33}
+.spine a,.spine .st{display:block;padding:13px 0 14px;border-bottom:1px solid var(--line);
+                    text-decoration:none;color:inherit}
+.spine a:hover{background:rgba(255,255,255,.55)}
+.spine .q{display:block;font-family:var(--serif);font-size:19px;font-weight:700;line-height:1.35;margin-bottom:5px}
+.spine .a{display:block;color:var(--ink-2);font-size:14.5px;line-height:1.7}
+.spine .go{display:inline-block;margin-top:7px;font-family:var(--mono);font-size:10px;
+           letter-spacing:.1em;color:var(--ink-3)}
+.spine li.live .go{color:#A33}
+.spine li.soon{opacity:.55}
+/* ===== 题目列表 ===== */
+.qlist{list-style:none;padding:0;margin:16px 0 0}
+.qlist li{border-bottom:1px solid var(--line)}
+.qlist a{display:block;padding:18px 0;text-decoration:none;color:inherit}
+.qlist a:hover{background:rgba(255,255,255,.55)}
+.qlist .num{font-family:var(--mono);font-size:10.5px;color:#A33;letter-spacing:.12em}
+.qlist .t{display:block;font-family:var(--serif);font-size:20px;font-weight:700;margin:7px 0 5px;line-height:1.35}
+.qlist .m{display:block;color:var(--ink-2);font-size:14px;line-height:1.7}
 /* 导航与标签里的中文用细体 */
 .in-zh { font-family: var(--serif); }
 .langswitch { display: inline-flex; border: 1px solid var(--line-strong); }
@@ -210,7 +245,7 @@ PAGE = """<!doctype html>
   <div class="mh-left">
     <a class="mh-mark" href="__HOME__">Java Notes</a>
     <nav class="mh-nav">
-      <a href="__HOME__"__ON_Q__><span class="in-en">Questions</span><span class="in-zh">题目</span></a>
+      <a href="__QIDX__"__ON_Q__><span class="in-en">Questions</span><span class="in-zh">题目</span></a>
       <a href="__BASICS__"__ON_B__><span class="in-en">Basics</span><span class="in-zh">基础</span></a>
       <a href="__GLOSS__"__ON_W__><span class="in-en">Words</span><span class="in-zh">词表</span></a>
       <a class="nav-game" href="__GAME__"><span class="in-en">Play</span><span class="in-zh">游戏</span></a>
@@ -312,6 +347,8 @@ def render_one(b):
                 % (extra, head, "\n        ".join(rows)))
     if k == "figure":
         return "    " + b[1]
+    if k == "html":
+        return b[1]
     if k == "note":
         return '    <p class="note"><span class="bi-en">%s</span><span class="bi-zh">%s</span></p>' % (b[1], b[2])
     if k == "links":
@@ -390,6 +427,7 @@ def page(path, data, on=""):
         "__TITLE__": data["title"][0], "__DESC__": data["title"][0],
         "__CSS__": up + "assets/style.css", "__JS__": up + "assets/app.js",
         "__HOME__": up + "index.html",
+        "__QIDX__": up + "questions/index.html",
         "__BASICS__": up + "basics/array.html",
         "__GLOSS__": up + "glossary.html",
         "__GAME__": up + "game/hashmap.html",

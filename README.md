@@ -19,7 +19,7 @@ Live: **https://tianyubabg.github.io/offer-camp/**
 | `basics/big-o.html` | What is O(1), O(n), O(log n)? |
 | `basics/hashmap-methods.html` | HashMap methods, and how they look in real code |
 | `basics/threads.html` | Why HashMap is not thread-safe |
-| `questions/java-hashmap.html` | The whole HashMap answer, in simple English |
+| `questions/index.html **and** questions/java-hashmap.html` | The whole HashMap answer, in simple English |
 | `glossary.html` | All 47 words, with pronunciation and a Chinese meaning |
 | `about.html` | Why the site is in English |
 
