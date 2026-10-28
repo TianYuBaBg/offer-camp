@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN" data-lang="zh">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>What is a key, hash and collision · Java Notes</title>
-<meta name="description" content="Key, hash, bucket, collision — in plain English.">
+<title>What is a key, a hash, a collision · Java Notes</title>
+<meta name="description" content="What is a key, a hash, a collision">
 <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body>
@@ -12,115 +12,126 @@
 
 <header class="masthead">
   <div class="mh-left">
-    <span class="mh-mark">Java Notes</span>
-    <span class="mh-en">OFFER&nbsp;CAMP</span>
+    <a class="mh-mark" href="../index.html">Java Notes</a>
     <nav class="mh-nav">
-      <a href="../index.html">Questions</a>
-      <a href="../basics/array.html" class="on">Basics</a>
-      <a href="../glossary.html">Words</a>
+      <a href="../index.html"><span class="in-en">Questions</span><span class="in-zh">题目</span></a>
+      <a href="../basics/array.html" class="on"><span class="in-en">Basics</span><span class="in-zh">基础</span></a>
+      <a href="../glossary.html"><span class="in-en">Words</span><span class="in-zh">词表</span></a>
     </nav>
   </div>
-  <div class="mh-right"><span>Lesson 4</span></div>
+  <div class="mh-right">
+    <span class="langswitch">
+      <button type="button" data-lang-set="zh">中文</button>
+      <button type="button" data-lang-set="both">中英</button>
+      <button type="button" data-lang-set="en">English</button>
+    </span>
+  </div>
 </header>
 
 <main>
-  <p class="crumb"><a href="../index.html">Home</a> / Lesson 4: Key and hash</p>
+  <p class="crumb"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a> / <span class="in-en">Lesson 4: Hash</span><span class="in-zh">第 4 课：哈希</span></p>
 
   <div class="qhead">
-    <p class="kicker">Lesson 4 · Hash</p>
-    <h1>What is a key? A hash? A collision?</h1>
-    <p class="lede">A key is the name you search by. A hash is a number computed from it. A collision is two keys with the same number.</p>
-    <div class="qmeta"><span class="tag">Basics</span><span class="tag">hash</span></div>
-    <button class="listen" data-listen>🔊 Listen to this page</button>
+    <p class="kicker"><span class="in-en">Lesson 4 · HashMap</span><span class="in-zh">第 4 课 · HashMap</span></p>
+    <h1><span class="in-en">What is a key? A hash? A collision?</span><span class="in-zh">什么是 key？什么是 hash？什么是冲突？</span></h1>
+    <p class="lede"><span class="in-en">A key is a name. A hash is a number made from it. A collision is two names with the same number.</span><span class="in-zh">key 是名字；hash 是由它算出来的编号；冲突是两个名字算出了同一个编号。</span></p>
+    <p class="tags"><span class="tag"><span class="in-en">Basics</span><span class="in-zh">基础</span></span><span class="tag"><span class="in-en">HashMap</span><span class="in-zh">HashMap</span></span><span class="tag"><span class="in-en">must know</span><span class="in-zh">必背</span></span></p>
+    <button class="listen" data-listen type="button">🔊</button>
   </div>
 
-
   <section class="sec">
-    <h2><span class="num">01</span>Three words: key, hash, bucket</h2>
-    <div class="analogy"><b>Think of it like this</b>Your name is the <b>key</b>. The school gives you a <b>student number</b> computed from your name — that is the <b>hash</b>. The classroom with that number is the <b>bucket</b>.</div>
+    <h2><span class="num">01</span><span class="in-en">Key: the name</span><span class="in-zh">key：名字</span></h2>
+    <p><span class="bi-en">A <b>key</b> is what you look things up by. <code>map.put("apple", 5)</code> — here the key is <code>"apple"</code>, the value is <code>5</code>.</span><span class="bi-zh"><b>key</b> 是你用来查东西的名字。<code>map.put("apple", 5)</code> 里，key 是 <code>"apple"</code>，value 是 <code>5</code>。</span></p>
+    <p><span class="bi-en">In Java, a key must have two methods that agree with each other: <code>hashCode()</code> and <code>equals()</code>.</span><span class="bi-zh">Java 里 key 必须有两个互相配合的方法：<code>hashCode()</code> 和 <code>equals()</code>。</span></p>
+  </section>
+  <section class="sec">
+    <h2><span class="num">02</span><span class="in-en">Hash: the number</span><span class="in-zh">hash：编号</span></h2>
+    <div class="analogy"><b><span class="in-en">Think of it like this</span><span class="in-zh">先这样想</span></b><span class="bi-en">A cloakroom. You give a coat, you get a ticket with a number. The number tells the staff which shelf to use. The coat is the key, the number is the hash, the shelf is the bucket.</span><span class="bi-zh">寄存处：你交出外套，拿到一张带编号的票，编号告诉工作人员去哪个架子。外套＝key，编号＝hash，架子＝桶（bucket）。</span></div>
+    <pre><code>hash = key.hashCode()          //  a number, like -1894770
+index = (n - 1) & hash          //  which bucket: 0 .. n-1</code></pre>
+    <p><span class="bi-en">The hash is <b>not</b> the memory address and <b>not</b> the value. It is only a number used to pick a bucket.</span><span class="bi-zh">hash <b>不是</b>内存地址，<b>不是</b> value，只是一个用来选桶的编号。</span></p>
+    <p class="note"><span class="bi-en">Java 8 also mixes the high bits into the low bits: <code>(h = key.hashCode()) ^ (h &gt;&gt;&gt; 16)</code>. If the high bits are all the same, some buckets would be overused.</span><span class="bi-zh">Java 8 还做了高低位混合 — <code>(h = key.hashCode()) ^ (h &gt;&gt;&gt; 16)</code>。如果不混合，高位相同的 key 会挤在同一批桶里。</span></p>
+  </section>
+  <section class="sec">
+    <h2><span class="num">03</span><span class="in-en">Collision: the same number</span><span class="in-zh">冲突：编号撞了</span></h2>
+    <p><span class="bi-en">There are about four billion possible ints, but a HashMap has only 16 buckets at the start. Two different keys can easily get the same bucket. That is a <b>collision</b>.</span><span class="bi-zh">int 有四十亿种可能，但 HashMap 一开始只有 16 个桶，两个不同的 key 很容易落到同一个桶。这就是<b>冲突</b>。</span></p>
+    <p><span class="bi-en">A collision is not a bug. There are only three ways to handle it, and HashMap uses the first two:</span><span class="bi-zh">冲突不是 bug。处理冲突只有三种办法，HashMap 用了前两种：</span></p>
     <ul>
-      <li><b>key</b> — the thing you look up by. For example <code>"apple"</code>.</li>
-      <li><b>hash</b> — a number computed from the key. Same key, same number, every time.</li>
-      <li><b>hash function</b> — the machine that turns a key into a number.</li>
-      <li><b>bucket</b> — one box in the array, chosen by the hash.</li>
+      <li><span class="bi-en"><b>Separate chaining</b> — keep a short list in the bucket (what HashMap does for small counts).</span><span class="bi-zh"><b>拉链法</b>——桶里挂一条短链（HashMap 数量少时就这么做）</span></li>
+      <li><span class="bi-en"><b>Treeify</b> — when one bucket has 8 items, turn that list into a red-black tree (HashMap, Java 8+).</span><span class="bi-zh"><b>树化</b>——一个桶攒到 8 个，就把短链变成红黑树（Java 8+ 的 HashMap）</span></li>
+      <li><span class="bi-en"><b>Open addressing</b> — move to the next free bucket (ThreadLocalMap, not HashMap).</span><span class="bi-zh"><b>开放寻址</b>——往下一个空桶放（ThreadLocalMap 用这种，HashMap 不用）</span></li>
     </ul>
-    <p>In HashMap the bucket number is computed like this:</p>
-    <pre><code>index = (n - 1) &amp; hash</code></pre>
-    <p><code>n</code> is the number of buckets (16 by default). The result is always between 0 and n-1, so it always points at a real box.</p>
   </section>
-
   <section class="sec">
-    <h2><span class="num">02</span>What is a collision</h2>
-    <p>Two different keys can produce the <b>same</b> bucket number. That is a <b>collision</b>.</p>
-    <pre><code>key "apple"  → hash 97  → index 1
-key "grape"  → hash 97  → index 1   ← same box: collision</code></pre>
+    <h2><span class="num">04</span><span class="in-en">Why we must handle it</span><span class="in-zh">为什么必须处理冲突</span></h2>
+    <p><span class="bi-en">If every key landed in its own bucket, looking up would be one step: O(1). When many keys share one bucket, you must walk the list inside it: O(n) in the worst case.</span><span class="bi-zh">如果每个 key 都落在自己的桶里，查找就是一步 O(1)。当很多 key 挤在一个桶，就得在桶里顺着链走，最坏是 O(n)。</span></p>
+    <p class="note"><span class="bi-en">That is the whole reason for the 0.75 load factor and the 8-item treeify rule: keep buckets short.</span><span class="bi-zh">负载因子 0.75 和“8 个树化”这两条规则，目的都只有一个：让每个桶都很短。</span></p>
   </section>
-
   <section class="sec">
-    <h2><span class="num">03</span>Why we must deal with collisions</h2>
-    <p>Because a bucket holds items in a <b>line</b> (a linked list). If ten keys land in one bucket, finding one of them takes up to ten steps — <b>O(n)</b> instead of O(1). One bad bucket can make the whole map slow.</p>
-    <p>So HashMap does three things:</p>
-    <ol class="steps">
-      <li><b>Spreads the keys</b> with a good hash function, so collisions are rare.</li>
-      <li><b>Keeps a short line</b> in the bucket, and grows the array (resize) when it gets crowded.</li>
-      <li><b>Grows a tree</b> when one bucket gets 8 items — the worst case becomes O(log n).</li>
-    </ol>
-    <div class="analogy"><b>Remember</b>A collision is not an error. It is normal. HashMap does not prevent it; it keeps it small.</div>
+    <h2><span class="num">05</span><span class="in-en">equals and hashCode must agree</span><span class="in-zh">equals 和 hashCode 必须一致</span></h2>
+    <p><span class="bi-en">If two keys are <code>equals()</code>, they <b>must</b> have the same <code>hashCode()</code>. Otherwise the map puts the same key into two different buckets, and you will “lose” a value.</span><span class="bi-zh">如果两个 key <code>equals()</code> 为真，它们的 <code>hashCode()</code> <b>必须</b>相同。否则同一个 key 会被放进两个不同的桶，你就会“丢”数据。</span></p>
+    <p><span class="bi-en">So when you write <code>equals()</code>, always write <code>hashCode()</code> too — use your IDE, it generates both.</span><span class="bi-zh">所以重写 <code>equals()</code> 时一定同时重写 <code>hashCode()</code>——让 IDE 一次生成两个就行。</span></p>
   </section>
-
-
   <section class="sec">
-    <h2><span class="num">→</span>New words</h2>
+    <h2><span class="num">→</span><span class="in-en">New words</span><span class="in-zh">新词</span></h2>
     <div class="wordlist">
       <div class="word">
         <span class="w">key</span>
         <span class="ipa">/kiː/</span>
-        <span class="mean">The name you look things up by, like "apple".</span>
-        <span class="links"><a class="say" href="https://youglish.com/pronounce/key/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="key" aria-label="say key">🔊</button></span>
+        <span class="mean"><span class="bi-en">The name you look things up by.</span><span class="bi-zh">key：用来查东西的名字</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/key/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="key" type="button" aria-label="say key">🔊</button></span>
       </div>
       <div class="word">
         <span class="w">hash</span>
         <span class="ipa">/hæʃ/</span>
-        <span class="mean">A number computed from a key. Like a fingerprint.</span>
-        <span class="links"><a class="say" href="https://youglish.com/pronounce/hash/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="hash" aria-label="say hash">🔊</button></span>
+        <span class="mean"><span class="bi-en">A number computed from a key.</span><span class="bi-zh">hash：由 key 算出的编号</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/hash/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="hash" type="button" aria-label="say hash">🔊</button></span>
       </div>
       <div class="word">
-        <span class="w">hash function</span>
-        <span class="ipa">/hæʃ ˈfʌŋkʃn/</span>
-        <span class="mean">The machine that turns a key into a number.</span>
-        <span class="links"><a class="say" href="https://youglish.com/pronounce/hash%20function/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="hash function" aria-label="say hash function">🔊</button></span>
-      </div>
-      <div class="word">
-        <span class="w">collision</span>
-        <span class="ipa">/kəˈlɪʒn/</span>
-        <span class="mean">Two different keys that get the same bucket.</span>
-        <span class="links"><a class="say" href="https://youglish.com/pronounce/collision/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="collision" aria-label="say collision">🔊</button></span>
+        <span class="w">hashCode</span>
+        <span class="ipa">/hæʃ koʊd/</span>
+        <span class="mean"><span class="bi-en">The Java method that gives that number.</span><span class="bi-zh">hashCode：给出这个编号的 Java 方法</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/hashCode/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="hashCode" type="button" aria-label="say hashCode">🔊</button></span>
       </div>
       <div class="word">
         <span class="w">bucket</span>
         <span class="ipa">/ˈbʌkɪt/</span>
-        <span class="mean">One box in the array that holds items with the same hash.</span>
-        <span class="links"><a class="say" href="https://youglish.com/pronounce/bucket/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="bucket" aria-label="say bucket">🔊</button></span>
+        <span class="mean"><span class="bi-en">One box of the array.</span><span class="bi-zh">桶：数组里的一格</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/bucket/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="bucket" type="button" aria-label="say bucket">🔊</button></span>
+      </div>
+      <div class="word">
+        <span class="w">collision</span>
+        <span class="ipa">/kəˈlɪʒn/</span>
+        <span class="mean"><span class="bi-en">Two keys with the same bucket.</span><span class="bi-zh">冲突：两个 key 落进同一个桶</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/collision/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="collision" type="button" aria-label="say collision">🔊</button></span>
+      </div>
+      <div class="word">
+        <span class="w">equals</span>
+        <span class="ipa">/ˈiːkwəlz/</span>
+        <span class="mean"><span class="bi-en">The method that says two keys are the same.</span><span class="bi-zh">equals：判断两个 key 是否相同</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/equals/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="equals" type="button" aria-label="say equals">🔊</button></span>
       </div>
     </div>
-    <p class="note">Click <b>hear it</b> to listen to real people say the word on YouGlish. Click <b>🔊</b> to hear the computer say it.</p>
+    <p class="note"><span class="bi-en">Click <b>▶ hear it</b> for real people on YouGlish; <b>🔊</b> for the computer voice.</span><span class="bi-zh">点 <b>▶ hear it</b> 听真人发音（YouGlish）；点 <b>🔊</b> 听电脑朗读。</span></p>
   </section>
 
   <section class="sec">
-    <h2><span class="num">✓</span>Check yourself</h2>
+    <h2><span class="num">✓</span><span class="in-en">Check yourself</span><span class="in-zh">自测</span></h2>
     <ol class="checks">
-      <li>Is the hash the same thing as the key?<small>No. The key is the name; the hash is a number computed from that name.</small></li>
-      <li>What is a collision?<small>Two different keys land in the same bucket.</small></li>
-      <li>Does a collision break HashMap?<small>No. It only makes that bucket slower. HashMap keeps the line short and turns long lines into a tree.</small></li>
+      <li><span class="bi-en">What is the difference between a key, a hash and a bucket?</span><span class="bi-zh">key、hash、桶，三者有什么区别？</span></li>
+      <li><span class="bi-en">Two keys collide — what does HashMap do?</span><span class="bi-zh">两个 key 冲突了，HashMap 怎么处理？</span></li>
+      <li><span class="bi-en">Why must equals and hashCode agree?</span><span class="bi-zh">为什么 equals 和 hashCode 必须一致？</span></li>
     </ol>
+    <p class="note"><span class="bi-en">Answer out loud, not in your head.</span><span class="bi-zh">出声回答，不要只在心里想。</span></p>
   </section>
 
-  <p class="log-tip">Next: <a href="big-o.html">What is O(1), O(n), O(log n)?</a></p>
+
+  <p class="log-tip"><a href="big-o.html"><span class="in-en">Next: Lesson 5, Big O →</span><span class="in-zh">下一课：第 5 课，复杂度 →</span></a></p>
 </main>
 
 <footer>
-  <div class="f-left"><span>Written for learning English · Wang Tianyu</span></div>
-  <div class="f-right"><a href="../index.html">Home</a><span class="sep">·</span><a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a></div>
+  <div class="f-left"><span class="in-en">Written for learning English · Wang Tianyu</span><span class="in-zh">为学英语而写 · 王天宇</span></div>
+  <div class="f-right"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a><span class="sep">·</span><a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a></div>
 </footer>
 <script src="../assets/app.js"></script>
 </body>

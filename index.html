@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN" data-lang="zh">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Java Notes · learn Java in English</title>
-<meta name="description" content="Short English pages about Java: arrays, linked lists, trees, hash, Big O, HashMap.">
+<title>Learn Java in English · Java Notes</title>
+<meta name="description" content="Learn Java in English">
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
@@ -12,88 +12,120 @@
 
 <header class="masthead">
   <div class="mh-left">
-    <span class="mh-mark">Java Notes</span>
-    <span class="mh-en">OFFER&nbsp;CAMP</span>
+    <a class="mh-mark" href="index.html">Java Notes</a>
     <nav class="mh-nav">
-      <a href="index.html" class="on">Questions</a>
-      <a href="basics/array.html">Basics</a>
-      <a href="glossary.html">Words</a>
+      <a href="index.html"><span class="in-en">Questions</span><span class="in-zh">题目</span></a>
+      <a href="basics/array.html"><span class="in-en">Basics</span><span class="in-zh">基础</span></a>
+      <a href="glossary.html"><span class="in-en">Words</span><span class="in-zh">词表</span></a>
     </nav>
   </div>
-  <div class="mh-right"><span>7 basics · 1 question</span></div>
+  <div class="mh-right">
+    <span class="langswitch">
+      <button type="button" data-lang-set="zh">中文</button>
+      <button type="button" data-lang-set="both">中英</button>
+      <button type="button" data-lang-set="en">English</button>
+    </span>
+  </div>
 </header>
 
 <main>
-  <section class="hero">
-    <p class="kicker">Java in English · for a complete beginner</p>
-    <h1>One small page,<br>one <em>idea</em>.</h1>
-    <p class="lede">I know nothing about Java. I want to learn it in English, not in Chinese. So every page gives one idea, five new words, and three questions. Short sentences. No idioms. Read out loud.</p>
-  </section>
+  <p class="crumb"><a href="index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a></p>
 
-  <section class="block">
-    <h2><span class="num">01</span>Basics — start here<span class="hint">7 short lessons</span></h2>
-    <ul class="qlist">
-      <li><a href="basics/array.html">
-        <span class="no">01</span>
-        <span class="t">What is an array?<small>A row of numbered boxes. Fast to read, slow to insert.</small></span>
-        <span class="m">5 min</span></a></li>
-      <li><a href="basics/linked-list.html">
-        <span class="no">02</span>
-        <span class="t">What is a linked list?<small>Notes with arrows. Fast to insert, slow to find.</small></span>
-        <span class="m">5 min</span></a></li>
-      <li><a href="basics/tree.html">
-        <span class="no">03</span>
-        <span class="t">What is a tree? And a red-black tree?<small>An upside-down family tree that stays short.</small></span>
-        <span class="m">6 min</span></a></li>
-      <li><a href="basics/hash.html">
-        <span class="no">04</span>
-        <span class="t">What is a key? A hash? A collision?<small>The fingerprint idea, in plain words.</small></span>
-        <span class="m">6 min</span></a></li>
-      <li><a href="basics/big-o.html">
-        <span class="no">05</span>
-        <span class="t">What is O(1), O(n), O(log n)?<small>How the work grows when the data grows.</small></span>
-        <span class="m">6 min</span></a></li>
-      <li><a href="basics/hashmap-methods.html">
-        <span class="no">06</span>
-        <span class="t">HashMap methods in real life<small>put, get, merge, computeIfAbsent — with examples.</small></span>
-        <span class="m">7 min</span></a></li>
-      <li><a href="basics/threads.html">
-        <span class="no">07</span>
-        <span class="t">Why is HashMap not thread-safe?<small>Two workers writing the same notebook.</small></span>
-        <span class="m">6 min</span></a></li>
-    </ul>
-  </section>
+  <div class="qhead">
+    <p class="kicker"><span class="in-en">Java in English · for a complete beginner</span><span class="in-zh">英文 Java · 写给完全零基础</span></p>
+    <h1><span class="in-en">One small page. One idea.</span><span class="in-zh">一次只读一页，一次只学一个概念。</span></h1>
+    <p class="lede"><span class="in-en">I know nothing about Java. I want to learn it in English, not in Chinese. So every page gives one idea, five new words, and three questions I answer out loud.</span><span class="in-zh">我不懂 Java，而且我想用英文学，不是用中文背。所以每一页只讲一个概念、给五个新词、三道要出声回答的题。</span></p>
+    <p class="tags"><span class="tag"><span class="in-en">7 lessons</span><span class="in-zh">7 节课</span></span><span class="tag"><span class="in-en">1 question</span><span class="in-zh">1 道题</span></span><span class="tag"><span class="in-en">45 words</span><span class="in-zh">45 个词</span></span></p>
+    <button class="listen" data-listen type="button">🔊</button>
+  </div>
 
-  <section class="block">
-    <h2><span class="num">02</span>Interview questions<span class="hint">one page each</span></h2>
-    <ul class="qlist">
-      <li><a href="questions/java-hashmap.html">
-        <span class="no">Q1</span>
-        <span class="t">How does HashMap work?<small>Buckets, hash, resize, tree, thread safety.</small></span>
-        <span class="m">12 min</span></a></li>
-    </ul>
+  <section class="sec">
+    <h2><span class="num">01</span><span class="in-en">Start here, in this order</span><span class="in-zh">从这里开始，按这个顺序读</span></h2>
+    <p><span class="bi-en">Each lesson is about 600 English words. Read it once with the page read aloud, then answer the three questions at the bottom.</span><span class="bi-zh">每节课大约 600 个英文词。先点朗读跟一遍，再回答页面底部的三道题。</span></p>
+    <table class="ledger">
+      <thead><tr><th><span class="in-en">Lesson</span><span class="in-zh">第几课</span></th><th><span class="in-en">English</span><span class="in-zh">英文标题</span></th><th>中文</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td><span class="bi-en"><a href="basics/array.html">What is an array?</a></span><span class="bi-zh">数组</span></td><td>什么是数组</td></tr>
+        <tr><td>2</td><td><span class="bi-en"><a href="basics/linked-list.html">What is a linked list?</a></span><span class="bi-zh">链表</span></td><td>什么是链表</td></tr>
+        <tr><td>3</td><td><span class="bi-en"><a href="basics/tree.html">What is a tree? What is a red-black tree?</a></span><span class="bi-zh">树</span></td><td>什么是树、什么是红黑树</td></tr>
+        <tr><td>4</td><td><span class="bi-en"><a href="basics/hash.html">What is a key? A hash? A collision?</a></span><span class="bi-zh">哈希</span></td><td>什么是 key、hash、冲突</td></tr>
+        <tr><td>5</td><td><span class="bi-en"><a href="basics/big-o.html">What is O(1), O(n), O(log n)?</a></span><span class="bi-zh">复杂度</span></td><td>什么是 O(1)、O(n)、O(log n)</td></tr>
+        <tr><td>6</td><td><span class="bi-en"><a href="basics/hashmap-methods.html">HashMap methods in real code</a></span><span class="bi-zh">方法</span></td><td>HashMap 的常用方法和真实用法</td></tr>
+        <tr><td>7</td><td><span class="bi-en"><a href="basics/threads.html">Why is HashMap not thread-safe?</a></span><span class="bi-zh">线程</span></td><td>为什么 HashMap 线程不安全</td></tr>
+      </tbody>
+    </table>
+    <p class="note"><span class="bi-en">After lesson 7, read the <a href="questions/java-hashmap.html">HashMap question</a> — it puts all seven lessons into one 60-second answer.</span><span class="bi-zh">七课上完，去读 <a href="questions/java-hashmap.html">HashMap 那道题</a>——它把七课合成一个 60 秒的回答。</span></p>
   </section>
-
-  <section class="block">
-    <h2><span class="num">03</span>How to use these pages<span class="hint">3 steps, 10 minutes</span></h2>
-    <div class="cards">
-      <div class="card"><span class="c-no">1</span><span class="c-title">Read it out loud</span>
-        <span class="c-desc">Press Listen. Follow with your eyes and read along. Your mouth learns faster than your eyes.</span>
-        <span class="c-meta">3 min</span></div>
-      <div class="card"><span class="c-no">2</span><span class="c-title">Say the new words</span>
-        <span class="c-desc">Five words per page. Click “hear it” on YouGlish, then say each word three times.</span>
-        <span class="c-meta">4 min</span></div>
-      <div class="card"><span class="c-no">3</span><span class="c-title">Answer the checks</span>
-        <span class="c-desc">Say the answer out loud before you look at the hint. If you cannot say it, read the page again.</span>
-        <span class="c-meta">3 min</span></div>
+  <section class="sec">
+    <h2><span class="num">02</span><span class="in-en">How to read a page</span><span class="in-zh">怎么读一页</span></h2>
+    <ol class="steps">
+      <li><span class="bi-en">Press <b>🔊</b> at the top. Follow the words with your eyes. Twice is enough.</span><span class="bi-zh">点页面顶部的 <b>🔊</b>，眼睛跟着字走。两遍就够。</span></li>
+      <li><span class="bi-en">Switch to <b>中英</b> if a sentence is too hard. Read the English first, then the Chinese.</span><span class="bi-zh">句子太难就切到 <b>中英</b>：先读英文，再看中文。</span></li>
+      <li><span class="bi-en">Click <b>▶ hear it</b> on five new words. Say each one out loud three times.</span><span class="bi-zh">在新词里点 <b>▶ hear it</b>，听真人发音，每个词大声说三遍。</span></li>
+      <li><span class="bi-en">Answer the three questions at the bottom <b>out loud</b>, not in your head.</span><span class="bi-zh">页面底部三道题要<b>出声</b>回答，不要只在心里想。</span></li>
+    </ol>
+    <p class="note"><span class="bi-en">Twenty minutes is enough. One page a day, seven days, then you can explain HashMap.</span><span class="bi-zh">二十分钟就够。一天一页，七天之后你就能讲清 HashMap。</span></p>
+  </section>
+  <section class="sec">
+    <h2><span class="num">03</span><span class="in-en">Why English, and why so slow</span><span class="in-zh">为什么要英文、为什么这么慢</span></h2>
+    <p><span class="bi-en">In an interview the words are English: <i>bucket</i>, <i>collision</i>, <i>resize</i>. If I only know the Chinese word, I hear a sound I cannot follow.</span><span class="bi-zh">面试里蹦出来的是英文词：bucket、collision、resize。如果我只知道中文说法，听到的就是一串抓不住的声音。</span></p>
+    <p><span class="bi-en">So this site is slow on purpose. One idea per page, five words, one picture.</span><span class="bi-zh">所以这个网站是故意慢的：一页一个概念、五个词、一张图。</span></p>
+  </section>
+  <section class="sec">
+    <h2><span class="num">→</span><span class="in-en">New words</span><span class="in-zh">新词</span></h2>
+    <div class="wordlist">
+      <div class="word">
+        <span class="w">bucket</span>
+        <span class="ipa">/ˈbʌkɪt/</span>
+        <span class="mean"><span class="bi-en">One box in the array.</span><span class="bi-zh">桶：数组里的一格</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/bucket/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="bucket" type="button" aria-label="say bucket">🔊</button></span>
+      </div>
+      <div class="word">
+        <span class="w">collision</span>
+        <span class="ipa">/kəˈlɪʒn/</span>
+        <span class="mean"><span class="bi-en">Two keys that land in the same bucket.</span><span class="bi-zh">冲突：两个 key 落进同一个桶</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/collision/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="collision" type="button" aria-label="say collision">🔊</button></span>
+      </div>
+      <div class="word">
+        <span class="w">resize</span>
+        <span class="ipa">/ˌriːˈsaɪz/</span>
+        <span class="mean"><span class="bi-en">Make the array bigger and move items.</span><span class="bi-zh">扩容：把数组变大并搬数据</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/resize/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="resize" type="button" aria-label="say resize">🔊</button></span>
+      </div>
+      <div class="word">
+        <span class="w">thread</span>
+        <span class="ipa">/θred/</span>
+        <span class="mean"><span class="bi-en">One worker inside a program.</span><span class="bi-zh">线程：程序里的一个干活的</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/thread/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="thread" type="button" aria-label="say thread">🔊</button></span>
+      </div>
+      <div class="word">
+        <span class="w">complexity</span>
+        <span class="ipa">/kəmˈpleksəti/</span>
+        <span class="mean"><span class="bi-en">How cost grows with size.</span><span class="bi-zh">复杂度：代价随数据量的增长方式</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/complexity/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="complexity" type="button" aria-label="say complexity">🔊</button></span>
+      </div>
     </div>
+    <p class="note"><span class="bi-en">Click <b>▶ hear it</b> for real people on YouGlish; <b>🔊</b> for the computer voice.</span><span class="bi-zh">点 <b>▶ hear it</b> 听真人发音（YouGlish）；点 <b>🔊</b> 听电脑朗读。</span></p>
   </section>
 
+  <section class="sec">
+    <h2><span class="num">✓</span><span class="in-en">Check yourself</span><span class="in-zh">自测</span></h2>
+    <ol class="checks">
+      <li><span class="bi-en">Say the plan for today in one sentence.</span><span class="bi-zh">用一句话说出今天要做的事。</span></li>
+      <li><span class="bi-en">Which page are you reading today?</span><span class="bi-zh">今天你读哪一页？</span></li>
+      <li><span class="bi-en">Say one word you learned, out loud.</span><span class="bi-zh">说出一个今天学的词，出声。</span></li>
+    </ol>
+    <p class="note"><span class="bi-en">Answer out loud, not in your head.</span><span class="bi-zh">出声回答，不要只在心里想。</span></p>
+  </section>
+
+
+  <p class="log-tip"><a href="basics/array.html"><span class="in-en">Start Lesson 1 →</span><span class="in-zh">开始第 1 课 →</span></a></p>
 </main>
 
 <footer>
-  <div class="f-left"><span>Written for learning English · Wang Tianyu · Beijing</span></div>
-  <div class="f-right"><a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a><span class="sep">·</span><span>no framework, no tracking</span></div>
+  <div class="f-left"><span class="in-en">Written for learning English · Wang Tianyu</span><span class="in-zh">为学英语而写 · 王天宇</span></div>
+  <div class="f-right"><a href="index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a><span class="sep">·</span><a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a></div>
 </footer>
+<script src="assets/app.js"></script>
 </body>
 </html>

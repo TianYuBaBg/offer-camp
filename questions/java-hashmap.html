@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN" data-lang="zh">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>How does HashMap work · Java Notes</title>
-<meta name="description" content="How HashMap works, explained in simple English: buckets, hash, resize, tree, thread safety.">
+<meta name="description" content="How does HashMap work">
 <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body>
@@ -12,244 +12,190 @@
 
 <header class="masthead">
   <div class="mh-left">
-    <span class="mh-mark">Java Notes</span>
-    <span class="mh-en">OFFER&nbsp;CAMP</span>
+    <a class="mh-mark" href="../index.html">Java Notes</a>
     <nav class="mh-nav">
-      <a href="../index.html" class="on">Questions</a>
-      <a href="../basics/array.html">Basics</a>
-      <a href="../glossary.html">Words</a>
+      <a href="../index.html" class="on"><span class="in-en">Questions</span><span class="in-zh">题目</span></a>
+      <a href="../basics/array.html"><span class="in-en">Basics</span><span class="in-zh">基础</span></a>
+      <a href="../glossary.html"><span class="in-en">Words</span><span class="in-zh">词表</span></a>
     </nav>
   </div>
-  <div class="mh-right"><span>Question 1</span></div>
+  <div class="mh-right">
+    <span class="langswitch">
+      <button type="button" data-lang-set="zh">中文</button>
+      <button type="button" data-lang-set="both">中英</button>
+      <button type="button" data-lang-set="en">English</button>
+    </span>
+  </div>
 </header>
 
 <main>
-  <p class="crumb"><a href="../index.html">Home</a> / Question 1: HashMap</p>
+  <p class="crumb"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a> / <span class="in-en">Question 1: HashMap</span><span class="in-zh">第 1 题：HashMap</span></p>
 
   <div class="qhead">
-    <p class="kicker">Question 1 · HashMap</p>
-    <h1>How does HashMap work?</h1>
-    <p class="lede">A box of small boxes. Give it a key, get back a value, very fast.</p>
-    <span class="tag hot">Must know</span><span class="tag">HashMap</span><span class="tag">speak 60s</span><span class="tag">7 lessons</span>
-    <button class="listen" data-listen>🔊 Listen to this page</button>
+    <p class="kicker"><span class="in-en">Question 1 · HashMap</span><span class="in-zh">第 1 题 · HashMap</span></p>
+    <h1><span class="in-en">How does HashMap work?</span><span class="in-zh">HashMap 是怎么工作的？</span></h1>
+    <p class="lede"><span class="in-en">A box of small boxes. Give it a key, get back a value, very fast.</span><span class="in-zh">一个装着小盒子的盒子：给它 key，它很快还你 value。</span></p>
+    <p class="tags"><span class="tag"><span class="in-en">Must know</span><span class="in-zh">必背</span></span><span class="tag"><span class="in-en">HashMap</span><span class="in-zh">HashMap</span></span><span class="tag"><span class="in-en">speak 60s</span><span class="in-zh">60 秒口播</span></span><span class="tag"><span class="in-en">7 lessons</span><span class="in-zh">关联 7 课</span></span></p>
+    <button class="listen" data-listen type="button">🔊</button>
   </div>
 
-
   <section class="sec">
-    <h2><span class="num">01</span>One sentence</h2>
-    <blockquote class="short">
-      <span class="lbl">Say this first</span>
-      A HashMap is a box of small boxes. You give it a <b>key</b> (a name), and it gives you back a <b>value</b> (a thing) very fast. Inside, it uses an <b>array</b>. Each box in the array is called a <b>bucket</b>. When two keys fall into the same bucket, they stand in a line.
+    <h2><span class="num">01</span><span class="in-en">One sentence</span><span class="in-zh">一句话</span></h2>
+    <blockquote class="short"><span class="lbl"><span class="in-en">Say this first</span><span class="in-zh">先说这句</span></span>
+      <p><span class="bi-en">A HashMap is a box of small boxes. You give it a key, and it gives you back a value very fast. Inside, it uses an array. Each box in the array is called a bucket. When two keys fall into the same bucket, they stand in a line.</span><span class="bi-zh">HashMap 是一个装着小盒子的盒子：给它 key，它很快还你 value。底层是一个数组，数组里每一格叫一个桶。两个 key 落进同一个桶时，就排成一队（链表）。</span></p>
     </blockquote>
   </section>
-
   <section class="sec">
-    <h2><span class="num">02</span>What is inside</h2>
-    <p>On the outside it looks like a table of names and values:</p>
+    <h2><span class="num">02</span><span class="in-en">What is inside</span><span class="in-zh">里面是什么</span></h2>
+    <p><span class="bi-en">Outside, it looks like a table of names and values:</span><span class="bi-zh">从外面看，是一张“名字 → 值”的表：</span></p>
     <table class="ledger">
-      <thead><tr><th>key</th><th>value</th></tr></thead>
+      <thead><tr><th><span class="in-en">key</span><span class="in-zh">键</span></th><th><span class="in-en">value</span><span class="in-zh">值</span></th></tr></thead>
       <tbody>
         <tr><td>"apple"</td><td>5</td></tr>
         <tr><td>"pear"</td><td>3</td></tr>
       </tbody>
     </table>
-    <p>On the inside it is an <b>array of buckets</b>. A bucket can be in one of three states:</p>
-
-    <figure class="figure">
-      <div class="arr">
-        <div class="cell">0</div><div class="cell">1</div><div class="cell">2</div><div class="cell on">3</div>
-        <div class="cell">4</div><div class="cell">5</div><div class="cell">6</div><div class="cell">7</div>
-        <div class="cell">8</div><div class="cell on">9</div><div class="cell">10</div><div class="cell">11</div>
-        <div class="cell on">12</div><div class="cell">13</div><div class="cell">14</div><div class="cell">15</div>
-      </div>
-      <div class="chainrow">
-        <div class="chain"><span class="node">bucket 3: Node</span><span class="nil">→ null</span></div>
-        <div class="chain"><span class="node">bucket 9: Node</span><span class="arrow">→</span><span class="node">Node</span><span class="arrow">→</span><span class="node">Node</span><span class="nil">→ null</span></div>
-        <div class="chain"><span class="node tree">bucket 12: red-black tree</span></div>
-      </div>
-      <figcaption>An array of 16 buckets. Bucket 9 holds a short line. Bucket 12 has become a tree.</figcaption>
-    </figure>
+    <p><span class="bi-en">Inside, it is an <b>array of buckets</b>. A bucket has three possible states: empty, a short line, or a tree.</span><span class="bi-zh">从里面看，是一个<b>桶数组</b>。一个桶只有三种状态：空、短链、树。</span></p>
+    <div class="arr"><div class="cell">0</div><div class="cell">1</div><div class="cell">2</div><div class="cell on">3</div><div class="cell">4</div><div class="cell">5</div><div class="cell">6</div><div class="cell">7</div><div class="cell">8</div><div class="cell on">9</div><div class="cell">10</div><div class="cell">11</div><div class="cell on">12</div><div class="cell">13</div><div class="cell">14</div><div class="cell">15</div></div><div class="chainrow"><div class="chain"><span class="node">bucket 3: Node</span><span class="nil">→ null</span></div><div class="chain"><span class="node">bucket 9: Node</span><span class="arrow">→</span><span class="node">Node</span><span class="arrow">→</span><span class="node">Node</span><span class="nil">→ null</span></div><div class="chain"><span class="node tree">bucket 12: red-black tree</span></div></div><figcaption><span class="in-en">An array of 16 buckets. Bucket 9 holds a short line. Bucket 12 has become a tree.</span><span class="in-zh">16 个桶的数组：桶 9 是一条短链，桶 12 已经变成了红黑树。</span></figcaption>
   </section>
-
   <section class="sec">
-    <h2><span class="num">03</span>How put works</h2>
-    <p>When you call <code>map.put("apple", 5)</code>, six things happen:</p>
+    <h2><span class="num">03</span><span class="in-en">How put works</span><span class="in-zh">put 的六步</span></h2>
     <ol class="steps">
-      <li><b>Make the table</b> — the first put creates the array with 16 buckets. (Before that, it is empty.)</li>
-      <li><b>Compute the hash</b> — a number from the key: <code>(h = key.hashCode()) ^ (h &gt;&gt;&gt; 16)</code>. The second half mixes the high bits into the low bits, so the number spreads better.</li>
-      <li><b>Find the bucket</b> — <code>index = (n - 1) &amp; hash</code>. Because n is a power of two, this is the same as <code>hash % n</code>, but faster.</li>
-      <li><b>Empty bucket?</b> — put a new node there. Done.</li>
-      <li><b>Not empty?</b> — compare the key: same key → replace the value; different key → go to the end of the line and add a new node. If the line reaches 8 items, the bucket may become a tree.</li>
-      <li><b>Too full?</b> — if <code>size &gt; capacity × 0.75</code>, double the array and move the items.</li>
+      <li><span class="bi-en"><b>Make the table</b> — the first put creates the array with 16 buckets.</span><span class="bi-zh"><b>建表</b>——第一次 put 才创建 16 格数组。</span></li>
+      <li><span class="bi-en"><b>Compute the hash</b> — <code>(h = key.hashCode()) ^ (h &gt;&gt;&gt; 16)</code>, mixing high bits into low bits.</span><span class="bi-zh"><b>算 hash</b>——<code>(h = key.hashCode()) ^ (h &gt;&gt;&gt; 16)</code>，把高位混进低位。</span></li>
+      <li><span class="bi-en"><b>Find the bucket</b> — <code>index = (n - 1) &amp; hash</code>; because n is a power of two this equals <code>hash % n</code>, but faster.</span><span class="bi-zh"><b>定位桶</b>——<code>index = (n - 1) &amp; hash</code>；因为 n 是 2 的幂，这等价于 <code>hash % n</code>，但更快。</span></li>
+      <li><span class="bi-en"><b>Empty bucket?</b> — put a new node there. Done.</span><span class="bi-zh"><b>桶是空的？</b>——放一个新节点，结束。</span></li>
+      <li><span class="bi-en"><b>Not empty?</b> — same key → replace the value; different key → go to the end of the line; at 8 items the bucket may become a tree.</span><span class="bi-zh"><b>不空？</b>——key 相同就覆盖 value；不同就挂到链尾；到 8 个可能树化。</span></li>
+      <li><span class="bi-en"><b>Too full?</b> — if <code>size &gt; capacity × 0.75</code>, double the array.</span><span class="bi-zh"><b>太满了？</b>——超过 容量 × 0.75 就扩容一倍。</span></li>
     </ol>
-
     <pre><code>if ((tab = table) == null || (n = tab.length) == 0)
     n = (tab = resize()).length;                  // 1. create the array
-if ((p = tab[i = (n - 1) &amp; hash]) == null)
+if ((p = tab[i = (n - 1) & hash]) == null)
     tab[i] = newNode(hash, key, value, null);     // 2. empty bucket
 else {
-    if (p.hash == hash &amp;&amp; (p.key == key || key.equals(p.key)))
+    if (p.hash == hash && (p.key == key || key.equals(p.key)))
         e = p;                                    // 3. same key: replace
     else if (p instanceof TreeNode)
-        e = ((TreeNode&lt;K,V&gt;) p).putTreeVal(...);   // 4. bucket is a tree
+        e = ((TreeNode<K,V>) p).putTreeVal(...);   // 4. bucket is a tree
     else {
         for (int binCount = 0; ; ++binCount) {
             if ((e = p.next) == null) {
                 p.next = newNode(hash, key, value, null);  // 5. add at the end
-                if (binCount &gt;= TREEIFY_THRESHOLD - 1)
-                    treeifyBin(tab, hash);                 //    line is long: tree
+                if (binCount >= TREEIFY_THRESHOLD - 1)
+                    treeifyBin(tab, hash);                 //    line too long: tree
                 break;
             }
-            if (e.hash == hash &amp;&amp; (e.key == key || key.equals(e.key))) break;
+            if (e.hash == hash && (e.key == key || key.equals(e.key))) break;
             p = e;
         }
     }
     if (e != null) { V old = e.value; e.value = value; return old; }
 }
 ++modCount;
-if (++size &gt; threshold) resize();                 // 6. too full: grow
+if (++size > threshold) resize();                 // 6. too full: grow
 return null;</code></pre>
   </section>
-
   <section class="sec">
-    <h2><span class="num">04</span>Why resize is cheap</h2>
-    <p>When the array grows from 16 to 32, an item has only two possible new places: <b>where it is</b>, or <b>where it is + 16</b>. One bit decides:</p>
-    <pre><code>if ((e.hash &amp; oldCap) == 0)  keep the item at index i
+    <h2><span class="num">04</span><span class="in-en">Why resize is cheap</span><span class="in-zh">为什么扩容不贵</span></h2>
+    <p><span class="bi-en">From 16 to 32, an item has only two possible places: <b>where it is</b>, or <b>where it is + 16</b>. One bit decides:</span><span class="bi-zh">从 16 扩到 32，每个元素只有两种去处：<b>原位</b>，或者<b>原位 + 16</b>。看一位就够：</span></p>
+    <pre><code>if ((e.hash & oldCap) == 0)  keep the item at index i
 else                          move it to index i + oldCap</code></pre>
-    <p>So HashMap does not recompute the hash or the index for every item. It splits each bucket into two small lines and moves them.</p>
+    <p><span class="bi-en">So HashMap does not recompute every hash. It splits each bucket into two short lines.</span><span class="bi-zh">所以不用重算每个 hash，只是把每个桶拆成两条短链。</span></p>
   </section>
-
   <section class="sec">
-    <h2><span class="num">05</span>Two numbers: 0.75 and 8</h2>
+    <h2><span class="num">05</span><span class="in-en">Two numbers: 0.75 and 8</span><span class="in-zh">两个数字：0.75 和 8</span></h2>
     <table class="ledger">
-      <thead><tr><th>Number</th><th>What it means</th><th>Why</th></tr></thead>
+      <thead><tr><th><span class="in-en">Number</span><span class="in-zh">数字</span></th><th><span class="in-en">Means</span><span class="in-zh">含义</span></th><th><span class="in-en">Why</span><span class="in-zh">为什么</span></th></tr></thead>
       <tbody>
-        <tr><td>0.75</td><td>load factor: grow when size &gt; capacity × 0.75</td><td>A balance: smaller wastes memory, bigger makes more collisions. 0.75 is the usual middle.</td></tr>
-        <tr><td>8</td><td>a bucket with 8 items may become a tree</td><td>With a good hash, a line of 8 is very rare (about 1 in 10,000,000). If it happens, the bucket is unlucky, so a tree makes it fast again.</td></tr>
-        <tr><td>64</td><td>the array must have 64 buckets before a tree is allowed</td><td>With a small array it is cheaper to grow the array than to build a tree.</td></tr>
-        <tr><td>6</td><td>a tree with 6 items turns back into a line</td><td>A buffer, so the bucket does not flip between tree and line again and again.</td></tr>
+        <tr><td>0.75</td><td><span class="bi-en">grow when size > capacity × 0.75</span><span class="bi-zh">超过 容量 × 0.75 就扩容</span></td><td><span class="bi-en">balance memory and collisions</span><span class="bi-zh">内存和冲突的平衡点</span></td></tr>
+        <tr><td>8</td><td><span class="bi-en">a bucket with 8 items may treeify</span><span class="bi-zh">桶里 8 个可能树化</span></td><td><span class="bi-en">a good hash rarely makes a line of 8</span><span class="bi-zh">hash 好时几乎不会有 8 个</span></td></tr>
+        <tr><td>64</td><td><span class="bi-en">the array must have 64 buckets to treeify</span><span class="bi-zh">容量至少 64 才允许树化</span></td><td><span class="bi-en">small array: growing is cheaper</span><span class="bi-zh">数组小的时候扩容更划算</span></td></tr>
+        <tr><td>6</td><td><span class="bi-en">a tree with 6 items turns back to a line</span><span class="bi-zh">树里剩 6 个就退回链表</span></td><td><span class="bi-en">a buffer, to avoid flipping</span><span class="bi-zh">留缓冲，避免来回变</span></td></tr>
       </tbody>
     </table>
   </section>
-
   <section class="sec">
-    <h2><span class="num">06</span>Why it is not thread-safe</h2>
-    <p>Two threads can call <code>put</code> at the same time. Both read the same <code>size</code>, both write it back — one increase is lost. In JDK 7, two threads resizing at once could even bend the lines into a circle, and then <code>get</code> would spin forever.</p>
-    <p>So in a web application use <b>ConcurrentHashMap</b>. It locks only the bucket that is being changed, not the whole map.</p>
-    <p class="note"><b>Want the long version?</b> Read <a href="../basics/threads.html">Lesson 7: Why HashMap is not thread-safe</a>.</p>
+    <h2><span class="num">06</span><span class="in-en">Why it is not thread-safe</span><span class="in-zh">为什么线程不安全</span></h2>
+    <p><span class="bi-en">Two threads call put at the same time: both read size, both write it back — one update is lost. In JDK 7, two resizes at once could bend a list into a circle and get would spin forever.</span><span class="bi-zh">两个线程同时 put：都读到 size、都写回——丢掉一次更新。JDK 7 里两个线程同时扩容，甚至能把链拧成环，get 就永远转不出来。</span></p>
+    <p><span class="bi-en">So in a web application I use <b>ConcurrentHashMap</b>: it locks only the bucket being changed.</span><span class="bi-zh">所以 Web 应用里我用 <b>ConcurrentHashMap</b>：它只锁正在改的那个桶。</span></p>
+    <p class="note"><span class="bi-en">Long version: <a href="../basics/threads.html">Lesson 7</a>.</span><span class="bi-zh">完整版：<a href="../basics/threads.html">第 7 课</a>。</span></p>
   </section>
-
   <section class="sec">
-    <h2><span class="num">07</span>Say it in 60 seconds</h2>
-    <blockquote class="script">
-      <span class="lbl">Read it out loud · then say it in your own words</span>
-      <p>A HashMap is an array of buckets. You give it a key, it computes a hash, and the hash tells it which bucket to use.</p>
-      <p>If the bucket is empty, the value goes in. If the bucket already has items with different keys, they stand in a line — a linked list. When one line reaches 8 items and the array has at least 64 buckets, the line becomes a red-black tree, so the worst case is O(log n) instead of O(n).</p>
-      <p>When the map is 75 percent full, the array doubles. Because the size is a power of two, each item either stays in its bucket or moves to bucket + old size, so there is no need to recompute the hash.</p>
-      <p>HashMap is fast and simple, but it is not thread-safe. In a web application I would use ConcurrentHashMap instead.</p>
+    <h2><span class="num">07</span><span class="in-en">Say it in 60 seconds</span><span class="in-zh">60 秒照念稿</span></h2>
+    <blockquote class="script"><span class="lbl"><span class="in-en">Read out loud, then say it your own way</span><span class="in-zh">先照着念，再换成自己的话</span></span>
+      <p><span class="bi-en">A HashMap is an array of buckets. You give it a key, it computes a hash, and the hash tells it which bucket to use.</span><span class="bi-zh">HashMap 是一个桶数组。给它 key，它算出一个 hash，hash 决定用哪个桶。</span></p>
+      <p><span class="bi-en">If the bucket is empty, the value goes in. If it already has items with different keys, they stand in a line. When a line reaches 8 items and the array has at least 64 buckets, it becomes a red-black tree, so the worst case is O(log n) instead of O(n).</span><span class="bi-zh">桶是空的就直接放。桶里已经有别的 key，就排成一条链。链到 8 个、且数组至少 64 格，就变成红黑树，最坏情况从 O(n) 降到 O(log n)。</span></p>
+      <p><span class="bi-en">When the map is 75 percent full, the array doubles. Because the size is a power of two, each item either stays or moves to bucket + old size, so no hash is recomputed.</span><span class="bi-zh">装到 75% 就扩容一倍。因为容量是 2 的幂，每个元素要么原位、要么挪到原位 + 旧容量，不用重算 hash。</span></p>
+      <p><span class="bi-en">HashMap is fast but not thread-safe, so in a web application I use ConcurrentHashMap.</span><span class="bi-zh">HashMap 快，但线程不安全，所以 Web 应用里我用 ConcurrentHashMap。</span></p>
     </blockquote>
   </section>
-
   <section class="sec">
-    <h2><span class="num">08</span>The numbers to remember</h2>
-    <table class="ledger">
-      <thead><tr><th>capacity</th><th>load factor</th><th>tree at</th><th>back to list at</th><th>tree needs capacity</th><th>growth</th></tr></thead>
-      <tbody><tr><td>16</td><td>0.75</td><td>8</td><td>6</td><td>64</td><td>×2</td></tr></tbody>
-    </table>
-  </section>
-
-  <section class="sec">
-    <h2><span class="num">09</span>Go deeper</h2>
-    <ul>
-      <li><a href="../basics/array.html">Lesson 1: What is an array?</a></li>
-      <li><a href="../basics/linked-list.html">Lesson 2: What is a linked list?</a></li>
-      <li><a href="../basics/tree.html">Lesson 3: What is a tree? And a red-black tree?</a></li>
-      <li><a href="../basics/hash.html">Lesson 4: What is a key, a hash, a collision?</a></li>
-      <li><a href="../basics/big-o.html">Lesson 5: What is O(1), O(n), O(log n)?</a></li>
-      <li><a href="../basics/hashmap-methods.html">Lesson 6: HashMap methods in real life</a></li>
-      <li><a href="../basics/threads.html">Lesson 7: Why HashMap is not thread-safe?</a></li>
+    <h2><span class="num">08</span><span class="in-en">Go deeper, one idea at a time</span><span class="in-zh">再往下学，一次一个概念</span></h2>
+    <ul class="deeper">
+      <li><a href="../basics/array.html"><span class="in-en">Lesson 1: What is an array?</span><span class="in-zh">第 1 课：什么是数组</span></a></li><li><a href="../basics/linked-list.html"><span class="in-en">Lesson 2: What is a linked list?</span><span class="in-zh">第 2 课：什么是链表</span></a></li><li><a href="../basics/tree.html"><span class="in-en">Lesson 3: What is a tree? Red-black tree?</span><span class="in-zh">第 3 课：什么是树、红黑树</span></a></li><li><a href="../basics/hash.html"><span class="in-en">Lesson 4: key, hash, collision</span><span class="in-zh">第 4 课：key、hash、冲突</span></a></li><li><a href="../basics/big-o.html"><span class="in-en">Lesson 5: O(1), O(n), O(log n)</span><span class="in-zh">第 5 课：O(1)、O(n)、O(log n)</span></a></li><li><a href="../basics/hashmap-methods.html"><span class="in-en">Lesson 6: HashMap methods in real code</span><span class="in-zh">第 6 课：HashMap 方法与真实用法</span></a></li><li><a href="../basics/threads.html"><span class="in-en">Lesson 7: Why it is not thread-safe</span><span class="in-zh">第 7 课：为什么线程不安全</span></a></li>
     </ul>
   </section>
-
-
   <section class="sec">
-    <h2><span class="num">→</span>New words</h2>
+    <h2><span class="num">→</span><span class="in-en">New words</span><span class="in-zh">新词</span></h2>
     <div class="wordlist">
       <div class="word">
         <span class="w">bucket</span>
         <span class="ipa">/ˈbʌkɪt/</span>
-        <span class="mean">One box in the array that holds items with the same hash.</span>
-        <span class="links"><a class="say" href="https://youglish.com/pronounce/bucket/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="bucket" aria-label="say bucket">🔊</button></span>
-      </div>
-      <div class="word">
-        <span class="w">hash</span>
-        <span class="ipa">/hæʃ/</span>
-        <span class="mean">A number computed from the key. Like a fingerprint.</span>
-        <span class="links"><a class="say" href="https://youglish.com/pronounce/hash/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="hash" aria-label="say hash">🔊</button></span>
-      </div>
-      <div class="word">
-        <span class="w">collision</span>
-        <span class="ipa">/kəˈlɪʒn/</span>
-        <span class="mean">Two different keys that land in the same bucket.</span>
-        <span class="links"><a class="say" href="https://youglish.com/pronounce/collision/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="collision" aria-label="say collision">🔊</button></span>
-      </div>
-      <div class="word">
-        <span class="w">resize</span>
-        <span class="ipa">/ˌriːˈsaɪz/</span>
-        <span class="mean">Make the array bigger and move the items.</span>
-        <span class="links"><a class="say" href="https://youglish.com/pronounce/resize/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="resize" aria-label="say resize">🔊</button></span>
-      </div>
-      <div class="word">
-        <span class="w">load factor</span>
-        <span class="ipa">/loʊd ˈfæktər/</span>
-        <span class="mean">How full the table can be before it grows. Default 0.75.</span>
-        <span class="links"><a class="say" href="https://youglish.com/pronounce/load%20factor/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="load factor" aria-label="say load factor">🔊</button></span>
-      </div>
-      <div class="word">
-        <span class="w">threshold</span>
-        <span class="ipa">/ˈθreʃhoʊld/</span>
-        <span class="mean">The size that triggers a resize: capacity × load factor.</span>
-        <span class="links"><a class="say" href="https://youglish.com/pronounce/threshold/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="threshold" aria-label="say threshold">🔊</button></span>
-      </div>
-      <div class="word">
-        <span class="w">treeify</span>
-        <span class="ipa">/ˈtriːɪfaɪ/</span>
-        <span class="mean">Turn a long line in a bucket into a tree.</span>
-        <span class="links"><a class="say" href="https://youglish.com/pronounce/treeify/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="treeify" aria-label="say treeify">🔊</button></span>
+        <span class="mean"><span class="bi-en">One box of the array.</span><span class="bi-zh">桶：数组的一格</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/bucket/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="bucket" type="button" aria-label="say bucket">🔊</button></span>
       </div>
       <div class="word">
         <span class="w">capacity</span>
         <span class="ipa">/kəˈpæsəti/</span>
-        <span class="mean">How many buckets the array has. Default 16.</span>
-        <span class="links"><a class="say" href="https://youglish.com/pronounce/capacity/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="capacity" aria-label="say capacity">🔊</button></span>
+        <span class="mean"><span class="bi-en">How many buckets the array has.</span><span class="bi-zh">容量：数组有多少格</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/capacity/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="capacity" type="button" aria-label="say capacity">🔊</button></span>
       </div>
       <div class="word">
-        <span class="w">thread-safe</span>
-        <span class="ipa">/θred seɪf/</span>
-        <span class="mean">Safe to use from several threads at the same time.</span>
-        <span class="links"><a class="say" href="https://youglish.com/pronounce/thread-safe/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="thread-safe" aria-label="say thread-safe">🔊</button></span>
+        <span class="w">load factor</span>
+        <span class="ipa">/loʊd ˈfæktər/</span>
+        <span class="mean"><span class="bi-en">How full before it grows. 0.75.</span><span class="bi-zh">负载因子：多满就扩容，默认 0.75</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/load%2520factor/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="load factor" type="button" aria-label="say load factor">🔊</button></span>
+      </div>
+      <div class="word">
+        <span class="w">threshold</span>
+        <span class="ipa">/ˈθreʃhoʊld/</span>
+        <span class="mean"><span class="bi-en">capacity × load factor.</span><span class="bi-zh">阈值：容量 × 负载因子</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/threshold/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="threshold" type="button" aria-label="say threshold">🔊</button></span>
+      </div>
+      <div class="word">
+        <span class="w">treeify</span>
+        <span class="ipa">/ˈtriːɪfaɪ/</span>
+        <span class="mean"><span class="bi-en">Turn a long bucket line into a tree.</span><span class="bi-zh">树化：把长链变成树</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/treeify/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="treeify" type="button" aria-label="say treeify">🔊</button></span>
+      </div>
+      <div class="word">
+        <span class="w">collision</span>
+        <span class="ipa">/kəˈlɪʒn/</span>
+        <span class="mean"><span class="bi-en">Two keys in the same bucket.</span><span class="bi-zh">冲突：两个 key 在一个桶</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/collision/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="collision" type="button" aria-label="say collision">🔊</button></span>
       </div>
     </div>
-    <p class="note">Click <b>hear it</b> to listen to real people say the word on YouGlish. Click <b>🔊</b> to hear the computer say it.</p>
+    <p class="note"><span class="bi-en">Click <b>▶ hear it</b> for real people on YouGlish; <b>🔊</b> for the computer voice.</span><span class="bi-zh">点 <b>▶ hear it</b> 听真人发音（YouGlish）；点 <b>🔊</b> 听电脑朗读。</span></p>
   </section>
 
   <section class="sec">
-    <h2><span class="num">✓</span>Check yourself</h2>
+    <h2><span class="num">✓</span><span class="in-en">Check yourself</span><span class="in-zh">自测</span></h2>
     <ol class="checks">
-      <li>What is a bucket?<small>One box in the array. Items that hash to the same index stand in that box.</small></li>
-      <li>How does HashMap find the bucket?<small>index = (n - 1) &amp; hash, where n is the number of buckets.</small></li>
-      <li>When does a line become a tree?<small>When one bucket has 8 items and the array has at least 64 buckets.</small></li>
-      <li>Why does resize not recompute every hash?<small>Because capacity is a power of two: an item either stays at i or moves to i + oldCap.</small></li>
-      <li>Why is HashMap not thread-safe?<small>put is many steps; two threads can overwrite each other, lose updates, or corrupt the lines.</small></li>
+      <li><span class="bi-en">Explain the whole thing in 60 seconds, in English.</span><span class="bi-zh">用英文把整件事讲 60 秒。</span></li>
+      <li><span class="bi-en">Where does the bucket index come from?</span><span class="bi-zh">桶的位置是怎么算出来的？</span></li>
+      <li><span class="bi-en">Why does resize not recompute the hash?</span><span class="bi-zh">为什么扩容不用重算 hash？</span></li>
+      <li><span class="bi-en">What would you say if I ask “then why not always use ConcurrentHashMap?”</span><span class="bi-zh">如果我问“那为什么不干脆一直用 ConcurrentHashMap”，你怎么答？</span></li>
     </ol>
+    <p class="note"><span class="bi-en">Answer out loud, not in your head.</span><span class="bi-zh">出声回答，不要只在心里想。</span></p>
   </section>
 
-  <p class="log-tip">Next: <a href="../index.html">back to all pages</a> · then try <a href="../basics/hash.html">Lesson 4</a> if “hash” still feels unclear.</p>
+
+  <p class="log-tip"><a href="../glossary.html"><span class="in-en">Next: practice the words →</span><span class="in-zh">下一步：把词练熟 →</span></a></p>
 </main>
 
 <footer>
-  <div class="f-left"><span>Written for learning English · Wang Tianyu</span></div>
-  <div class="f-right"><a href="../index.html">Home</a><span class="sep">·</span><a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a></div>
+  <div class="f-left"><span class="in-en">Written for learning English · Wang Tianyu</span><span class="in-zh">为学英语而写 · 王天宇</span></div>
+  <div class="f-right"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a><span class="sep">·</span><a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a></div>
 </footer>
 <script src="../assets/app.js"></script>
 </body>

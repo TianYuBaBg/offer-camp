@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN" data-lang="zh">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>About · Java Notes</title>
-<meta name="description" content="Why this site is in English, and how to use it.">
+<meta name="description" content="About">
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
@@ -12,77 +12,89 @@
 
 <header class="masthead">
   <div class="mh-left">
-    <span class="mh-mark">Java Notes</span>
-    <span class="mh-en">OFFER&nbsp;CAMP</span>
+    <a class="mh-mark" href="index.html">Java Notes</a>
     <nav class="mh-nav">
-      <a href="index.html">Questions</a>
-      <a href="basics/array.html">Basics</a>
-      <a href="glossary.html">Words</a>
+      <a href="index.html"><span class="in-en">Questions</span><span class="in-zh">题目</span></a>
+      <a href="basics/array.html"><span class="in-en">Basics</span><span class="in-zh">基础</span></a>
+      <a href="glossary.html"><span class="in-en">Words</span><span class="in-zh">词表</span></a>
     </nav>
   </div>
-  <div class="mh-right"><span>About</span></div>
+  <div class="mh-right">
+    <span class="langswitch">
+      <button type="button" data-lang-set="zh">中文</button>
+      <button type="button" data-lang-set="both">中英</button>
+      <button type="button" data-lang-set="en">English</button>
+    </span>
+  </div>
 </header>
 
 <main>
-  <p class="crumb"><a href="index.html">Home</a> / About</p>
+  <p class="crumb"><a href="index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a> / <span class="in-en">About</span><span class="in-zh">关于</span></p>
 
   <div class="qhead">
-    <p class="kicker">About</p>
-    <h1>Learn Java, in English.</h1>
-    <p class="lede">Short sentences, real pronunciation, no Chinese in the learning path.</p>
-    <span class="tag">English first</span><span class="tag">no tracking</span>
-    <button class="listen" data-listen>🔊 Listen to this page</button>
+    <p class="kicker"><span class="in-en">About</span><span class="in-zh">关于</span></p>
+    <h1><span class="in-en">Learn Java, in English.</span><span class="in-zh">用英文学 Java。</span></h1>
+    <p class="lede"><span class="in-en">Short sentences, real pronunciation, and a Chinese line whenever you need it.</span><span class="in-zh">短句子、真人发音，需要的时候还有一行中文。</span></p>
+    <p class="tags"><span class="tag"><span class="in-en">English first</span><span class="in-zh">英文优先</span></span><span class="tag"><span class="in-en">no tracking</span><span class="in-zh">无追踪</span></span></p>
+    <button class="listen" data-listen type="button">🔊</button>
   </div>
 
-
   <section class="sec">
-    <h2><span class="num">01</span>Why this site is in English</h2>
-    <p>I am learning Java, and I am learning English at the same time. If I read Java in Chinese, I only learn the idea. If I read it in English, I learn the idea <b>and</b> the words I will hear in an interview.</p>
-    <p>So every page here is in English, with short sentences and no idioms. Every technical word has a real pronunciation link.</p>
+    <h2><span class="num">01</span><span class="in-en">Why this site exists</span><span class="in-zh">为什么做这个站</span></h2>
+    <p><span class="bi-en">I am learning Java and English at the same time. If I read Java in Chinese, I learn the idea only. If I read it in English, I learn the idea and the words I will hear in an interview.</span><span class="bi-zh">我在同时学 Java 和英语。用中文读 Java，只学到概念；用英文读，概念和面试里会听到的词一起学到。</span></p>
   </section>
-
   <section class="sec">
-    <h2><span class="num">02</span>How to use it</h2>
+    <h2><span class="num">02</span><span class="in-en">Three buttons</span><span class="in-zh">三个按钮</span></h2>
     <ul>
-      <li><b>Listen first.</b> Press “Listen to this page” and follow with your eyes.</li>
-      <li><b>Say the new words.</b> Five words a page. YouGlish gives real people saying them.</li>
-      <li><b>Answer the checks out loud.</b> If you cannot say it, read the page again.</li>
-      <li><b>Come back tomorrow.</b> Yesterday's words, then one new page.</li>
+      <li><span class="bi-en"><b>中文</b> — read only Chinese.</span><span class="bi-zh"><b>中文</b>——只看中文。</span></li>
+      <li><span class="bi-en"><b>中英</b> — English first, Chinese under it. Good for the hard pages.</span><span class="bi-zh"><b>中英</b>——先英文，下面跟一行中文。难页用这个。</span></li>
+      <li><span class="bi-en"><b>English</b> — the real test.</span><span class="bi-zh"><b>English</b>——真正的考试模式。</span></li>
     </ul>
   </section>
-
   <section class="sec">
-    <h2><span class="num">03</span>What is on it</h2>
-    <ul>
-      <li><b>Basics</b> — seven short lessons: array, linked list, tree, hash, Big O, HashMap methods, threads.</li>
-      <li><b>Questions</b> — one page per interview question, starting with HashMap.</li>
-      <li><b>Words</b> — every word in one list, with pronunciation.</li>
-    </ul>
-    <p class="note">The site is plain HTML with no framework and no tracking. It is published from <a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a> by Cloudflare Pages.</p>
-  </section>
-
-
-  <section class="sec">
-    <h2><span class="num">→</span>New words</h2>
-    <div class="wordlist">
-
-    </div>
-    <p class="note">Click <b>hear it</b> to listen to real people say the word on YouGlish. Click <b>🔊</b> to hear the computer say it.</p>
-  </section>
-
-  <section class="sec">
-    <h2><span class="num">✓</span>Check yourself</h2>
-    <ol class="checks">
-
+    <h2><span class="num">03</span><span class="in-en">How to use it</span><span class="in-zh">怎么用</span></h2>
+    <ol class="steps">
+      <li><span class="bi-en">Press <b>🔊</b> and follow with your eyes.</span><span class="bi-zh">点 <b>🔊</b>，眼睛跟着字走。</span></li>
+      <li><span class="bi-en">Say five new words out loud, after YouGlish.</span><span class="bi-zh">跟着 YouGlish 把五个新词读出声。</span></li>
+      <li><span class="bi-en">Answer the checks out loud, then read the page again if you could not.</span><span class="bi-zh">自测题出声回答，答不出来就回去再读。</span></li>
     </ol>
+    <p class="note"><span class="bi-en">Plain HTML, no framework, no tracking. Published by GitHub Pages from <a href="https://github.com/TianYuBaBg/offer-camp">this repository</a>.</span><span class="bi-zh">纯 HTML，没有框架，没有追踪。由 GitHub Pages 从<a href="https://github.com/TianYuBaBg/offer-camp">这个仓库</a>发布。</span></p>
+  </section>
+  <section class="sec">
+    <h2><span class="num">→</span><span class="in-en">New words</span><span class="in-zh">新词</span></h2>
+    <div class="wordlist">
+      <div class="word">
+        <span class="w">plain</span>
+        <span class="ipa">/pleɪn/</span>
+        <span class="mean"><span class="bi-en">Simple, without extra things.</span><span class="bi-zh">plain：简单的、不加料的</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/plain/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="plain" type="button" aria-label="say plain">🔊</button></span>
+      </div>
+      <div class="word">
+        <span class="w">framework</span>
+        <span class="ipa">/ˈfreɪmwɜːrk/</span>
+        <span class="mean"><span class="bi-en">A set of tools you build on.</span><span class="bi-zh">framework：一套打底的工具</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/framework/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="framework" type="button" aria-label="say framework">🔊</button></span>
+      </div>
+    </div>
+    <p class="note"><span class="bi-en">Click <b>▶ hear it</b> for real people on YouGlish; <b>🔊</b> for the computer voice.</span><span class="bi-zh">点 <b>▶ hear it</b> 听真人发音（YouGlish）；点 <b>🔊</b> 听电脑朗读。</span></p>
   </section>
 
-  <p class="log-tip">Next: <a href="basics/array.html">start Lesson 1</a>.</p>
+  <section class="sec">
+    <h2><span class="num">✓</span><span class="in-en">Check yourself</span><span class="in-zh">自测</span></h2>
+    <ol class="checks">
+      <li><span class="bi-en">Which mode will you use today?</span><span class="bi-zh">今天你打算用哪个模式？</span></li>
+      <li><span class="bi-en">Say the three buttons in English.</span><span class="bi-zh">用英文说出三个按钮。</span></li>
+    </ol>
+    <p class="note"><span class="bi-en">Answer out loud, not in your head.</span><span class="bi-zh">出声回答，不要只在心里想。</span></p>
+  </section>
+
+
+  <p class="log-tip"><a href="index.html"><span class="in-en">Back to the map →</span><span class="in-zh">回目录 →</span></a></p>
 </main>
 
 <footer>
-  <div class="f-left"><span>Written for learning English · Wang Tianyu</span></div>
-  <div class="f-right"><a href="index.html">Home</a><span class="sep">·</span><a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a></div>
+  <div class="f-left"><span class="in-en">Written for learning English · Wang Tianyu</span><span class="in-zh">为学英语而写 · 王天宇</span></div>
+  <div class="f-right"><a href="index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a><span class="sep">·</span><a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a></div>
 </footer>
 <script src="assets/app.js"></script>
 </body>

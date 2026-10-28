@@ -1,6 +1,6 @@
 # Java Notes
 
-A small website for learning Java **in English**, written for a complete beginner.
+A small website for learning Java in English, written for a complete beginner. **Every page has a 中文 / 中英 / English switch** in the top right corner.
 Every page gives one idea, five new words, a picture, and a few questions to check yourself.
 
 Live: **https://tianyubabg.github.io/offer-camp/**
@@ -20,8 +20,18 @@ Live: **https://tianyubabg.github.io/offer-camp/**
 | `basics/hashmap-methods.html` | HashMap methods, and how they look in real code |
 | `basics/threads.html` | Why HashMap is not thread-safe |
 | `questions/java-hashmap.html` | The whole HashMap answer, in simple English |
-| `glossary.html` | All 45 words, with pronunciation |
+| `glossary.html` | All 47 words, with pronunciation and a Chinese meaning |
 | `about.html` | Why the site is in English |
+
+## Language switch (top right)
+
+| Button | What you see |
+| --- | --- |
+| **中文** | Chinese only. Technical terms stay in English (key, bucket, hash…). |
+| **中英** | English first, then a Chinese line under it. Use this on hard pages. |
+| **English** | English only. The real test. |
+
+The choice is remembered in the browser (`localStorage`), and the 🔊 button reads whatever language is showing.
 
 ## Two things on every page
 
@@ -48,12 +58,14 @@ questions/*.html      interview questions
 glossary.html         all words
 assets/style.css      the look (paper, serif, one accent colour)
 assets/app.js         speak buttons, word links, read-the-page
-_build_main.py        generates index / question / glossary / about
-_build_lessons.py     generates the seven lessons
+_build.py             generates every page (bilingual)
+_content_a.py         text for home + lessons 1–4
+_content_b.py         text for lessons 5–7, the question, words, about
+_render.py            layout + CSS/JS
 ```
 
 Plain HTML, no framework, no tracking, no build step needed to view.
-If you edit the generated pages, edit the `_build_*.py` script and run `python _build_main.py` so the change is not lost.
+To change the text, edit `_content_a.py` / `_content_b.py` and run `python _build.py`.
 
 ## Deploy
 

@@ -1,0 +1,359 @@
+# -*- coding: utf-8 -*-
+"""渲染器：把 _content_a / _content_b 里的双语内容渲染成 HTML。"""
+import io, os, urllib.parse
+
+BASE = "https://tianyubabg.github.io/offer-camp/"
+
+CSS_EXTRA = """
+/* ===== 语言切换 ===== */
+html[data-lang="zh"] .bi-en, html[data-lang="zh"] .in-en { display: none !important; }
+html[data-lang="en"] .bi-zh, html[data-lang="en"] .in-zh { display: none !important; }
+.bi-en { display: block; }
+.bi-zh { display: block; }
+.in-en, .in-zh { display: inline; }
+html[data-lang="both"] .bi-zh { color: var(--ink-2); font-size: .94em; }
+html[data-lang="both"] p.bi-zh, html[data-lang="both"] li > .bi-zh,
+html[data-lang="both"] blockquote .bi-zh { border-left: 2px solid var(--line); padding-left: 12px; margin-top: 6px; }
+html[data-lang="both"] .in-zh { color: var(--ink-3); font-size: .9em; margin-left: .35em; }
+html[data-lang="both"] .in-zh::before { content: " " }
+html[data-lang="both"] .word .bi-en, html[data-lang="both"] .word .bi-zh { display: inline; }
+html[data-lang="both"] .word .bi-zh { color: var(--ink-3); margin-left: .4em; font-size: .92em; }
+/* 表格里中英并排，不要上下堆 */
+html[data-lang="both"] .ledger .bi-en, html[data-lang="both"] .ledger .in-en { display: inline; }
+html[data-lang="both"] .ledger .bi-zh, html[data-lang="both"] .ledger .in-zh {
+  display: inline; font-size: .9em; color: var(--ink-3); margin-left: .4em;
+}
+/* ===== 手机端表格：不隐藏列，改成能读的小字 ===== */
+@media (max-width:820px){
+  .ledger th:nth-child(3), .ledger td:nth-child(3){ display: table-cell; }
+  .ledger{ font-size: 11.5px; width: 100%; }
+  .ledger th, .ledger td{ padding: .8mm 1.1mm; white-space: normal; }
+  .ledger td:nth-child(1){ font-size: 13px; white-space: normal; }
+  .ledger td:nth-child(2){ white-space: normal; }
+  .wordlist{ grid-template-columns: 1fr; gap: 3px; }
+  .wordlist .word{ grid-template-columns: 1fr; }
+  .wordlist .links{ margin-top: 2px; }
+}
+/* 导航与标签里的中文用细体 */
+.in-zh { font-family: var(--serif); }
+.langswitch { display: inline-flex; border: 1px solid var(--line-strong); }
+.langswitch button {
+  font: inherit; font-size: 11px; letter-spacing: .04em; padding: 4px 9px;
+  background: transparent; color: var(--ink-3); border: 0; cursor: pointer;
+}
+.langswitch button + button { border-left: 1px solid var(--line); }
+.langswitch button.on { background: var(--ink); color: var(--paper); }
+.mh-right { display: flex; align-items: center; gap: 14px; }
+"""
+
+JS = r"""
+/* Java Notes — 语言切换 + 朗读 */
+(function () {
+  /* ---------- 语言 ---------- */
+  var root = document.documentElement;
+  var KEY = 'jn-lang';
+
+  function apply(lang) {
+    root.setAttribute('data-lang', lang);
+    try { localStorage.setItem(KEY, lang); } catch (e) {}
+    document.querySelectorAll('[data-lang-set]').forEach(function (b) {
+      b.classList.toggle('on', b.getAttribute('data-lang-set') === lang);
+    });
+    var btn = document.querySelector('[data-listen]');
+    if (btn && !btn.classList.contains('on')) setListenLabel('idle');
+  }
+
+  var saved = null;
+  try { saved = localStorage.getItem(KEY); } catch (e) {}
+  apply(saved || root.getAttribute('data-lang') || 'zh');
+
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest('[data-lang-set]');
+    if (t) { apply(t.getAttribute('data-lang-set')); }
+  });
+
+  /* ---------- 朗读 ---------- */
+  var synth = window.speechSynthesis;
+  if (!synth) return;
+  var btn = document.querySelector('[data-listen]');
+  var speaking = false, queue = [];
+
+  function lang() { return root.getAttribute('data-lang') || 'zh'; }
+
+  function visible(el) {
+    var L = lang();
+    if (el.closest('.bi-en, .in-en') && L === 'zh') return false;
+    if (el.closest('.bi-zh, .in-zh') && L === 'en') return false;
+    return true;
+  }
+
+  function pick() {
+    var main = document.querySelector('main');
+    if (!main) return [];
+    var out = [];
+    main.querySelectorAll('h1, h2, h3, p, li').forEach(function (el) {
+      if (el.closest('pre')) return;
+      if (el.querySelector('p, li')) return;          /* 只取叶子 */
+      if (!visible(el)) return;
+      var t = (el.textContent || '').replace(/\s+/g, ' ').trim();
+      if (!t) return;
+      /* 只读当前语言的那一层，避免中英混读 */
+      if (lang() === 'both') {
+        var own = el.closest('.bi-zh, .in-zh') ? 'zh' : 'en';
+        if (own === 'zh') return;
+      }
+      if (el.tagName === 'H2' || el.tagName === 'H3') t += lang() === 'zh' ? '。' : '.';
+      t.split(/(?<=[.!?。？！])\s*/).forEach(function (s) {
+        if (s.trim().length > 1) out.push(s.trim());
+      });
+    });
+    return out;
+  }
+
+  function setListenLabel(state) {
+    var b = btn || document.querySelector('[data-listen]');
+    if (!b) return;
+    var zh = lang() === 'zh';
+    if (state === 'on') b.textContent = zh ? '■ 停止' : '■ Stop';
+    else if (state === 'idle') b.textContent = zh ? '🔊 朗读本页' : '🔊 Listen to this page';
+  }
+
+  function stop() {
+    speaking = false; queue = []; synth.cancel();
+    if (btn) { btn.classList.remove('on'); setListenLabel('idle'); }
+  }
+
+  if (btn) {
+    btn.addEventListener('click', function () {
+      if (speaking) { stop(); return; }
+      queue = pick();
+      if (!queue.length) return;
+      speaking = true;
+      btn.classList.add('on');
+      setListenLabel('on');
+      var voiceLang = lang() === 'zh' ? 'zh-CN' : 'en-US';
+      var i = 0;
+      (function next() {
+        if (!speaking || i >= queue.length) { stop(); return; }
+        var u = new SpeechSynthesisUtterance(queue[i++]);
+        u.lang = voiceLang;
+        u.rate = voiceLang === 'zh-CN' ? 0.95 : 0.9;
+        u.onend = next; u.onerror = next;
+        synth.speak(u);
+      })();
+    });
+  }
+
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest('[data-say]');
+    if (!el) return;
+    synth.cancel();
+    var u = new SpeechSynthesisUtterance(el.getAttribute('data-say'));
+    u.lang = 'en-US'; u.rate = 0.85;
+    synth.speak(u);
+  });
+})();
+"""
+
+PAGE = """<!doctype html>
+<html lang="zh-CN" data-lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>__TITLE__ · Java Notes</title>
+<meta name="description" content="__DESC__">
+<link rel="stylesheet" href="__CSS__">
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="masthead">
+  <div class="mh-left">
+    <a class="mh-mark" href="__HOME__">Java Notes</a>
+    <nav class="mh-nav">
+      <a href="__HOME__"__ON_Q__><span class="in-en">Questions</span><span class="in-zh">题目</span></a>
+      <a href="__BASICS__"__ON_B__><span class="in-en">Basics</span><span class="in-zh">基础</span></a>
+      <a href="__GLOSS__"__ON_W__><span class="in-en">Words</span><span class="in-zh">词表</span></a>
+    </nav>
+  </div>
+  <div class="mh-right">
+    <span class="langswitch">
+      <button type="button" data-lang-set="zh">中文</button>
+      <button type="button" data-lang-set="both">中英</button>
+      <button type="button" data-lang-set="en">English</button>
+    </span>
+  </div>
+</header>
+
+<main>
+  <p class="crumb">__CRUMB__</p>
+
+  <div class="qhead">
+    <p class="kicker"><span class="in-en">__KICKER_EN__</span><span class="in-zh">__KICKER_ZH__</span></p>
+    <h1><span class="in-en">__H1_EN__</span><span class="in-zh">__H1_ZH__</span></h1>
+    <p class="lede"><span class="in-en">__LEDE_EN__</span><span class="in-zh">__LEDE_ZH__</span></p>
+    <p class="tags">__TAGS__</p>
+    <button class="listen" data-listen type="button">🔊</button>
+  </div>
+
+__BODY__
+
+  <p class="log-tip">__NEXT__</p>
+</main>
+
+<footer>
+  <div class="f-left"><span class="in-en">Written for learning English · Wang Tianyu</span><span class="in-zh">为学英语而写 · 王天宇</span></div>
+  <div class="f-right"><a href="__HOME__"><span class="in-en">Home</span><span class="in-zh">首页</span></a><span class="sep">·</span><a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a></div>
+</footer>
+<script src="__JS__"></script>
+</body>
+</html>
+"""
+
+
+def esc(s):
+    return (s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;"))
+
+
+def bisp(en, zh, tag="p", cls=""):
+    c = ' class="%s"' % cls if cls else ""
+    return '<%s%s><span class="bi-en">%s</span><span class="bi-zh">%s</span></%s>' % (
+        tag, c, en, zh, tag)
+
+
+def render_blocks(blocks):
+    out = []
+    for b in blocks:
+        k = b[0]
+        if k == "h2":
+            out.append('  <section class="sec">\n    <h2><span class="num">%s</span>'
+                       '<span class="in-en">%s</span><span class="in-zh">%s</span></h2>'
+                       % (b[1], b[2], b[3]))
+            body = b[4] if len(b) > 4 else []
+            for x in body:
+                out.append(render_one(x))
+            out.append('  </section>')
+        else:
+            out.append(render_one(b))
+    return "\n".join(out)
+
+
+def render_one(b):
+    k = b[0]
+    if k == "p":
+        return "    " + bisp(b[1], b[2])
+    if k == "ul":
+        lis = "\n".join('      <li><span class="bi-en">%s</span><span class="bi-zh">%s</span></li>' % (e, z) for e, z in b[1])
+        return "    <ul>\n%s\n    </ul>" % lis
+    if k == "ol":
+        lis = "\n".join('      <li><span class="bi-en">%s</span><span class="bi-zh">%s</span></li>' % (e, z) for e, z in b[1])
+        return '    <ol class="steps">\n%s\n    </ol>' % lis
+    if k == "pre":
+        return "    <pre><code>%s</code></pre>" % b[1]
+    if k == "quote":
+        head = '<span class="in-en">%s</span><span class="in-zh">%s</span>' % (b[2], b[3])
+        ps = "\n".join("      " + bisp(e, z) for e, z in b[4])
+        return '    <blockquote class="%s"><span class="lbl">%s</span>\n%s\n    </blockquote>' % (b[1], head, ps)
+    if k == "analogy":
+        return ('    <div class="analogy"><b><span class="in-en">%s</span><span class="in-zh">%s</span></b>'
+                '<span class="bi-en">%s</span><span class="bi-zh">%s</span></div>' % (b[1], b[2], b[3], b[4]))
+    if k == "table":
+        def cell_th(e, z):
+            return "<th>%s</th>" % e if e == z else ("<th><span class=\"in-en\">%s</span><span class=\"in-zh\">%s</span></th>" % (e, z))
+        head = "".join(cell_th(e, z) for e, z in b[1])
+        rows = []
+        for r in b[2]:
+            def cell_td(e, z):
+                return "<td>%s</td>" % e if e == z else ("<td><span class=\"bi-en\">%s</span><span class=\"bi-zh\">%s</span></td>" % (e, z))
+            rows.append("<tr>" + "".join(cell_td(e, z) for e, z in r) + "</tr>")
+        return ('    <table class="ledger">\n      <thead><tr>%s</tr></thead>\n      <tbody>\n        %s\n      </tbody>\n    </table>'
+                % (head, "\n        ".join(rows)))
+    if k == "figure":
+        return "    " + b[1]
+    if k == "note":
+        return '    <p class="note"><span class="bi-en">%s</span><span class="bi-zh">%s</span></p>' % (b[1], b[2])
+    if k == "links":
+        items = "".join('<li><a href="%s"><span class="in-en">%s</span><span class="in-zh">%s</span></a></li>' % (h, e, z) for h, e, z in b[1])
+        return '    <ul class="deeper">\n      %s\n    </ul>' % items
+    raise ValueError("unknown block %r" % (k,))
+
+
+def words_html(words):
+    out = []
+    for term, ipa, en, zh in words:
+        q = urllib.parse.quote(term.replace(" ", "%20")) if " " in term else urllib.parse.quote(term)
+        out.append(
+            '      <div class="word">\n'
+            '        <span class="w">%s</span>\n'
+            '        <span class="ipa">%s</span>\n'
+            '        <span class="mean"><span class="bi-en">%s</span><span class="bi-zh">%s</span></span>\n'
+            '        <span class="links">'
+            '<a class="say" href="https://youglish.com/pronounce/%s/english" target="_blank" rel="noopener">▶ hear it</a>'
+            '<button class="spk" data-say="%s" type="button" aria-label="say %s">🔊</button>'
+            '</span>\n'
+            '      </div>' % (term, ipa, en, zh, q, term, term))
+    return "\n".join(out)
+
+
+def checks_html(checks):
+    return "\n".join('      <li><span class="bi-en">%s</span><span class="bi-zh">%s</span></li>' % (e, z)
+                     for e, z in checks)
+
+
+def page(path, data, on=""):
+    depth = path.count("/")
+    up = "../" * depth
+    tags = "".join(
+        '<span class="tag"><span class="in-en">%s</span><span class="in-zh">%s</span></span>' % (e, z)
+        for e, z in data["tags"])
+
+    body = render_blocks(data["blocks"])
+    if not data.get("plain"):
+        body += """
+  <section class="sec">
+    <h2><span class="num">→</span><span class="in-en">New words</span><span class="in-zh">新词</span></h2>
+    <div class="wordlist">
+%s
+    </div>
+    <p class="note"><span class="bi-en">Click <b>▶ hear it</b> for real people on YouGlish; <b>🔊</b> for the computer voice.</span><span class="bi-zh">点 <b>▶ hear it</b> 听真人发音（YouGlish）；点 <b>🔊</b> 听电脑朗读。</span></p>
+  </section>
+
+  <section class="sec">
+    <h2><span class="num">✓</span><span class="in-en">Check yourself</span><span class="in-zh">自测</span></h2>
+    <ol class="checks">
+%s
+    </ol>
+    <p class="note"><span class="bi-en">Answer out loud, not in your head.</span><span class="bi-zh">出声回答，不要只在心里想。</span></p>
+  </section>
+""" % (words_html(data["words"]), checks_html(data["checks"]))
+
+    subs = {
+        "__TITLE__": data["title"][0], "__DESC__": data["title"][0],
+        "__CSS__": up + "assets/style.css", "__JS__": up + "assets/app.js",
+        "__HOME__": up + "index.html",
+        "__BASICS__": up + "basics/array.html",
+        "__GLOSS__": up + "glossary.html",
+        "__ON_Q__": ' class="on"' if on == "q" else "",
+        "__ON_B__": ' class="on"' if on == "b" else "",
+        "__ON_W__": ' class="on"' if on == "w" else "",
+        "__CRUMB__": data["crumb"],
+        "__KICKER_EN__": data["kicker"][0], "__KICKER_ZH__": data["kicker"][1],
+        "__H1_EN__": data["h1"][0], "__H1_ZH__": data["h1"][1],
+        "__LEDE_EN__": data["lede"][0], "__LEDE_ZH__": data["lede"][1],
+        "__TAGS__": tags, "__BODY__": body, "__NEXT__": data["next"],
+    }
+    html = PAGE
+    for k, v in subs.items():
+        html = html.replace(k, v)
+    os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+    io.open(path, "w", encoding="utf-8").write(html)
+    print("wrote", path)
+
+
+def write_assets():
+    css = io.open("assets/style.css", encoding="utf-8").read()
+    if "/* ===== 语言切换 ===== */" in css:
+        css = css[:css.index("/* ===== 语言切换 ===== */")]
+    io.open("assets/style.css", "w", encoding="utf-8").write(css.rstrip() + "\n" + CSS_EXTRA)
+    io.open("assets/app.js", "w", encoding="utf-8").write(JS)
+    print("assets updated")

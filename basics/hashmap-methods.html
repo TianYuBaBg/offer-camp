@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN" data-lang="zh">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>HashMap methods in real life · Java Notes</title>
-<meta name="description" content="put, get, getOrDefault, merge, computeIfAbsent with three real examples.">
+<title>HashMap methods in real code · Java Notes</title>
+<meta name="description" content="HashMap methods in real code">
 <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body>
@@ -12,140 +12,135 @@
 
 <header class="masthead">
   <div class="mh-left">
-    <span class="mh-mark">Java Notes</span>
-    <span class="mh-en">OFFER&nbsp;CAMP</span>
+    <a class="mh-mark" href="../index.html">Java Notes</a>
     <nav class="mh-nav">
-      <a href="../index.html">Questions</a>
-      <a href="../basics/array.html" class="on">Basics</a>
-      <a href="../glossary.html">Words</a>
+      <a href="../index.html"><span class="in-en">Questions</span><span class="in-zh">题目</span></a>
+      <a href="../basics/array.html" class="on"><span class="in-en">Basics</span><span class="in-zh">基础</span></a>
+      <a href="../glossary.html"><span class="in-en">Words</span><span class="in-zh">词表</span></a>
     </nav>
   </div>
-  <div class="mh-right"><span>Lesson 6</span></div>
+  <div class="mh-right">
+    <span class="langswitch">
+      <button type="button" data-lang-set="zh">中文</button>
+      <button type="button" data-lang-set="both">中英</button>
+      <button type="button" data-lang-set="en">English</button>
+    </span>
+  </div>
 </header>
 
 <main>
-  <p class="crumb"><a href="../index.html">Home</a> / Lesson 6: Methods</p>
+  <p class="crumb"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a> / <span class="in-en">Lesson 6: HashMap methods</span><span class="in-zh">第 6 课：HashMap 方法</span></p>
 
   <div class="qhead">
-    <p class="kicker">Lesson 6 · Practice</p>
-    <h1>HashMap methods, and how to use them</h1>
-    <p class="lede">Six methods you use every day, and three patterns that solve most problems.</p>
-    <div class="qmeta"><span class="tag">Basics</span><span class="tag">practice</span></div>
-    <button class="listen" data-listen>🔊 Listen to this page</button>
+    <p class="kicker"><span class="in-en">Lesson 6 · Use it</span><span class="in-zh">第 6 课 · 拿来用</span></p>
+    <h1><span class="in-en">HashMap methods, and how they look in real code</span><span class="in-zh">HashMap 的常用方法，以及它们在真实代码里长什么样</span></h1>
+    <p class="lede"><span class="in-en">Six methods cover almost everything: put, get, getOrDefault, computeIfAbsent, merge, remove.</span><span class="in-zh">六个方法能盖住几乎所有场景：put、get、getOrDefault、computeIfAbsent、merge、remove。</span></p>
+    <p class="tags"><span class="tag"><span class="in-en">Basics</span><span class="in-zh">基础</span></span><span class="tag"><span class="in-en">HashMap</span><span class="in-zh">HashMap</span></span><span class="tag"><span class="in-en">real code</span><span class="in-zh">真实代码</span></span></p>
+    <button class="listen" data-listen type="button">🔊</button>
   </div>
 
-
   <section class="sec">
-    <h2><span class="num">01</span>The six methods you will use every day</h2>
+    <h2><span class="num">01</span><span class="in-en">The six methods</span><span class="in-zh">六个方法</span></h2>
     <table class="ledger">
-      <thead><tr><th>Method</th><th>What it does</th></tr></thead>
+      <thead><tr><th><span class="in-en">Method</span><span class="in-zh">方法</span></th><th><span class="in-en">What it does</span><span class="in-zh">做什么</span></th><th><span class="in-en">Where I use it</span><span class="in-zh">我用在哪</span></th></tr></thead>
       <tbody>
-        <tr><td><code>put(k, v)</code></td><td>Add or replace a value. Returns the old value, or null.</td></tr>
-        <tr><td><code>get(k)</code></td><td>Read the value. Returns null if the key is missing.</td></tr>
-        <tr><td><code>getOrDefault(k, d)</code></td><td>Read, or give a default when the key is missing.</td></tr>
-        <tr><td><code>containsKey(k)</code></td><td>True if the key exists. Use it when null is a real value.</td></tr>
-        <tr><td><code>remove(k)</code></td><td>Delete the key and return its value.</td></tr>
-        <tr><td><code>size()</code></td><td>How many pairs are inside.</td></tr>
+        <tr><td>put(k,v)</td><td><span class="bi-en">add or replace</span><span class="bi-zh">添加或覆盖</span></td><td><span class="bi-en">save a value by key</span><span class="bi-zh">按 key 存一个值</span></td></tr>
+        <tr><td>get(k)</td><td><span class="bi-en">read, null if missing</span><span class="bi-zh">读，没有则返回 null</span></td><td><span class="bi-en">simple lookup</span><span class="bi-zh">简单查询</span></td></tr>
+        <tr><td>getOrDefault(k,d)</td><td><span class="bi-en">read, <code>d</code> if missing</span><span class="bi-zh">读，没有就给默认值</span></td><td><span class="bi-en">counters, optional config</span><span class="bi-zh">计数、可选配置</span></td></tr>
+        <tr><td>computeIfAbsent(k,f)</td><td><span class="bi-en">compute and store only if missing</span><span class="bi-zh">没有才算并存入</span></td><td><span class="bi-en">cache, grouping</span><span class="bi-zh">缓存、分组</span></td></tr>
+        <tr><td>merge(k,v,f)</td><td><span class="bi-en">combine old and new</span><span class="bi-zh">合并新旧值</span></td><td><span class="bi-en">sum, max, join</span><span class="bi-zh">求和、取最大、拼接</span></td></tr>
+        <tr><td>remove(k)</td><td><span class="bi-en">delete</span><span class="bi-zh">删除</span></td><td><span class="bi-en">clear, cancel</span><span class="bi-zh">清理、取消</span></td></tr>
       </tbody>
     </table>
-    <pre><code>Map&lt;String, Integer&gt; price = new HashMap&lt;&gt;();
-price.put("apple", 5);
-price.put("apple", 6);              // replaces 5, returns 5
-int p = price.get("apple");         // 6
-int q = price.getOrDefault("pear", 0);   // 0, no exception
-boolean has = price.containsKey("pear"); // false</code></pre>
   </section>
-
   <section class="sec">
-    <h2><span class="num">02</span>Three real patterns</h2>
-
-    <h3>1. Count things</h3>
-    <pre><code>Map&lt;String, Integer&gt; count = new HashMap&lt;&gt;();
-for (String word : words) {
-    count.merge(word, 1, Integer::sum);   // add 1, or create with 1
-}</code></pre>
-    <p><code>merge</code> is the shortest way to count. Old style was <code>get</code>, plus one, then <code>put</code>.</p>
-
-    <h3>2. Group things</h3>
-    <pre><code>Map&lt;Character, List&lt;String&gt;&gt; byLetter = new HashMap&lt;&gt;();
-for (String name : names) {
-    byLetter.computeIfAbsent(name.charAt(0), k -&gt; new ArrayList&lt;&gt;()).add(name);
-}</code></pre>
-    <p><code>computeIfAbsent</code> creates the list only when needed. Without it you would write an <code>if (list == null)</code> every time.</p>
-
-    <h3>3. A small cache</h3>
-    <pre><code>Map&lt;Long, User&gt; cache = new HashMap&lt;&gt;();
-User u = cache.computeIfAbsent(id, this::loadFromDb);</code></pre>
-    <p>Read from the map; if the key is missing, load it and remember it. Note: this is not thread-safe, so use <code>ConcurrentHashMap</code> in a web application.</p>
+    <h2><span class="num">02</span><span class="in-en">Real code: a cache</span><span class="in-zh">真实代码：缓存</span></h2>
+    <pre><code>// 没有就查数据库，再放进缓存（最常见的写法）
+User user = cache.computeIfAbsent(userId, id -> userMapper.selectById(id));</code></pre>
+    <p><span class="bi-en">One line: read the cache, miss → query the database → write back. No null check, no two lookups.</span><span class="bi-zh">一行：读缓存，没命中——查库——写回。不用判空，也不用查两次。</span></p>
+    <p class="note"><span class="bi-en">In a real service add an expiry (Caffeine or Redis). computeIfAbsent keeps the map small, but it never forgets.</span><span class="bi-zh">真实服务里还要加过期（Caffeine 或 Redis）。computeIfAbsent 只是让它懒加载，但不会自己忘。</span></p>
   </section>
-
   <section class="sec">
-    <h2><span class="num">03</span>Two traps</h2>
+    <h2><span class="num">03</span><span class="in-en">Real code: counting</span><span class="in-zh">真实代码：计数</span></h2>
+    <pre><code>// 统计每个状态有多少单
+Map<String,Integer> count = new HashMap<>();
+for (Order o : orders) {
+    count.merge(o.getStatus(), 1, Integer::sum);
+}</code></pre>
+    <p><span class="bi-en"><code>merge</code> is the cleanest counter: old value + 1, or 1 if it is the first time.</span><span class="bi-zh"><code>merge</code> 是最干净的计数写法：老值 +1，第一次出现就给 1。</span></p>
+  </section>
+  <section class="sec">
+    <h2><span class="num">04</span><span class="in-en">Real code: grouping</span><span class="in-zh">真实代码：分组</span></h2>
+    <pre><code>// 按用户分组：Map<Long, List<Order>>
+Map<Long,List<Order>> byUser = new HashMap<>();
+for (Order o : orders) {
+    byUser.computeIfAbsent(o.getUserId(), k -> new ArrayList<>()).add(o);
+}</code></pre>
+    <p><span class="bi-en">Or with the stream API: <code>orders.stream().collect(Collectors.groupingBy(Order::getUserId))</code> — it does the same thing internally.</span><span class="bi-zh">也可以用 stream：<code>orders.stream().collect(Collectors.groupingBy(Order::getUserId))</code>，内部做的就是同一件事。</span></p>
+  </section>
+  <section class="sec">
+    <h2><span class="num">05</span><span class="in-en">Four things that bite</span><span class="in-zh">四个坑</span></h2>
     <ul>
-      <li><b>get returns null</b> when the key is missing. If a real value can also be null, use <code>containsKey</code> to tell the two apart.</li>
-      <li><b>Mutable keys are dangerous.</b> If you change a key object after <code>put</code>, its hash changes and <code>get</code> cannot find it any more. Use immutable keys like String or Long.</li>
+      <li><span class="bi-en"><b>get returns null</b> — use <code>getOrDefault</code> when the value may be missing.</span><span class="bi-zh"><b>get 返回 null</b>——可能没有的时候用 <code>getOrDefault</code>。</span></li>
+      <li><span class="bi-en"><b>Mutable keys</b> — if you change a field used in <code>hashCode()</code> after <code>put</code>, the key is lost.</span><span class="bi-zh"><b>可变的 key</b>——put 之后改了参与 <code>hashCode()</code> 的字段，这个 key 就找不回来了。</span></li>
+      <li><span class="bi-en"><b>No order</b> — HashMap does not keep order. Use <code>LinkedHashMap</code> or <code>TreeMap</code>.</span><span class="bi-zh"><b>无序</b>——HashMap 不保证顺序，要顺序用 <code>LinkedHashMap</code> 或 <code>TreeMap</code>。</span></li>
+      <li><span class="bi-en"><b>Not thread-safe</b> — lesson 7.</span><span class="bi-zh"><b>线程不安全</b>——第 7 课讲。</span></li>
     </ul>
   </section>
-
-
   <section class="sec">
-    <h2><span class="num">→</span>New words</h2>
+    <h2><span class="num">→</span><span class="in-en">New words</span><span class="in-zh">新词</span></h2>
     <div class="wordlist">
       <div class="word">
-        <span class="w">method</span>
-        <span class="ipa">/ˈmeθəd/</span>
-        <span class="mean">A function that belongs to a class.</span>
-        <span class="links"><a class="say" href="https://youglish.com/pronounce/method/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="method" aria-label="say method">🔊</button></span>
-      </div>
-      <div class="word">
-        <span class="w">parameter</span>
-        <span class="ipa">/pəˈræmɪtər/</span>
-        <span class="mean">The value you pass into a method.</span>
-        <span class="links"><a class="say" href="https://youglish.com/pronounce/parameter/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="parameter" aria-label="say parameter">🔊</button></span>
-      </div>
-      <div class="word">
-        <span class="w">return</span>
-        <span class="ipa">/rɪˈtɜːrn/</span>
-        <span class="mean">The value a method gives back.</span>
-        <span class="links"><a class="say" href="https://youglish.com/pronounce/return/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="return" aria-label="say return">🔊</button></span>
+        <span class="w">HashMap</span>
+        <span class="ipa">/hæʃ mæp/</span>
+        <span class="mean"><span class="bi-en">Map by key, built on an array of buckets.</span><span class="bi-zh">HashMap：用桶数组实现的键值表</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/HashMap/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="HashMap" type="button" aria-label="say HashMap">🔊</button></span>
       </div>
       <div class="word">
         <span class="w">entry</span>
         <span class="ipa">/ˈentri/</span>
-        <span class="mean">One key-value pair inside the map.</span>
-        <span class="links"><a class="say" href="https://youglish.com/pronounce/entry/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="entry" aria-label="say entry">🔊</button></span>
-      </div>
-      <div class="word">
-        <span class="w">frequency</span>
-        <span class="ipa">/ˈfriːkwənsi/</span>
-        <span class="mean">How many times something appears.</span>
-        <span class="links"><a class="say" href="https://youglish.com/pronounce/frequency/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="frequency" aria-label="say frequency">🔊</button></span>
+        <span class="mean"><span class="bi-en">One key-value pair.</span><span class="bi-zh">entry：一个键值对</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/entry/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="entry" type="button" aria-label="say entry">🔊</button></span>
       </div>
       <div class="word">
         <span class="w">cache</span>
         <span class="ipa">/kæʃ/</span>
-        <span class="mean">A small store of things you already computed.</span>
-        <span class="links"><a class="say" href="https://youglish.com/pronounce/cache/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="cache" aria-label="say cache">🔊</button></span>
+        <span class="mean"><span class="bi-en">A small fast copy of slow data.</span><span class="bi-zh">缓存：慢数据的一份快速副本</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/cache/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="cache" type="button" aria-label="say cache">🔊</button></span>
+      </div>
+      <div class="word">
+        <span class="w">merge</span>
+        <span class="ipa">/mɜːrdʒ/</span>
+        <span class="mean"><span class="bi-en">Combine two values.</span><span class="bi-zh">merge：合并两个值</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/merge/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="merge" type="button" aria-label="say merge">🔊</button></span>
+      </div>
+      <div class="word">
+        <span class="w">grouping</span>
+        <span class="ipa">/ˈɡruːpɪŋ/</span>
+        <span class="mean"><span class="bi-en">Putting items into groups by a field.</span><span class="bi-zh">分组：按字段归类</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/grouping/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="grouping" type="button" aria-label="say grouping">🔊</button></span>
       </div>
     </div>
-    <p class="note">Click <b>hear it</b> to listen to real people say the word on YouGlish. Click <b>🔊</b> to hear the computer say it.</p>
+    <p class="note"><span class="bi-en">Click <b>▶ hear it</b> for real people on YouGlish; <b>🔊</b> for the computer voice.</span><span class="bi-zh">点 <b>▶ hear it</b> 听真人发音（YouGlish）；点 <b>🔊</b> 听电脑朗读。</span></p>
   </section>
 
   <section class="sec">
-    <h2><span class="num">✓</span>Check yourself</h2>
+    <h2><span class="num">✓</span><span class="in-en">Check yourself</span><span class="in-zh">自测</span></h2>
     <ol class="checks">
-      <li>Which method reads a value with a default?<small>getOrDefault(key, defaultValue).</small></li>
-      <li>Why is merge good for counting?<small>It adds one in a single call, with no null check.</small></li>
-      <li>What happens if you change a key after put?<small>Its hash changes, so get cannot find it any more. Use immutable keys.</small></li>
+      <li><span class="bi-en">Difference between get and getOrDefault?</span><span class="bi-zh">get 和 getOrDefault 有什么区别？</span></li>
+      <li><span class="bi-en">Write the one-liner cache with computeIfAbsent.</span><span class="bi-zh">用 computeIfAbsent 写出那一行缓存。</span></li>
+      <li><span class="bi-en">How do you count occurrences cleanly?</span><span class="bi-zh">怎么干净地做计数？</span></li>
     </ol>
+    <p class="note"><span class="bi-en">Answer out loud, not in your head.</span><span class="bi-zh">出声回答，不要只在心里想。</span></p>
   </section>
 
-  <p class="log-tip">Next: <a href="threads.html">Why is HashMap not thread-safe?</a></p>
+
+  <p class="log-tip"><a href="threads.html"><span class="in-en">Next: Lesson 7, threads →</span><span class="in-zh">下一课：第 7 课，线程 →</span></a></p>
 </main>
 
 <footer>
-  <div class="f-left"><span>Written for learning English · Wang Tianyu</span></div>
-  <div class="f-right"><a href="../index.html">Home</a><span class="sep">·</span><a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a></div>
+  <div class="f-left"><span class="in-en">Written for learning English · Wang Tianyu</span><span class="in-zh">为学英语而写 · 王天宇</span></div>
+  <div class="f-right"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a><span class="sep">·</span><a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a></div>
 </footer>
 <script src="../assets/app.js"></script>
 </body>

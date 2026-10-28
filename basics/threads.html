@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN" data-lang="zh">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Why HashMap is not thread-safe · Java Notes</title>
-<meta name="description" content="Threads, race conditions, and why HashMap breaks under concurrent writes.">
+<meta name="description" content="Why HashMap is not thread-safe">
 <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body>
@@ -12,126 +12,125 @@
 
 <header class="masthead">
   <div class="mh-left">
-    <span class="mh-mark">Java Notes</span>
-    <span class="mh-en">OFFER&nbsp;CAMP</span>
+    <a class="mh-mark" href="../index.html">Java Notes</a>
     <nav class="mh-nav">
-      <a href="../index.html">Questions</a>
-      <a href="../basics/array.html" class="on">Basics</a>
-      <a href="../glossary.html">Words</a>
+      <a href="../index.html"><span class="in-en">Questions</span><span class="in-zh">题目</span></a>
+      <a href="../basics/array.html" class="on"><span class="in-en">Basics</span><span class="in-zh">基础</span></a>
+      <a href="../glossary.html"><span class="in-en">Words</span><span class="in-zh">词表</span></a>
     </nav>
   </div>
-  <div class="mh-right"><span>Lesson 7</span></div>
+  <div class="mh-right">
+    <span class="langswitch">
+      <button type="button" data-lang-set="zh">中文</button>
+      <button type="button" data-lang-set="both">中英</button>
+      <button type="button" data-lang-set="en">English</button>
+    </span>
+  </div>
 </header>
 
 <main>
-  <p class="crumb"><a href="../index.html">Home</a> / Lesson 7: Threads</p>
+  <p class="crumb"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a> / <span class="in-en">Lesson 7: Threads</span><span class="in-zh">第 7 课：线程</span></p>
 
   <div class="qhead">
-    <p class="kicker">Lesson 7 · Concurrency</p>
-    <h1>Why is HashMap not thread-safe?</h1>
-    <p class="lede">Because put is many steps, and two threads can step on each other between them.</p>
-    <div class="qmeta"><span class="tag">Basics</span><span class="tag">concurrency</span></div>
-    <button class="listen" data-listen>🔊 Listen to this page</button>
+    <p class="kicker"><span class="in-en">Lesson 7 · Concurrency</span><span class="in-zh">第 7 课 · 并发</span></p>
+    <h1><span class="in-en">Why is HashMap not thread-safe?</span><span class="in-zh">为什么 HashMap 是线程不安全的？</span></h1>
+    <p class="lede"><span class="in-en">Two threads write at the same time, one write is lost. In JDK 7 it could even bend into a circle.</span><span class="in-zh">两个线程同时写，就会丢掉一次写入；在 JDK 7 里甚至能把链表拧成一个圈。</span></p>
+    <p class="tags"><span class="tag"><span class="in-en">Basics</span><span class="in-zh">基础</span></span><span class="tag"><span class="in-en">concurrency</span><span class="in-zh">并发</span></span><span class="tag"><span class="in-en">must know</span><span class="in-zh">必背</span></span></p>
+    <button class="listen" data-listen type="button">🔊</button>
   </div>
 
-
   <section class="sec">
-    <h2><span class="num">01</span>The idea</h2>
-    <div class="analogy"><b>Think of it like this</b>Two people writing on the same line of a notebook at the same time. Person A writes “5”, person B writes “7”. The last hand wins, and nobody knows what the first hand wrote.</div>
-    <p>A <b>thread</b> is one worker inside your program. Two threads can run at the same time. A <b>race condition</b> happens when two workers use the same data and the result depends on who is faster.</p>
+    <h2><span class="num">01</span><span class="in-en">The idea</span><span class="in-zh">先有一个画面</span></h2>
+    <div class="analogy"><b><span class="in-en">Think of it like this</span><span class="in-zh">先这样想</span></b><span class="bi-en">Two people write on the same whiteboard at the same time. Both read “size = 10”, both write “size = 11”. One item was added, but the number only went up by one — the other add is invisible.</span><span class="bi-zh">两个人在同一块白板上同时写。两个人都读到 size = 10，都写下 size = 11。 明明加了两个，数字只涨了 1——另一次写入消失了。</span></div>
+    <p><span class="bi-en"><code>put</code> is not one instruction. It is a series of steps: pick a bucket, read the head, write the new node, increase <code>size</code>. Another thread can jump in between any two steps.</span><span class="bi-zh"><code>put</code> 不是一条指令，而是一串步骤：选桶、读头节点、写新节点、<code>size++</code>。另一个线程可以在任意两步之间插进来。</span></p>
   </section>
-
   <section class="sec">
-    <h2><span class="num">02</span>Why HashMap is not safe</h2>
-    <p>Look at what <code>put</code> really does. It is not one step:</p>
-    <ol class="steps">
-      <li>compute the hash,</li>
-      <li>find the bucket,</li>
-      <li>insert the node at the end of the line,</li>
-      <li>increase <code>size</code>, and maybe resize the array.</li>
-    </ol>
-    <p>Between any two steps, the other thread can change things. Real results:</p>
+    <h2><span class="num">02</span><span class="in-en">Three ways it breaks</span><span class="in-zh">三种坏法</span></h2>
     <ul>
-      <li><b>Lost update</b> — both threads write a new value, one is silently gone.</li>
-      <li><b>Wrong size</b> — both increase <code>size</code> from the same old value.</li>
-      <li><b>Broken line</b> — two threads insert at the same place, a pointer is overwritten, items disappear.</li>
-      <li><b>Infinite loop (JDK 7)</b> — two threads resize at the same time and the links form a circle; then <code>get</code> spins forever and the CPU is at 100%.</li>
+      <li><span class="bi-en"><b>Lost update</b> — two <code>put</code>s increase size, one increase is overwritten. The map says 1 item, there are 2.</span><span class="bi-zh"><b>丢更新</b>——两次 put 各涨一次 size，被覆盖掉一次：表里说有 1 个，实际有 2 个。</span></li>
+      <li><span class="bi-en"><b>Data lost</b> — two threads add to the same empty bucket; one node overwrites the other.</span><span class="bi-zh"><b>丢数据</b>——两个线程同时往同一个空桶放，一个节点把另一个覆盖掉。</span></li>
+      <li><span class="bi-en"><b>Broken list / infinite loop</b> — JDK 7 head-insert during resize could make a circle, then <code>get</code> spins forever.</span><span class="bi-zh"><b>链坏掉 / 死循环</b>——JDK 7 扩容时头插法可能把链拧成圈，之后 <code>get</code> 永远转不出来。</span></li>
     </ul>
-    <p>JDK 8 changed the resize to keep the order, so the circle is gone. The data loss is <b>not</b> gone: JDK 8 is still not thread-safe.</p>
+    <p class="note"><span class="bi-en">Java 8 changed resize to keep the order (no circle), but data loss and wrong size still happen. “No circle” is not “thread-safe”.</span><span class="bi-zh">Java 8 把扩容改成保序（不会再成环），但丢数据和 size 不准依然存在。“不成环”不等于“线程安全”。</span></p>
   </section>
-
   <section class="sec">
-    <h2><span class="num">03</span>What to use instead</h2>
+    <h2><span class="num">03</span><span class="in-en">How to fix it</span><span class="in-zh">怎么解决</span></h2>
     <table class="ledger">
-      <thead><tr><th>Option</th><th>When</th></tr></thead>
+      <thead><tr><th><span class="in-en">Option</span><span class="in-zh">方案</span></th><th><span class="in-en">Good for</span><span class="in-zh">适合</span></th><th><span class="in-en">Watch out</span><span class="in-zh">注意</span></th></tr></thead>
       <tbody>
-        <tr><td><code>ConcurrentHashMap</code></td><td>Many threads read and write. Locks only the bucket head, so it is fast.</td></tr>
-        <tr><td><code>Collections.synchronizedMap</code></td><td>One big lock. Simple, but slow when many threads write.</td></tr>
-        <tr><td>Plain <code>HashMap</code></td><td>One thread only, or read-only after it is built.</td></tr>
+        <tr><td>ConcurrentHashMap</td><td><span class="bi-en">web apps, shared caches</span><span class="bi-zh">Web 应用、共享缓存</span></td><td><span class="bi-en">null keys not allowed</span><span class="bi-zh">不允许 null key</span></td></tr>
+        <tr><td>Collections.synchronizedMap</td><td><span class="bi-en">rare, small maps</span><span class="bi-zh">很少用、很小的表</span></td><td><span class="bi-en">one lock for everything</span><span class="bi-zh">整表一把锁，慢</span></td></tr>
+        <tr><td>ThreadLocal</td><td><span class="bi-en">per-user / per-request data</span><span class="bi-zh">每用户、每请求的数据</span></td><td><span class="bi-en">memory leak in thread pools</span><span class="bi-zh">线程池里会内存泄漏</span></td></tr>
+        <tr><td><span class="bi-en">Local variable</span><span class="bi-zh">局部变量</span></td><td><span class="bi-en">inside one method</span><span class="bi-zh">方法内部</span></td><td><span class="bi-en">nothing</span><span class="bi-zh">没有</span></td></tr>
       </tbody>
     </table>
-    <div class="analogy"><b>Remember</b>HashMap is a fast bicycle. ConcurrentHashMap is a bicycle with training wheels and a lock. Use the second one when two people ride.</div>
   </section>
-
-
   <section class="sec">
-    <h2><span class="num">→</span>New words</h2>
+    <h2><span class="num">04</span><span class="in-en">One sentence for the interview</span><span class="in-zh">面试用一句话</span></h2>
+    <blockquote class="short"><span class="lbl"><span class="in-en">Say it like this</span><span class="in-zh">可以这样说</span></span>
+      <p><span class="bi-en">HashMap is not thread-safe because put is a multi-step write: two threads can overwrite each other's size, lose a node, or in JDK 7 even build a circle and loop forever. In a web application I use ConcurrentHashMap.</span><span class="bi-zh">HashMap 线程不安全，因为 put 是多步写入：两个线程会互相覆盖 size、丢节点，JDK 7 里甚至会成环死循环。Web 应用里我用 ConcurrentHashMap。</span></p>
+    </blockquote>
+  </section>
+  <section class="sec">
+    <h2><span class="num">→</span><span class="in-en">New words</span><span class="in-zh">新词</span></h2>
     <div class="wordlist">
       <div class="word">
         <span class="w">thread</span>
         <span class="ipa">/θred/</span>
-        <span class="mean">One worker running inside your program.</span>
-        <span class="links"><a class="say" href="https://youglish.com/pronounce/thread/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="thread" aria-label="say thread">🔊</button></span>
+        <span class="mean"><span class="bi-en">One worker inside a program.</span><span class="bi-zh">线程：程序里的一个执行单位</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/thread/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="thread" type="button" aria-label="say thread">🔊</button></span>
       </div>
       <div class="word">
         <span class="w">concurrent</span>
         <span class="ipa">/kənˈkɜːrənt/</span>
-        <span class="mean">Happening at the same time.</span>
-        <span class="links"><a class="say" href="https://youglish.com/pronounce/concurrent/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="concurrent" aria-label="say concurrent">🔊</button></span>
+        <span class="mean"><span class="bi-en">Happening at the same time.</span><span class="bi-zh">并发的：同时发生</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/concurrent/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="concurrent" type="button" aria-label="say concurrent">🔊</button></span>
       </div>
       <div class="word">
         <span class="w">race condition</span>
         <span class="ipa">/reɪs kənˈdɪʃn/</span>
-        <span class="mean">A bug where the result depends on who runs first.</span>
-        <span class="links"><a class="say" href="https://youglish.com/pronounce/race%20condition/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="race condition" aria-label="say race condition">🔊</button></span>
+        <span class="mean"><span class="bi-en">The result depends on who runs first.</span><span class="bi-zh">竞态：结果取决于谁先跑</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/race%2520condition/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="race condition" type="button" aria-label="say race condition">🔊</button></span>
       </div>
       <div class="word">
         <span class="w">lock</span>
         <span class="ipa">/lɑːk/</span>
-        <span class="mean">A way to let only one worker touch something.</span>
-        <span class="links"><a class="say" href="https://youglish.com/pronounce/lock/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="lock" aria-label="say lock">🔊</button></span>
+        <span class="mean"><span class="bi-en">Let only one worker in.</span><span class="bi-zh">锁：只让一个线程进</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/lock/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="lock" type="button" aria-label="say lock">🔊</button></span>
       </div>
       <div class="word">
         <span class="w">synchronized</span>
         <span class="ipa">/ˈsɪŋkrənaɪzd/</span>
-        <span class="mean">Java's keyword for “only one thread at a time here”.</span>
-        <span class="links"><a class="say" href="https://youglish.com/pronounce/synchronized/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="synchronized" aria-label="say synchronized">🔊</button></span>
+        <span class="mean"><span class="bi-en">Java keyword: one thread at a time.</span><span class="bi-zh">synchronized：Java 关键字，一次只一个线程</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/synchronized/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="synchronized" type="button" aria-label="say synchronized">🔊</button></span>
       </div>
       <div class="word">
-        <span class="w">thread-safe</span>
-        <span class="ipa">/θred seɪf/</span>
-        <span class="mean">Safe to use from many threads at the same time.</span>
-        <span class="links"><a class="say" href="https://youglish.com/pronounce/thread-safe/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="thread-safe" aria-label="say thread-safe">🔊</button></span>
+        <span class="w">volatile</span>
+        <span class="ipa">/ˈvɑːlətl/</span>
+        <span class="mean"><span class="bi-en">Java keyword: always read the newest value.</span><span class="bi-zh">volatile：总是读最新值</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/volatile/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="volatile" type="button" aria-label="say volatile">🔊</button></span>
       </div>
     </div>
-    <p class="note">Click <b>hear it</b> to listen to real people say the word on YouGlish. Click <b>🔊</b> to hear the computer say it.</p>
+    <p class="note"><span class="bi-en">Click <b>▶ hear it</b> for real people on YouGlish; <b>🔊</b> for the computer voice.</span><span class="bi-zh">点 <b>▶ hear it</b> 听真人发音（YouGlish）；点 <b>🔊</b> 听电脑朗读。</span></p>
   </section>
 
   <section class="sec">
-    <h2><span class="num">✓</span>Check yourself</h2>
+    <h2><span class="num">✓</span><span class="in-en">Check yourself</span><span class="in-zh">自测</span></h2>
     <ol class="checks">
-      <li>What is a race condition?<small>Two threads use the same data, and the result depends on the order they run in.</small></li>
-      <li>Name one thing that breaks when two threads put at once.<small>Lost update, wrong size, broken line, or (in JDK 7) an infinite loop.</small></li>
-      <li>What should you use in a web application instead of HashMap?<small>ConcurrentHashMap. It locks only the bucket head, so it stays fast.</small></li>
+      <li><span class="bi-en">Why can size be wrong after two puts?</span><span class="bi-zh">为什么两次 put 之后 size 会不准？</span></li>
+      <li><span class="bi-en">What was special about JDK 7 resize?</span><span class="bi-zh">JDK 7 的扩容有什么特别之处？</span></li>
+      <li><span class="bi-en">What would you use in a Spring service, and why?</span><span class="bi-zh">Spring 服务里你会用什么？为什么？</span></li>
     </ol>
+    <p class="note"><span class="bi-en">Answer out loud, not in your head.</span><span class="bi-zh">出声回答，不要只在心里想。</span></p>
   </section>
 
-  <p class="log-tip">Back to: <a href="../questions/java-hashmap.html">Question 1: How does HashMap work?</a></p>
+
+  <p class="log-tip"><a href="../questions/java-hashmap.html"><span class="in-en">Next: the whole HashMap answer →</span><span class="in-zh">下一步：HashMap 整道题 →</span></a></p>
 </main>
 
 <footer>
-  <div class="f-left"><span>Written for learning English · Wang Tianyu</span></div>
-  <div class="f-right"><a href="../index.html">Home</a><span class="sep">·</span><a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a></div>
+  <div class="f-left"><span class="in-en">Written for learning English · Wang Tianyu</span><span class="in-zh">为学英语而写 · 王天宇</span></div>
+  <div class="f-right"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a><span class="sep">·</span><a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a></div>
 </footer>
 <script src="../assets/app.js"></script>
 </body>

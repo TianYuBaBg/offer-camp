@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN" data-lang="zh">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>What is O(1), O(n), O(log n) · Java Notes</title>
-<meta name="description" content="Big O in plain English with a table of the four common shapes.">
+<meta name="description" content="What is O(1), O(n), O(log n)">
 <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body>
@@ -12,119 +12,116 @@
 
 <header class="masthead">
   <div class="mh-left">
-    <span class="mh-mark">Java Notes</span>
-    <span class="mh-en">OFFER&nbsp;CAMP</span>
+    <a class="mh-mark" href="../index.html">Java Notes</a>
     <nav class="mh-nav">
-      <a href="../index.html">Questions</a>
-      <a href="../basics/array.html" class="on">Basics</a>
-      <a href="../glossary.html">Words</a>
+      <a href="../index.html"><span class="in-en">Questions</span><span class="in-zh">题目</span></a>
+      <a href="../basics/array.html" class="on"><span class="in-en">Basics</span><span class="in-zh">基础</span></a>
+      <a href="../glossary.html"><span class="in-en">Words</span><span class="in-zh">词表</span></a>
     </nav>
   </div>
-  <div class="mh-right"><span>Lesson 5</span></div>
+  <div class="mh-right">
+    <span class="langswitch">
+      <button type="button" data-lang-set="zh">中文</button>
+      <button type="button" data-lang-set="both">中英</button>
+      <button type="button" data-lang-set="en">English</button>
+    </span>
+  </div>
 </header>
 
 <main>
-  <p class="crumb"><a href="../index.html">Home</a> / Lesson 5: Big O</p>
+  <p class="crumb"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a> / <span class="in-en">Lesson 5: Big O</span><span class="in-zh">第 5 课：复杂度</span></p>
 
   <div class="qhead">
-    <p class="kicker">Lesson 5 · Complexity</p>
-    <h1>What is O(1), O(n), O(log n)?</h1>
-    <p class="lede">Big O tells you how the work grows when the data grows. That is all it is.</p>
-    <div class="qmeta"><span class="tag">Basics</span><span class="tag">complexity</span></div>
-    <button class="listen" data-listen>🔊 Listen to this page</button>
+    <p class="kicker"><span class="in-en">Lesson 5 · Complexity</span><span class="in-zh">第 5 课 · 复杂度</span></p>
+    <h1><span class="in-en">What is O(1), O(n), O(log n)?</span><span class="in-zh">什么是 O(1)、O(n)、O(log n)？</span></h1>
+    <p class="lede"><span class="in-en">Big O is not about seconds. It is about how the cost grows when the data grows.</span><span class="in-zh">大 O 说的不是几秒，而是“数据变多时，代价怎么变”。</span></p>
+    <p class="tags"><span class="tag"><span class="in-en">Basics</span><span class="in-zh">基础</span></span><span class="tag"><span class="in-en">complexity</span><span class="in-zh">复杂度</span></span><span class="tag"><span class="in-en">must know</span><span class="in-zh">必背</span></span></p>
+    <button class="listen" data-listen type="button">🔊</button>
   </div>
 
-
   <section class="sec">
-    <h2><span class="num">01</span>The idea</h2>
-    <div class="analogy"><b>Think of it like this</b>Guess a number from 1 to 100. Each guess halves the range. 50? lower. 25? higher. You find it in about 7 guesses. That is what log n feels like.</div>
-    <p><b>Big O</b> answers one question: <b>when the data grows, how much more work do I do?</b> It ignores small details and keeps only the shape of the growth.</p>
-  </section>
-
-  <section class="sec">
-    <h2><span class="num">02</span>Four shapes</h2>
+    <h2><span class="num">01</span><span class="in-en">The idea</span><span class="in-zh">先有一个画面</span></h2>
+    <div class="analogy"><b><span class="in-en">Think of it like this</span><span class="in-zh">先这样想</span></b><span class="bi-en">Finding a shoe. (1) You know the box number — open one box. (2) The boxes have no order — open one by one. (3) The boxes are sorted by size — cut the range in half each time.</span><span class="bi-zh">找鞋：(1) 你知道在哪一格——开一格； (2) 全乱堆着——一格一格开； (3) 按大小排好了——每次砍一半。</span></div>
+    <p><span class="bi-en">That is O(1), O(n), O(log n). The letter is the data size; the function is how many steps you need.</span><span class="bi-zh">这就是 O(1)、O(n)、O(log n)。字母是数据量，函数是需要的步数。</span></p>
     <table class="ledger">
-      <thead><tr><th>Big O</th><th>Name</th><th>Work when n = 1,000,000</th><th>Example</th></tr></thead>
+      <thead><tr><th><span class="in-en">Big O</span><span class="in-zh">大 O</span></th><th><span class="in-en">Means</span><span class="in-zh">意思</span></th><th><span class="in-en">n=1000 steps</span><span class="in-zh">1000 个时要几步</span></th></tr></thead>
       <tbody>
-        <tr><td>O(1)</td><td>constant</td><td>1 step</td><td>read array[500]</td></tr>
-        <tr><td>O(log n)</td><td>logarithmic</td><td>about 20 steps</td><td>binary search, balanced tree</td></tr>
-        <tr><td>O(n)</td><td>linear</td><td>1,000,000 steps</td><td>walk a linked list</td></tr>
-        <tr><td>O(n²)</td><td>quadratic</td><td>1,000,000,000,000 steps</td><td>two nested loops</td></tr>
+        <tr><td>O(1)</td><td><span class="bi-en">one step, no matter how many</span><span class="bi-zh">不管多少，都是一步</span></td><td>1</td></tr>
+        <tr><td>O(log n)</td><td><span class="bi-en">half each time</span><span class="bi-zh">每次砍一半</span></td><td><span class="bi-en">about 10</span><span class="bi-zh">约 10</span></td></tr>
+        <tr><td>O(n)</td><td><span class="bi-en">one by one</span><span class="bi-zh">一个一个来</span></td><td>1000</td></tr>
+        <tr><td>O(n log n)</td><td><span class="bi-en">sort by halving, n times</span><span class="bi-zh">每次砍一半、做 n 遍</span></td><td><span class="bi-en">about 10000</span><span class="bi-zh">约 1 万</span></td></tr>
+        <tr><td>O(n²)</td><td><span class="bi-en">every pair</span><span class="bi-zh">两两配对</span></td><td><span class="bi-en">1,000,000</span><span class="bi-zh">100 万</span></td></tr>
       </tbody>
     </table>
-    <p>HashMap is O(1) on average because it computes the bucket directly — no walking. When a bucket is a line, the worst case is O(n); after the tree, it is O(log n).</p>
   </section>
-
   <section class="sec">
-    <h2><span class="num">03</span>How to read the notation</h2>
+    <h2><span class="num">02</span><span class="in-en">How to read it</span><span class="in-zh">怎么读出来</span></h2>
+    <p><span class="bi-en">“O” is said “big O”. “O(1)” is “big O of one, constant time”. “O(log n)” is “big O of log n”.</span><span class="bi-zh">“O”读作 big O；“O(1)”读 big O of one，也叫常数时间；“O(log n)”读 big O of log n。</span></p>
+    <p><span class="bi-en">We drop the small parts. <code>O(2n + 5)</code> is O(n); <code>O(n² + n)</code> is O(n²). Big O cares about the shape of the curve, not the exact number.</span><span class="bi-zh">小项会被丢掉：<code>O(2n + 5)</code> 就是 O(n)，<code>O(n² + n)</code> 就是 O(n²)。大 O 只看曲线的形状，不看具体数字。</span></p>
+  </section>
+  <section class="sec">
+    <h2><span class="num">03</span><span class="in-en">Where you meet it</span><span class="in-zh">你会在哪里遇到它</span></h2>
     <ul>
-      <li><b>n</b> — how many items you have.</li>
-      <li><b>O(1)</b> — the time does not change with n.</li>
-      <li><b>O(n)</b> — twice the items, twice the time.</li>
-      <li><b>O(log n)</b> — double the items, add one step.</li>
+      <li><span class="bi-en">HashMap get: O(1) on average, O(log n) in a bad bucket, O(n) in the worst case.</span><span class="bi-zh">HashMap 的 get：平均 O(1)，桶里成了树是 O(log n)，最坏 O(n)。</span></li>
+      <li><span class="bi-en">ArrayList get: O(1). Insert in the middle: O(n).</span><span class="bi-zh">ArrayList 按下标读：O(1)；中间插入：O(n)。</span></li>
+      <li><span class="bi-en">A double loop over the same list: O(n²) — too slow for big data.</span><span class="bi-zh">对同一个列表写两层循环：O(n²)，数据一大就慢。</span></li>
     </ul>
-    <div class="analogy"><b>Remember</b>Big O is not about seconds on your laptop. It is about the <b>shape</b> of the cost when the data grows.</div>
+    <p class="note"><span class="bi-en">In an interview, say the number <b>and</b> why: “O(1), because it computes the bucket from the hash.”</span><span class="bi-zh">面试时说数字，<b>并且</b>说原因：“O(1)，因为它是用 hash 直接算出桶的位置。”</span></p>
   </section>
-
-
   <section class="sec">
-    <h2><span class="num">→</span>New words</h2>
+    <h2><span class="num">→</span><span class="in-en">New words</span><span class="in-zh">新词</span></h2>
     <div class="wordlist">
       <div class="word">
         <span class="w">time complexity</span>
         <span class="ipa">/taɪm kəmˈpleksəti/</span>
-        <span class="mean">How the running time grows with the data size.</span>
-        <span class="links"><a class="say" href="https://youglish.com/pronounce/time%20complexity/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="time complexity" aria-label="say time complexity">🔊</button></span>
+        <span class="mean"><span class="bi-en">How run time grows with data size.</span><span class="bi-zh">时间复杂度：耗时随数据量增长的方式</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/time%2520complexity/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="time complexity" type="button" aria-label="say time complexity">🔊</button></span>
+      </div>
+      <div class="word">
+        <span class="w">Big O</span>
+        <span class="ipa">/bɪɡ oʊ/</span>
+        <span class="mean"><span class="bi-en">The notation for that growth.</span><span class="bi-zh">大 O：描述增长的量级记号</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/Big%2520O/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="Big O" type="button" aria-label="say Big O">🔊</button></span>
       </div>
       <div class="word">
         <span class="w">constant</span>
         <span class="ipa">/ˈkɑːnstənt/</span>
-        <span class="mean">Does not change: O(1).</span>
-        <span class="links"><a class="say" href="https://youglish.com/pronounce/constant/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="constant" aria-label="say constant">🔊</button></span>
+        <span class="mean"><span class="bi-en">Does not grow: O(1).</span><span class="bi-zh">常数：不增长，O(1)</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/constant/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="constant" type="button" aria-label="say constant">🔊</button></span>
       </div>
       <div class="word">
         <span class="w">linear</span>
         <span class="ipa">/ˈlɪniər/</span>
-        <span class="mean">Grows in a straight line: O(n).</span>
-        <span class="links"><a class="say" href="https://youglish.com/pronounce/linear/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="linear" aria-label="say linear">🔊</button></span>
+        <span class="mean"><span class="bi-en">Grows in a line: O(n).</span><span class="bi-zh">线性：成一条直线增长，O(n)</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/linear/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="linear" type="button" aria-label="say linear">🔊</button></span>
       </div>
       <div class="word">
         <span class="w">logarithmic</span>
         <span class="ipa">/ˌlɔːɡəˈrɪðmɪk/</span>
-        <span class="mean">Grows very slowly: O(log n).</span>
-        <span class="links"><a class="say" href="https://youglish.com/pronounce/logarithmic/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="logarithmic" aria-label="say logarithmic">🔊</button></span>
-      </div>
-      <div class="word">
-        <span class="w">quadratic</span>
-        <span class="ipa">/kwɑːˈdrætɪk/</span>
-        <span class="mean">Grows like n × n: O(n²).</span>
-        <span class="links"><a class="say" href="https://youglish.com/pronounce/quadratic/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="quadratic" aria-label="say quadratic">🔊</button></span>
-      </div>
-      <div class="word">
-        <span class="w">growth</span>
-        <span class="ipa">/ɡroʊθ/</span>
-        <span class="mean">How fast the cost goes up.</span>
-        <span class="links"><a class="say" href="https://youglish.com/pronounce/growth/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="growth" aria-label="say growth">🔊</button></span>
+        <span class="mean"><span class="bi-en">Grows very slowly: O(log n).</span><span class="bi-zh">对数：增长很慢，O(log n)</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/logarithmic/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="logarithmic" type="button" aria-label="say logarithmic">🔊</button></span>
       </div>
     </div>
-    <p class="note">Click <b>hear it</b> to listen to real people say the word on YouGlish. Click <b>🔊</b> to hear the computer say it.</p>
+    <p class="note"><span class="bi-en">Click <b>▶ hear it</b> for real people on YouGlish; <b>🔊</b> for the computer voice.</span><span class="bi-zh">点 <b>▶ hear it</b> 听真人发音（YouGlish）；点 <b>🔊</b> 听电脑朗读。</span></p>
   </section>
 
   <section class="sec">
-    <h2><span class="num">✓</span>Check yourself</h2>
+    <h2><span class="num">✓</span><span class="in-en">Check yourself</span><span class="in-zh">自测</span></h2>
     <ol class="checks">
-      <li>If n doubles, what happens to O(n)?<small>The work doubles too.</small></li>
-      <li>If n doubles, what happens to O(log n)?<small>It adds about one step. Doubling 1,000,000 to 2,000,000 adds one step to the 20.</small></li>
-      <li>Why is HashMap usually O(1)?<small>Because it computes the bucket number directly, without walking through items.</small></li>
+      <li><span class="bi-en">In your own words: what is O(n)?</span><span class="bi-zh">用你自己的话说：什么是 O(n)？</span></li>
+      <li><span class="bi-en">Why is reading an array O(1)?</span><span class="bi-zh">为什么读数组是 O(1)？</span></li>
+      <li><span class="bi-en">A bucket with 8 items: how many steps at most?</span><span class="bi-zh">桶里有 8 个元素：最多几步？</span></li>
     </ol>
+    <p class="note"><span class="bi-en">Answer out loud, not in your head.</span><span class="bi-zh">出声回答，不要只在心里想。</span></p>
   </section>
 
-  <p class="log-tip">Next: <a href="hashmap-methods.html">HashMap methods in real life</a></p>
+
+  <p class="log-tip"><a href="hashmap-methods.html"><span class="in-en">Next: Lesson 6, HashMap methods →</span><span class="in-zh">下一课：第 6 课，HashMap 方法 →</span></a></p>
 </main>
 
 <footer>
-  <div class="f-left"><span>Written for learning English · Wang Tianyu</span></div>
-  <div class="f-right"><a href="../index.html">Home</a><span class="sep">·</span><a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a></div>
+  <div class="f-left"><span class="in-en">Written for learning English · Wang Tianyu</span><span class="in-zh">为学英语而写 · 王天宇</span></div>
+  <div class="f-right"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a><span class="sep">·</span><a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a></div>
 </footer>
 <script src="../assets/app.js"></script>
 </body>

@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN" data-lang="zh">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>What is a linked list · Java Notes</title>
-<meta name="description" content="Linked list: nodes with arrows. Fast to insert, slow to find.">
+<meta name="description" content="What is a linked list">
 <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body>
@@ -12,121 +12,121 @@
 
 <header class="masthead">
   <div class="mh-left">
-    <span class="mh-mark">Java Notes</span>
-    <span class="mh-en">OFFER&nbsp;CAMP</span>
+    <a class="mh-mark" href="../index.html">Java Notes</a>
     <nav class="mh-nav">
-      <a href="../index.html">Questions</a>
-      <a href="../basics/array.html" class="on">Basics</a>
-      <a href="../glossary.html">Words</a>
+      <a href="../index.html"><span class="in-en">Questions</span><span class="in-zh">题目</span></a>
+      <a href="../basics/array.html" class="on"><span class="in-en">Basics</span><span class="in-zh">基础</span></a>
+      <a href="../glossary.html"><span class="in-en">Words</span><span class="in-zh">词表</span></a>
     </nav>
   </div>
-  <div class="mh-right"><span>Lesson 2</span></div>
+  <div class="mh-right">
+    <span class="langswitch">
+      <button type="button" data-lang-set="zh">中文</button>
+      <button type="button" data-lang-set="both">中英</button>
+      <button type="button" data-lang-set="en">English</button>
+    </span>
+  </div>
 </header>
 
 <main>
-  <p class="crumb"><a href="../index.html">Home</a> / Lesson 2: Linked list</p>
+  <p class="crumb"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a> / <span class="in-en">Lesson 2: Linked list</span><span class="in-zh">第 2 课：链表</span></p>
 
   <div class="qhead">
-    <p class="kicker">Lesson 2 · Data structure</p>
-    <h1>What is a linked list?</h1>
-    <p class="lede">Notes with arrows. You cannot jump; you follow the next pointer.</p>
-    <div class="qmeta"><span class="tag">Basics</span><span class="tag">data structure</span></div>
-    <button class="listen" data-listen>🔊 Listen to this page</button>
+    <p class="kicker"><span class="in-en">Lesson 2 · Data structure</span><span class="in-zh">第 2 课 · 数据结构</span></p>
+    <h1><span class="in-en">What is a linked list?</span><span class="in-zh">什么是链表？</span></h1>
+    <p class="lede"><span class="in-en">Boxes that hold hands. Each one knows only where the next one is.</span><span class="in-zh">手拉手的一串盒子，每个只知道自己右边是谁。</span></p>
+    <p class="tags"><span class="tag"><span class="in-en">Basics</span><span class="in-zh">基础</span></span><span class="tag"><span class="in-en">data structure</span><span class="in-zh">数据结构</span></span><span class="tag"><span class="in-en">O(1) insert</span><span class="in-zh">插 O(1)</span></span></p>
+    <button class="listen" data-listen type="button">🔊</button>
   </div>
 
-
   <section class="sec">
-    <h2><span class="num">01</span>The idea</h2>
-    <div class="analogy"><b>Think of it like this</b>A treasure hunt. Each note says one thing: the next place. You cannot jump to the end. You follow the arrows, one note at a time.</div>
-    <p>A <b>linked list</b> is made of small boxes called <b>nodes</b>. Each node has two parts:</p>
+    <h2><span class="num">01</span><span class="in-en">The idea</span><span class="in-zh">先有一个画面</span></h2>
+    <div class="analogy"><b><span class="in-en">Think of it like this</span><span class="in-zh">先这样想</span></b><span class="bi-en">A treasure hunt. The first note says “the next note is under the tree”. The second says “the next note is in the kitchen”. To get to the third note, you must read the first and the second. There is no number to jump to.</span><span class="bi-zh">寻宝游戏：第一张纸条写“下一张在树下”，第二张写“下一张在厨房”。想到第三张，必须先读第一张、再读第二张。没有编号可以直接跳。</span></div>
+    <p><span class="bi-en">A <b>linked list</b> is that chain of notes. Each box is a <b>node</b>. A node holds:</span><span class="bi-zh"><b>链表</b>就是这一串纸条。每个盒子叫 <b>node</b>（节点），里面装两样东西：</span></p>
     <ul>
-      <li>a <b>value</b> (the thing you want to keep),</li>
-      <li>a <b>pointer</b> to the <b>next</b> node.</li>
+      <li><span class="bi-en">the <b>value</b></span><span class="bi-zh"><b>值</b>（要存的东西）</span></li>
+      <li><span class="bi-en">the <b>pointer</b> to the next node</span><span class="bi-zh">指向下一个节点的<b>指针</b></span></li>
     </ul>
-    <p>The first node is called the <b>head</b>. The last node points to <b>null</b> — nothing. That means “this is the end”.</p>
+    <div class="chainrow" style="margin:0"><div class="chain"><span class="node">10</span><span class="arrow">→</span><span class="node">20</span><span class="arrow">→</span><span class="node">30</span><span class="nil">→ null</span></div></div><figcaption><span class="in-en">Three nodes. The last one points to null — “nothing”.</span><span class="in-zh">三个节点，最后一个指向 null，意思是“没有了”。</span></figcaption>
   </section>
-
   <section class="sec">
-    <h2><span class="num">02</span>Difference from an array</h2>
+    <h2><span class="num">02</span><span class="in-en">Array vs linked list</span><span class="in-zh">数组和链表差在哪</span></h2>
     <table class="ledger">
-      <thead><tr><th></th><th>Array</th><th>Linked list</th></tr></thead>
+      <thead><tr><th></th><th><span class="in-en">Array</span><span class="in-zh">数组</span></th><th><span class="in-en">Linked list</span><span class="in-zh">链表</span></th></tr></thead>
       <tbody>
-        <tr><td>Where it lives</td><td>boxes next to each other</td><td>boxes anywhere in memory</td></tr>
-        <tr><td>Read item 500</td><td>jump straight there — O(1)</td><td>walk 500 steps — O(n)</td></tr>
-        <tr><td>Insert in the middle</td><td>move everything after — O(n)</td><td>change two arrows — O(1)</td></tr>
-        <tr><td>Extra cost</td><td>none</td><td>each node stores one extra pointer</td></tr>
+        <tr><td><span class="bi-en">Where the boxes are</span><span class="bi-zh">盒子在哪</span></td><td><span class="bi-en">next to each other</span><span class="bi-zh">紧挨着</span></td><td><span class="bi-en">anywhere, joined by pointers</span><span class="bi-zh">随便放，用指针连起来</span></td></tr>
+        <tr><td><span class="bi-en">Read number 500</span><span class="bi-zh">读第 500 个</span></td><td><span class="bi-en">O(1) one step</span><span class="bi-zh">O(1)，一步</span></td><td><span class="bi-en">O(n) walk 500 nodes</span><span class="bi-zh">O(n)，要走 500 个</span></td></tr>
+        <tr><td><span class="bi-en">Insert in the middle</span><span class="bi-zh">中间插入</span></td><td><span class="bi-en">O(n) move everything after</span><span class="bi-zh">O(n)，后面全要挪</span></td><td><span class="bi-en">O(1) change two pointers</span><span class="bi-zh">O(1)，改两个指针</span></td></tr>
+        <tr><td><span class="bi-en">Memory</span><span class="bi-zh">内存</span></td><td><span class="bi-en">needs one full block</span><span class="bi-zh">要一整块连续内存</span></td><td><span class="bi-en">any small blocks</span><span class="bi-zh">小块内存就行</span></td></tr>
       </tbody>
     </table>
   </section>
-
   <section class="sec">
-    <h2><span class="num">03</span>In Java</h2>
-    <pre><code>LinkedList&lt;String&gt; list = new LinkedList&lt;&gt;();
-list.add("Ann");
-list.add("Bob");
-list.get(1);        // "Bob" — but it walks from the head</code></pre>
-    <p>You will meet this shape again in HashMap: when two keys land in the same bucket, they form a <b>linked list</b> — each <code>Node</code> has a <code>next</code> pointer. That is exactly the treasure hunt.</p>
+    <h2><span class="num">03</span><span class="in-en">Why it is used in HashMap</span><span class="in-zh">为什么 HashMap 里要用它</span></h2>
+    <p><span class="bi-en">Two different keys can land in the same bucket. The simplest fix is to keep them in a short linked list: put the new one at the end, and when you look up a key, walk the list and compare keys.</span><span class="bi-zh">两个不同的 key 可能落进同一个桶。最简单的办法就是把它们串成一条短链表：新的放末尾，查找时顺着链走、逐个比 key。</span></p>
+    <p class="note"><span class="bi-en">That is why the array inside a HashMap is called an “array of buckets”: each cell holds the <b>head</b> of a small list.</span><span class="bi-zh">所以 HashMap 里的数组叫“桶数组”：每一格存的是那条短链的<b>头</b>。</span></p>
   </section>
-
-
   <section class="sec">
-    <h2><span class="num">→</span>New words</h2>
+    <h2><span class="num">04</span><span class="in-en">Where you meet it</span><span class="in-zh">你会在哪里遇到它</span></h2>
+    <ul>
+      <li><span class="bi-en">HashMap: one bucket = one short list (lesson 4).</span><span class="bi-zh">HashMap：一个桶就是一条短链（第 4 课会讲）。</span></li>
+      <li><span class="bi-en">A queue of tasks with a pointer to the next: a linked list.</span><span class="bi-zh">任务队列：每个任务指向下一个，本质就是链表。</span></li>
+    </ul>
+  </section>
+  <section class="sec">
+    <h2><span class="num">→</span><span class="in-en">New words</span><span class="in-zh">新词</span></h2>
     <div class="wordlist">
       <div class="word">
         <span class="w">linked list</span>
         <span class="ipa">/lɪŋkt lɪst/</span>
-        <span class="mean">Boxes connected by arrows, one after another.</span>
-        <span class="links"><a class="say" href="https://youglish.com/pronounce/linked%20list/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="linked list" aria-label="say linked list">🔊</button></span>
+        <span class="mean"><span class="bi-en">Boxes joined by pointers.</span><span class="bi-zh">链表：用指针串起来的盒子</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/linked%2520list/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="linked list" type="button" aria-label="say linked list">🔊</button></span>
       </div>
       <div class="word">
         <span class="w">node</span>
         <span class="ipa">/noʊd/</span>
-        <span class="mean">One small box: a value plus a pointer.</span>
-        <span class="links"><a class="say" href="https://youglish.com/pronounce/node/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="node" aria-label="say node">🔊</button></span>
+        <span class="mean"><span class="bi-en">One box: a value plus a pointer.</span><span class="bi-zh">节点：一个值加一个指针</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/node/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="node" type="button" aria-label="say node">🔊</button></span>
       </div>
       <div class="word">
         <span class="w">pointer</span>
         <span class="ipa">/ˈpɔɪntər/</span>
-        <span class="mean">A value that says where the next box is.</span>
-        <span class="links"><a class="say" href="https://youglish.com/pronounce/pointer/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="pointer" aria-label="say pointer">🔊</button></span>
+        <span class="mean"><span class="bi-en">A value that says where the next box is.</span><span class="bi-zh">指针：记录下一个盒子在哪</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/pointer/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="pointer" type="button" aria-label="say pointer">🔊</button></span>
       </div>
       <div class="word">
         <span class="w">head</span>
         <span class="ipa">/hed/</span>
-        <span class="mean">The first node of the list.</span>
-        <span class="links"><a class="say" href="https://youglish.com/pronounce/head/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="head" aria-label="say head">🔊</button></span>
-      </div>
-      <div class="word">
-        <span class="w">traverse</span>
-        <span class="ipa">/trəˈvɜːrs/</span>
-        <span class="mean">Walk through all the nodes, one by one.</span>
-        <span class="links"><a class="say" href="https://youglish.com/pronounce/traverse/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="traverse" aria-label="say traverse">🔊</button></span>
+        <span class="mean"><span class="bi-en">The first node of the list.</span><span class="bi-zh">头节点：链表的第一个</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/head/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="head" type="button" aria-label="say head">🔊</button></span>
       </div>
       <div class="word">
         <span class="w">null</span>
         <span class="ipa">/nʌl/</span>
-        <span class="mean">Nothing. It marks the end of the list.</span>
-        <span class="links"><a class="say" href="https://youglish.com/pronounce/null/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="null" aria-label="say null">🔊</button></span>
+        <span class="mean"><span class="bi-en">Nothing. The end of a list.</span><span class="bi-zh">空；链表的结尾</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/null/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="null" type="button" aria-label="say null">🔊</button></span>
       </div>
     </div>
-    <p class="note">Click <b>hear it</b> to listen to real people say the word on YouGlish. Click <b>🔊</b> to hear the computer say it.</p>
+    <p class="note"><span class="bi-en">Click <b>▶ hear it</b> for real people on YouGlish; <b>🔊</b> for the computer voice.</span><span class="bi-zh">点 <b>▶ hear it</b> 听真人发音（YouGlish）；点 <b>🔊</b> 听电脑朗读。</span></p>
   </section>
 
   <section class="sec">
-    <h2><span class="num">✓</span>Check yourself</h2>
+    <h2><span class="num">✓</span><span class="in-en">Check yourself</span><span class="in-zh">自测</span></h2>
     <ol class="checks">
-      <li>What two things does a node keep?<small>A value and a pointer to the next node.</small></li>
-      <li>Why is finding item 500 slow?<small>You must walk from the head, one node at a time. That is O(n).</small></li>
-      <li>Why is inserting fast if you already stand at that place?<small>You only change two pointers. No boxes move.</small></li>
+      <li><span class="bi-en">Why can I not jump to the 500th item?</span><span class="bi-zh">为什么不能直接跳到第 500 个？</span></li>
+      <li><span class="bi-en">Insert in the middle: array or linked list? Why?</span><span class="bi-zh">中间插入：数组还是链表？为什么？</span></li>
+      <li><span class="bi-en">What does the last pointer hold?</span><span class="bi-zh">最后一个节点的指针指向什么？</span></li>
     </ol>
+    <p class="note"><span class="bi-en">Answer out loud, not in your head.</span><span class="bi-zh">出声回答，不要只在心里想。</span></p>
   </section>
 
-  <p class="log-tip">Next: <a href="tree.html">What is a tree?</a></p>
+
+  <p class="log-tip"><a href="tree.html"><span class="in-en">Next: Lesson 3, tree →</span><span class="in-zh">下一课：第 3 课，树 →</span></a></p>
 </main>
 
 <footer>
-  <div class="f-left"><span>Written for learning English · Wang Tianyu</span></div>
-  <div class="f-right"><a href="../index.html">Home</a><span class="sep">·</span><a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a></div>
+  <div class="f-left"><span class="in-en">Written for learning English · Wang Tianyu</span><span class="in-zh">为学英语而写 · 王天宇</span></div>
+  <div class="f-right"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a><span class="sep">·</span><a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a></div>
 </footer>
 <script src="../assets/app.js"></script>
 </body>
