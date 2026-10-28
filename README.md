@@ -23,6 +23,20 @@ Live: **https://tianyubabg.github.io/offer-camp/**
 | `glossary.html` | All 47 words, with pronunciation and a Chinese meaning |
 | `about.html` | Why the site is in English |
 
+## Publishing is throttled: one push per day
+
+GitHub Pages limits builds (soft cap ~10 builds/hour; site ≤ 1 GB; 100 GB bandwidth/month).
+Pushing ten times an hour gets the account temporarily blocked from building.
+
+So the rule is:
+
+- **commit locally as often as you like** — commits cost nothing and never deploy
+- **push only through `python tools/publish.py`** — it refuses a second publish on the same day
+- every publish appends one line to `publish-log.json`
+- `python tools/publish.py --check` shows today's status; `--force` overrides and must be noted in the log
+
+Work that is ready but not published yet can sit in the repo for a day. Nothing is lost.
+
 ## Language switch (top right)
 
 | Button | What you see |
