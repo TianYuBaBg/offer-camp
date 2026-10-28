@@ -17,6 +17,7 @@
       <a href="questions/index.html"><span class="in-en">Questions</span><span class="in-zh">题目</span></a>
       <a href="basics/array.html"><span class="in-en">Basics</span><span class="in-zh">基础</span></a>
       <a href="glossary.html"><span class="in-en">Words</span><span class="in-zh">词表</span></a>
+      <a href="speak.html"><span class="in-en">Phrasing</span><span class="in-zh">话术</span></a>
       <a class="nav-game" href="game/hashmap.html"><span class="in-en">Play</span><span class="in-zh">游戏</span></a>
     </nav>
   </div>
@@ -37,64 +38,55 @@
     <h1><span class="in-en">One small page. One idea.</span><span class="in-zh">一次只读一页，一次只学一个概念。</span></h1>
     <p class="lede"><span class="in-en">I know nothing about Java. I want to learn it in English, not in Chinese. So every page gives one idea, five new words, and three questions I answer out loud.</span><span class="in-zh">我不懂 Java，而且我想用英文学，不是用中文背。所以每一页只讲一个概念、给五个新词、三道要出声回答的题。</span></p>
     <div class="answerbox"><b><span class="in-en">Short answer</span><span class="in-zh">先给答案</span></b><span class="bi-en">This site teaches Java in English, one idea per page: seven short lessons, then the HashMap interview question.</span><span class="bi-zh">这个站用英文教 Java，一页只讲一个概念：先上七节短课，再读 HashMap 那道面试题。</span></div>
-    <p class="tags"><span class="tag"><span class="in-en">7 lessons</span><span class="in-zh">7 节课</span></span><span class="tag"><span class="in-en">2 questions</span><span class="in-zh">2 道题</span></span><span class="tag"><span class="in-en">8 stations</span><span class="in-zh">8 站</span></span></p>
+    <p class="tags"><span class="tag"><span class="in-en">8 questions</span><span class="in-zh">8 个问题</span></span><span class="tag"><span class="in-en">7 lessons</span><span class="in-zh">7 节课</span></span><span class="tag"><span class="in-en">3 tools</span><span class="in-zh">3 个工具</span></span></p>
     <button class="listen" data-listen type="button">🔊</button>
   </div>
 
   <section class="sec">
-    <h2><span class="num">01</span><span class="in-en">The line: one question, many branches</span><span class="in-zh">主线：从一个问题长出去</span></h2>
-    <p><span class="bi-en">Everything starts from one question. Each station below is a place the answer opens a new question. Read down the line, not across the table.</span><span class="bi-zh">所有内容都从一个问题长出来。线上一站就是一处“答案又生出一个新问题”的地方。顺着线往下读，不要横着扫。</span></p>
-    <ol class="spine">
-      <li class="live"><a href="questions/java-hashmap.html"><span class="dot">01</span><span class="q"><span class="in-en">What is a HashMap, really?</span><span class="in-zh">HashMap 到底是个什么东西？</span></span><span class="a"><span class="bi-en">An array of buckets; each bucket holds a short list.</span><span class="bi-zh">一个桶数组，每个桶挂一条短链。</span></span><span class="go">第 1 题 · 已上线</span></a></li>
-      <li class="live"><a href="basics/hash.html"><span class="dot">02</span><span class="q"><span class="in-en">How does a key end up in one bucket?</span><span class="in-zh">一个 key 怎么就跑到某个桶里？</span></span><span class="a"><span class="bi-en">hash it, then <code>h &amp; (n - 1)</code>.</span><span class="bi-zh">先算 hash，再 <code>h &amp; (n-1)</code> 取下标。</span></span><span class="go">第 4 课</span></a></li>
-      <li class="live"><a href="basics/tree.html"><span class="dot">03</span><span class="q"><span class="in-en">Two keys, one bucket. Now what?</span><span class="in-zh">两个 key 撞进同一个桶，怎么办？</span></span><span class="a"><span class="bi-en">Stand in a line — a linked list; after 8, a tree.</span><span class="bi-zh">排队——挂成链表；到 8 个就转成红黑树。</span></span><span class="go">第 2–3 课</span></a></li>
-      <li class="live"><a href="basics/big-o.html"><span class="dot">04</span><span class="q"><span class="in-en">The buckets are getting full. Then?</span><span class="in-zh">桶快满了呢？</span></span><span class="a"><span class="bi-en">At 75% the array doubles; each key stays or moves +n.</span><span class="bi-zh">装到 75% 翻倍；每个 key 要么原位、要么 +n。</span></span><span class="go">第 5 课</span></a></li>
-      <li class="live"><a href="basics/threads.html"><span class="dot">05</span><span class="q"><span class="in-en">Two threads put at the same time?</span><span class="in-zh">两个线程同时 put 会怎样？</span></span><span class="a"><span class="bi-en">Lost data, or a loop in JDK 7. Use ConcurrentHashMap.</span><span class="bi-zh">丢数据，JDK 7 还会成环。换 ConcurrentHashMap。</span></span><span class="go">第 7 课</span></a></li>
-      <li class="soon"><span class="st"><span class="dot">06</span><span class="q"><span class="in-en">So how is it used as a cache at work?</span><span class="in-zh">那工作中怎么拿它当缓存用？</span></span><span class="a"><span class="bi-en">Redis in front of the DB — and three ways the cache bites back.</span><span class="bi-zh">Redis 挡在数据库前面——以及缓存咬你的三种方式。</span></span><span class="go">待写</span></span></li>
-      <li class="live"><a href="questions/pay-callback.html"><span class="dot">07</span><span class="q"><span class="in-en">WeChat sends the same callback three times. Then?</span><span class="in-zh">微信同时回调三条，怎么办？</span></span><span class="a"><span class="bi-en">Idempotent table, then status CAS, then a lock.</span><span class="bi-zh">幂等表 → 状态 CAS → 再上锁。</span></span><span class="go">第 2 题 · 已上线</span></a></li>
-      <li class="soon"><span class="st"><span class="dot">08</span><span class="q"><span class="in-en">Ten thousand people, one thousand items. No oversell?</span><span class="in-zh">一万人抢一千件，怎么不超卖？</span></span><span class="a"><span class="bi-en">Pre-deduct in Redis, then let the DB be the last check.</span><span class="bi-zh">先在 Redis 预扣，数据库做最后一道闸。</span></span><span class="go">待写</span></span></li>
-    </ol>
-    <p class="note"><span class="bi-en">Grey stations are not written yet. The line grows as we go — that is the point.</span><span class="bi-zh">灰色的站还没写。线会一直长下去，这本来就是重点。</span></p>
+    <h2><span class="num">01</span><span class="in-en">Directory: pick one question</span><span class="in-zh">目录：挑一个问题进去学</span></h2>
+    <p><span class="bi-en">Every row is one question and its own page. Read top to bottom if you are new; jump to any row if you already know the answer.</span><span class="bi-zh">每一行就是一个问题、一个独立页面。刚开始就从上往下读；已经会了就直接跳。</span></p>
+    <div class="dir">
+    <div class="grp"><div class="gt"><span class="zh">从 HashMap 出发</span><span>The HashMap line</span></div>
+    <a href="questions/java-hashmap.html"><span class="n">01</span><span class="t">HashMap 到底是个什么东西？<span class="a">一个桶数组，每个桶挂一条短链。</span></span><span class="m">第 1 题</span></a>
+    <a href="basics/hash.html"><span class="n">02</span><span class="t">一个 key 怎么就跑到某个桶里？<span class="a">先算 hash，再 h & (n-1) 取下标。</span></span><span class="m">第 4 课</span></a>
+    <a href="basics/tree.html"><span class="n">03</span><span class="t">两个 key 撞进同一个桶怎么办？<span class="a">排队挂链表；到 8 个转成红黑树。</span></span><span class="m">第 2–3 课</span></a>
+    <a href="basics/big-o.html"><span class="n">04</span><span class="t">桶快满了呢？<span class="a">装到 75% 翻倍，每个 key 要么原位、要么 +n。</span></span><span class="m">第 5 课</span></a>
+    <a href="basics/threads.html"><span class="n">05</span><span class="t">两个线程同时 put 会怎样？<span class="a">丢数据，JDK 7 还会成环；换 ConcurrentHashMap。</span></span><span class="m">第 7 课</span></a>
+    </div>
+    <div class="dir">
+    <div class="grp"><div class="gt"><span class="zh">缓存</span><span>Cache</span></div>
+    <div class="row soon"><span class="n">06</span><span class="t">工作中怎么拿它当缓存用？<span class="a">Redis 挡在数据库前面——以及缓存咬你的三种方式。</span></span><span class="m">待写</span></div>
+    </div>
+    <div class="dir">
+    <div class="grp"><div class="gt"><span class="zh">支付与并发</span><span>Payments and concurrency</span></div>
+    <a href="questions/pay-callback.html"><span class="n">07</span><span class="t">微信回调同时来三条，怎么办？<span class="a">幂等表 → 状态 CAS → 再上锁。</span></span><span class="m">第 2 题</span></a>
+    <div class="row soon"><span class="n">08</span><span class="t">一万人抢一千件，怎么不超卖？<span class="a">先在 Redis 预扣，数据库做最后一道闸。</span></span><span class="m">待写</span></div>
+    </div>
+    <div class="grp"><div class="gt"><span class="zh">地基：七节课</span><span>Lessons</span></div>
+    <div class="row"><span class="n">L</span><span class="t" style="font-size:14px;font-weight:400"><span class="ln"><a href="basics/array.html">1 数组</a> · <a href="basics/linked-list.html">2 链表</a> · <a href="basics/tree.html">3 树 / 红黑树</a> · <a href="basics/hash.html">4 key / hash / 冲突</a> · <a href="basics/big-o.html">5 O(1) / O(n) / O(log n)</a> · <a href="basics/hashmap-methods.html">6 HashMap 常用方法</a> · <a href="basics/threads.html">7 为什么线程不安全</a></span></span><span class="m">7 页</span></div>
+    </div>
+    <div class="grp"><div class="gt"><span class="zh">工具与练习</span><span>Tools</span></div>
+    <a href="speak.html"><span class="n">T</span><span class="t">高级程序员话术语录<span class="a">12 条：同一件事，老手怎么说</span></span><span class="m">12 条</span></a>
+    <a href="questions/index.html"><span class="n">T</span><span class="t">面试题（2 道）<span class="a">每题：一句话答案 + 机制 + 追问 + 60 秒稿</span></span><span class="m">2 页</span></a>
+    <a href="glossary.html"><span class="n">T</span><span class="t">术语词表<span class="a">47 个词：音标 + 意思 + 真人发音</span></span><span class="m">47 词</span></a>
+    <a href="game/hashmap.html"><span class="n">T</span><span class="t">装桶小游戏<span class="a">三关：放进去 / 扩容 / 树化，电脑上玩</span></span><span class="m">3 关</span></a>
+    </div>
+    </div>
+    <p class="note"><span class="bi-en">Grey rows are not written yet. The list grows; nothing is removed.</span><span class="bi-zh">灰色的是还没写的。这张表只会变长，不会删。</span></p>
   </section>
   <section class="sec">
-    <h2><span class="num">02</span><span class="in-en">Five minutes with your hands</span><span class="in-zh">动手 5 分钟：把 key 放进桶里</span></h2>
-    <p><span class="bi-en">Reading gives you the words. Playing gives you the mechanics. Three levels, about five minutes.</span><span class="bi-zh">读是把话记住，玩是把机制记住。三关，大约 5 分钟。</span></p>
-    <ul>
-      <li><span class="bi-en">Level 1 — place 5 keys, and watch <code>order</code> and <code>node</code> collide in bucket 15.</span><span class="bi-zh">第一关：放 5 个 key，看 <code>order</code> 和 <code>node</code> 在桶 15 撞成一条链。</span></li>
-      <li><span class="bi-en">Level 2 — fill 12 of 16 (that is 75%), then watch the array double and every key either stay or move by 16.</span><span class="bi-zh">第二关：装满 12 个（16 的 75%），看数组翻倍，每个 key 要么原位、要么 +16。</span></li>
-      <li><span class="bi-en">Level 3 — the 8th key in one bucket turns the chain into a red-black tree: 8 steps become 3.</span><span class="bi-zh">第三关：同一个桶放第 8 个，链子变成红黑树，8 次比较变成 3 次。</span></li>
-      <li><span class="bi-en">Every word on a card can be clicked to hear it read aloud (five sites to choose from).</span><span class="bi-zh">卡片上的每个单词都能点开听真人发音（右上角可选 5 个站）。</span></li>
-    </ul>
-    <p><span class="bi-en"><a class="playbtn" href="game/hashmap.html">Play the bucket game →</a></span><span class="bi-zh"><a class="playbtn" href="game/hashmap.html">玩装桶小游戏 →</a></span></p>
-  </section>
-  <section class="sec">
-    <h2><span class="num">03</span><span class="in-en">The seven lessons: the ground under the line</span><span class="in-zh">七节课：这条线脚下的地基</span></h2>
-    <p><span class="bi-en">Each lesson is about 600 English words. They are the small pieces the line is built from.</span><span class="bi-zh">每节课大约 600 个英文词，是这条线用到的零件。</span></p>
-    <table class="ledger">
-      <thead><tr><th><span class="in-en">Lesson</span><span class="in-zh">第几课</span></th><th><span class="in-en">Title</span><span class="in-zh">标题</span></th><th><span class="in-en">What it answers</span><span class="in-zh">讲什么内容</span></th></tr></thead>
-      <tbody>
-        <tr><td>1</td><td><span class="bi-en"><a href="basics/array.html">What is an array?</a></span><span class="bi-zh">数组</span></td><td>什么是数组</td></tr>
-        <tr><td>2</td><td><span class="bi-en"><a href="basics/linked-list.html">What is a linked list?</a></span><span class="bi-zh">链表</span></td><td>什么是链表</td></tr>
-        <tr><td>3</td><td><span class="bi-en"><a href="basics/tree.html">What is a tree? What is a red-black tree?</a></span><span class="bi-zh">树</span></td><td>什么是树、什么是红黑树</td></tr>
-        <tr><td>4</td><td><span class="bi-en"><a href="basics/hash.html">What is a key? A hash? A collision?</a></span><span class="bi-zh">哈希</span></td><td>什么是 key、hash、冲突</td></tr>
-        <tr><td>5</td><td><span class="bi-en"><a href="basics/big-o.html">What is O(1), O(n), O(log n)?</a></span><span class="bi-zh">复杂度</span></td><td>什么是 O(1)、O(n)、O(log n)</td></tr>
-        <tr><td>6</td><td><span class="bi-en"><a href="basics/hashmap-methods.html">HashMap methods in real code</a></span><span class="bi-zh">方法</span></td><td>HashMap 的常用方法和真实用法</td></tr>
-        <tr><td>7</td><td><span class="bi-en"><a href="basics/threads.html">Why is HashMap not thread-safe?</a></span><span class="bi-zh">线程</span></td><td>为什么 HashMap 线程不安全</td></tr>
-      </tbody>
-    </table>
-  </section>
-  <section class="sec">
-    <h2><span class="num">04</span><span class="in-en">How to read a page</span><span class="in-zh">怎么读一页</span></h2>
+    <h2><span class="num">02</span><span class="in-en">How to read a page</span><span class="in-zh">怎么读一页</span></h2>
     <ol class="steps">
       <li><span class="bi-en">Press <b>🔊</b> at the top. Follow the words with your eyes. Twice is enough.</span><span class="bi-zh">点页面顶部的 <b>🔊</b>，眼睛跟着字走。两遍就够。</span></li>
       <li><span class="bi-en">Switch to <b>中英</b> if a sentence is too hard. Read the English first, then the Chinese.</span><span class="bi-zh">句子太难就切到 <b>中英</b>：先读英文，再看中文。</span></li>
       <li><span class="bi-en">Click <b>▶ hear it</b> on five new words. Say each one out loud three times.</span><span class="bi-zh">在新词里点 <b>▶ hear it</b>，听真人发音，每个词大声说三遍。</span></li>
       <li><span class="bi-en">Answer the three questions at the bottom <b>out loud</b>, not in your head.</span><span class="bi-zh">页面底部三道题要<b>出声</b>回答，不要只在心里想。</span></li>
+      <li><span class="bi-en">Then go back to the directory. One row a day is enough.</span><span class="bi-zh">然后回目录。一天一行就够。</span></li>
     </ol>
-    <p class="note"><span class="bi-en">Twenty minutes is enough. One station a day, and the line keeps growing.</span><span class="bi-zh">二十分钟就够。一天一站，线就一直在长。</span></p>
+    <p class="note"><span class="bi-en">Twenty minutes a row. The directory is the plan — do not hold it in your head.</span><span class="bi-zh">一行二十分钟。计划就在目录里，不用记在脑子里。</span></p>
   </section>
   <section class="sec">
-    <h2><span class="num">05</span><span class="in-en">Why English, and why so slow</span><span class="in-zh">为什么要英文、为什么这么慢</span></h2>
+    <h2><span class="num">03</span><span class="in-en">Why English, and why so slow</span><span class="in-zh">为什么要英文、为什么这么慢</span></h2>
     <p><span class="bi-en">In an interview the words are English: <i>bucket</i>, <i>collision</i>, <i>resize</i>. If I only know the Chinese word, I hear a sound I cannot follow.</span><span class="bi-zh">面试里蹦出来的是英文词：bucket、collision、resize。如果我只知道中文说法，听到的就是一串抓不住的声音。</span></p>
     <p><span class="bi-en">So this site is slow on purpose. One idea per page, five words, one picture.</span><span class="bi-zh">所以这个网站是故意慢的：一页一个概念、五个词、一张图。</span></p>
   </section>

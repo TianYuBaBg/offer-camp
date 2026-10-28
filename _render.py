@@ -75,6 +75,44 @@ details.answers[open] summary::before{ content:"－ " }
 
 
 
+/* ===== 首页目录 ===== */
+.dir{margin:14px 0 0}
+.dir .grp{margin:30px 0 0}
+.dir .gt{display:flex;justify-content:space-between;align-items:baseline;
+  border-bottom:1px solid var(--rule);padding-bottom:8px;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;color:#8a8378;text-transform:uppercase}
+.dir .gt .zh{font-family:var(--serif);font-size:15px;letter-spacing:.06em;color:var(--ink);text-transform:none}
+.dir a,.dir .row{display:grid;grid-template-columns:40px 1fr 96px;gap:16px;align-items:baseline;
+  padding:15px 6px;border-bottom:1px solid var(--line);text-decoration:none;color:inherit}
+.dir a:hover{background:rgba(255,255,255,.6)}
+.dir .n{font-family:var(--mono);font-size:11px;color:#A33;letter-spacing:.06em}
+.dir .t{font-family:var(--serif);font-size:18.5px;font-weight:700;line-height:1.42}
+.dir .a{display:block;color:var(--ink-2);font-size:13.5px;line-height:1.65;margin-top:4px}
+.dir .m{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);text-align:right;white-space:nowrap}
+.dir .soon{opacity:.5}
+.dir .ln{font-family:var(--mono);font-size:11.5px;line-height:2.3;color:var(--ink-2)}
+.dir .ln a{display:inline;padding:0;border:0;text-decoration:none;color:var(--ink);border-bottom:1px solid var(--rule)}
+.dir .ln a:hover{background:none;border-bottom-color:#A33}
+
+/* ===== 高级程序员话术语录 ===== */
+.say{border-top:1px solid var(--line);padding:24px 0 6px}
+.say .sc{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--ink-3)}
+.say .sc b{color:#A33;font-weight:400;margin-right:8px}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:0;margin:14px 0 0;border:1px solid var(--rule-soft)}
+.vs > div{padding:14px 16px}
+.vs > div + div{border-left:1px solid var(--rule-soft);background:var(--paper-2)}
+.vs .who{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;
+  color:var(--ink-faint);margin-bottom:8px}
+.vs .said{font-size:14.5px;line-height:1.8;color:var(--ink-2)}
+.vs .said.senior{font-family:var(--serif);font-size:16.5px;line-height:2;color:var(--ink)}
+.vs .said.senior .kw{border-bottom:1px solid #E0C9C2;font-weight:700}
+.chips{margin:12px 0 0}
+.chips span{display:inline-block;margin:0 6px 6px 0;padding:2px 8px;border:1px solid var(--rule);
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;color:var(--ink-2)}
+.whylist{margin:12px 0 0;padding-left:18px}
+.whylist li{font-size:13.8px;line-height:1.8;color:var(--ink-2);margin-bottom:6px}
+
 /* 照念稿（blockquote.read） */
 blockquote.read{margin:0; padding:20px 24px; background:var(--paper-2);
   border-left:3px solid var(--red); font-family:var(--serif); font-size:16.5px;
@@ -248,6 +286,7 @@ PAGE = """<!doctype html>
       <a href="__QIDX__"__ON_Q__><span class="in-en">Questions</span><span class="in-zh">题目</span></a>
       <a href="__BASICS__"__ON_B__><span class="in-en">Basics</span><span class="in-zh">基础</span></a>
       <a href="__GLOSS__"__ON_W__><span class="in-en">Words</span><span class="in-zh">词表</span></a>
+      <a href="__SPEAK__"__ON_S__><span class="in-en">Phrasing</span><span class="in-zh">话术</span></a>
       <a class="nav-game" href="__GAME__"><span class="in-en">Play</span><span class="in-zh">游戏</span></a>
     </nav>
   </div>
@@ -431,6 +470,8 @@ def page(path, data, on=""):
         "__BASICS__": up + "basics/array.html",
         "__GLOSS__": up + "glossary.html",
         "__GAME__": up + "game/hashmap.html",
+        "__SPEAK__": up + "speak.html",
+        "__ON_S__": ' class="on"' if on == "s" else "",
         "__ON_Q__": ' class="on"' if on == "q" else "",
         "__ON_B__": ' class="on"' if on == "b" else "",
         "__ON_W__": ' class="on"' if on == "w" else "",

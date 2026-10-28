@@ -11,54 +11,19 @@ INDEX = {
              "So every page gives one idea, five new words, and three questions I answer out loud.",
              "我不懂 Java，而且我想用英文学，不是用中文背。所以每一页只讲一个概念、"
              "给五个新词、三道要出声回答的题。"),
-    "tags": [("7 lessons", "7 节课"), ("2 questions", "2 道题"), ("8 stations", "8 站")],
+    "tags": [("8 questions", "8 个问题"), ("7 lessons", "7 节课"), ("3 tools", "3 个工具")],
     "blocks": [
-        ("h2", "01", "The line: one question, many branches",
-         "主线：从一个问题长出去",
+        ("h2", "01", "Directory: pick one question",
+         "目录：挑一个问题进去学",
          [
-             ("p", "Everything starts from one question. Each station below is a place the answer opens "
-                   "a new question. Read down the line, not across the table.",
-              "所有内容都从一个问题长出来。线上一站就是一处“答案又生出一个新问题”的地方。"
-              "顺着线往下读，不要横着扫。"),
-             ("html", "__SPINE__"),
-             ("note", "Grey stations are not written yet. The line grows as we go — that is the point.",
-              "灰色的站还没写。线会一直长下去，这本来就是重点。"),
+             ("p", "Every row is one question and its own page. Read top to bottom if you are new; "
+                   "jump to any row if you already know the answer.",
+              "每一行就是一个问题、一个独立页面。刚开始就从上往下读；已经会了就直接跳。"),
+             ("html", "__DIRECTORY__"),
+             ("note", "Grey rows are not written yet. The list grows; nothing is removed.",
+              "灰色的是还没写的。这张表只会变长，不会删。"),
          ]),
-        ("h2", "02", "Five minutes with your hands", "动手 5 分钟：把 key 放进桶里",
-         [
-             ("p", "Reading gives you the words. Playing gives you the mechanics. Three levels, about five minutes.",
-              "读是把话记住，玩是把机制记住。三关，大约 5 分钟。"),
-             ("ul", [
-                 ("Level 1 — place 5 keys, and watch <code>order</code> and <code>node</code> collide in bucket 15.",
-                  "第一关：放 5 个 key，看 <code>order</code> 和 <code>node</code> 在桶 15 撞成一条链。"),
-                 ("Level 2 — fill 12 of 16 (that is 75%), then watch the array double and every key either stay or move by 16.",
-                  "第二关：装满 12 个（16 的 75%），看数组翻倍，每个 key 要么原位、要么 +16。"),
-                 ("Level 3 — the 8th key in one bucket turns the chain into a red-black tree: 8 steps become 3.",
-                  "第三关：同一个桶放第 8 个，链子变成红黑树，8 次比较变成 3 次。"),
-                 ("Every word on a card can be clicked to hear it read aloud (five sites to choose from).",
-                  "卡片上的每个单词都能点开听真人发音（右上角可选 5 个站）。"),
-             ]),
-             ("p", '<a class="playbtn" href="game/hashmap.html">Play the bucket game →</a>',
-                    '<a class="playbtn" href="game/hashmap.html">玩装桶小游戏 →</a>'),
-         ]),
-        ("h2", "03", "The seven lessons: the ground under the line",
-         "七节课：这条线脚下的地基",
-         [
-             ("p", "Each lesson is about 600 English words. They are the small pieces the line is built from.",
-              "每节课大约 600 个英文词，是这条线用到的零件。"),
-             ("table",
-              [("Lesson", "第几课"), ("Title", "标题"), ("What it answers", "讲什么内容")],
-              [
-                  [("1", "1"), ('<a href="basics/array.html">What is an array?</a>', '数组'), ("什么是数组", "什么是数组")],
-                  [("2", "2"), ('<a href="basics/linked-list.html">What is a linked list?</a>', '链表'), ("什么是链表", "什么是链表")],
-                  [("3", "3"), ('<a href="basics/tree.html">What is a tree? What is a red-black tree?</a>', '树'), ("什么是树、什么是红黑树", "什么是树、什么是红黑树")],
-                  [("4", "4"), ('<a href="basics/hash.html">What is a key? A hash? A collision?</a>', '哈希'), ("什么是 key、hash、冲突", "什么是 key、hash、冲突")],
-                  [("5", "5"), ('<a href="basics/big-o.html">What is O(1), O(n), O(log n)?</a>', '复杂度'), ("什么是 O(1)、O(n)、O(log n)", "什么是 O(1)、O(n)、O(log n)")],
-                  [("6", "6"), ('<a href="basics/hashmap-methods.html">HashMap methods in real code</a>', '方法'), ("HashMap 的常用方法和真实用法", "HashMap 的常用方法和真实用法")],
-                  [("7", "7"), ('<a href="basics/threads.html">Why is HashMap not thread-safe?</a>', '线程'), ("为什么 HashMap 线程不安全", "为什么 HashMap 线程不安全")],
-              ]),
-         ]),
-        ("h2", "04", "How to read a page", "怎么读一页",
+        ("h2", "02", "How to read a page", "怎么读一页",
          [
              ("ol", [
                  ("Press <b>🔊</b> at the top. Follow the words with your eyes. Twice is enough.",
@@ -69,11 +34,13 @@ INDEX = {
                   "在新词里点 <b>▶ hear it</b>，听真人发音，每个词大声说三遍。"),
                  ("Answer the three questions at the bottom <b>out loud</b>, not in your head.",
                   "页面底部三道题要<b>出声</b>回答，不要只在心里想。"),
+                 ("Then go back to the directory. One row a day is enough.",
+                  "然后回目录。一天一行就够。"),
              ]),
-             ("note", "Twenty minutes is enough. One station a day, and the line keeps growing.",
-              "二十分钟就够。一天一站，线就一直在长。"),
+             ("note", "Twenty minutes a row. The directory is the plan — do not hold it in your head.",
+              "一行二十分钟。计划就在目录里，不用记在脑子里。"),
          ]),
-        ("h2", "05", "Why English, and why so slow", "为什么要英文、为什么这么慢",
+        ("h2", "03", "Why English, and why so slow", "为什么要英文、为什么这么慢",
          [
              ("p", "In an interview the words are English: <i>bucket</i>, <i>collision</i>, <i>resize</i>. "
                    "If I only know the Chinese word, I hear a sound I cannot follow.",

@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="zh-CN" data-lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Senior phrasing · Java Notes</title>
+<meta name="description" content="Senior phrasing">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="masthead">
+  <div class="mh-left">
+    <a class="mh-mark" href="index.html">Java Notes</a>
+    <nav class="mh-nav">
+      <a href="questions/index.html"><span class="in-en">Questions</span><span class="in-zh">题目</span></a>
+      <a href="basics/array.html"><span class="in-en">Basics</span><span class="in-zh">基础</span></a>
+      <a href="glossary.html"><span class="in-en">Words</span><span class="in-zh">词表</span></a>
+      <a href="speak.html" class="on"><span class="in-en">Phrasing</span><span class="in-zh">话术</span></a>
+      <a class="nav-game" href="game/hashmap.html"><span class="in-en">Play</span><span class="in-zh">游戏</span></a>
+    </nav>
+  </div>
+  <div class="mh-right">
+    <span class="langswitch">
+      <button type="button" data-lang-set="zh">中文</button>
+      <button type="button" data-lang-set="both">中英</button>
+      <button type="button" data-lang-set="en">English</button>
+    </span>
+  </div>
+</header>
+
+<main>
+  <p class="crumb"><a href="index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a> / <span class="in-en">Phrasing</span><span class="in-zh">话术语录</span></p>
+
+  <div class="qhead">
+    <p class="kicker"><span class="in-en">Phrasing · same thing, said by a senior</span><span class="in-zh">话术语录 · 同一件事，老手怎么说</span></p>
+    <h1><span class="in-en">同一件事，换一种说法。</span><span class="in-zh">同一件事，换一种说法。</span></h1>
+    <p class="lede"><span class="in-en">Left is how a junior says it. Right is how a senior says the same thing — and the reasons under each card are what makes it land. Read them out loud.</span><span class="in-zh">左边是菜鸟的说法，右边是老手的说法。每张卡下面的三条，是这句话为什么站得住。要出声念。</span></p>
+    
+    <p class="tags"><span class="tag"><span class="in-en">12 entries</span><span class="in-zh">12 条</span></span><span class="tag"><span class="in-en">read aloud</span><span class="in-zh">都要念</span></span><span class="tag"><span class="in-en">interview-ready</span><span class="in-zh">背完就能说</span></span></p>
+    <button class="listen" data-listen type="button">🔊</button>
+  </div>
+
+  <section class="sec">
+    <h2><span class="num">01</span><span class="in-en">Phrasebook: same thing, two people</span><span class="in-zh">对照表：同一件事，两个人怎么说</span></h2>
+    <p class="note"><span class="bi-en">Do not memorize the whole sentence. Memorize the <b>three bold words</b> in each senior line — then say it in your own order.</span><span class="bi-zh">不要整句背。记住老手那段的<b>三个关键词</b>，然后用你自己的顺序讲出来。</span></p>
+    <div class="say">
+      <span class="sc"><b>01</b>支付回调重复 —— 你给的那段，我精修过</span>
+      <div class="vs">
+        <div><span class="who">菜鸟说</span><span class="said">「微信有时候会重复通知，我在代码里做了个判断，重复的就不处理了。」</span></div>
+        <div><span class="who">老手说</span><span class="said senior">因为网络经常会抖动，微信支付可能因为<b class="kw">超时重试</b>发来多条回调。为了保证<b class="kw">数据一致性</b>，我们在数据库里通过<b class="kw">行锁</b>、<b class="kw">乐观锁</b>（带状态判断的 SQL），以及给交易号加<b class="kw">唯一索引</b>，从而实现了接口的<b class="kw">幂等性</b>，保证商品只发一次。</span></div>
+      </div>
+      <div class="chips"><span>网络抖动</span><span>超时重试</span><span>数据一致性</span><span>行锁</span><span>乐观锁</span><span>唯一索引</span><span>幂等性</span></div>
+      <ul class="whylist">
+        <li>先讲<b>原因</b>（网络抖动 → 超时重试），不是先讲自己的代码；面试官听到的是“他理解系统的边界”。</li>
+        <li>把手段按<b>从强到弱</b>排：唯一索引（数据库兜底）> 乐观锁 CAS > 行锁，说明你知道哪一层最可靠。</li>
+        <li>最后落在<b>结果</b>（只发一次货），一句话闭环，不拖泥带水。</li>
+      </ul>
+    </div>
+    <div class="say">
+      <span class="sc"><b>02</b>缓存和数据库不一致怎么办</span>
+      <div class="vs">
+        <div><span class="who">菜鸟说</span><span class="said">「我改数据库之后就把缓存删掉。」</span></div>
+        <div><span class="who">老手说</span><span class="said senior">我们走的是 <b class="kw">Cache Aside</b>：写库之后<b>删缓存</b>，不是更新缓存。删除失败会进延迟队列重试两次，兜底再靠过期时间；<b class="kw">强一致场景</b>不走缓存，直接读主库。</span></div>
+      </div>
+      <div class="chips"><span>Cache Aside</span><span>删缓存不更新缓存</span><span>延迟双删</span><span>补偿重试</span><span>过期兜底</span><span>强一致场景</span></div>
+      <ul class="whylist">
+        <li>说清<b>模式名</b>（Cache Aside），面试官立刻知道你不是凭感觉写的。</li>
+        <li>说清<b>为什么删而不是更新</b>：并发更新会写出脏数据。</li>
+        <li>给出<b>兜底</b>（重试 + 过期），最后加一句“强一致就不走缓存”——加一句边界，可信度立刻上来。</li>
+      </ul>
+    </div>
+    <div class="say">
+      <span class="sc"><b>03</b>穿透、击穿、雪崩，一次说清</span>
+      <div class="vs">
+        <div><span class="who">菜鸟说</span><span class="said">「就是缓存不管用了，请求都打到数据库。」</span></div>
+        <div><span class="who">老手说</span><span class="said senior">这三种要分开看：<b>穿透</b>是查不存在的数据，每一次都落到库，用<b class="kw">布隆过滤器</b>或<b class="kw">空值缓存</b>挡；<b>击穿</b>是某个热点 key 过期瞬间被打爆，用<b class="kw">逻辑过期</b> + <b class="kw">互斥重建</b>；<b>雪崩</b>是大量 key 同时失效或 Redis 整体挂了，用随机过期时间 + 集群/本地缓存二级兜底。</span></div>
+      </div>
+      <div class="chips"><span>布隆过滤器</span><span>空值缓存</span><span>逻辑过期</span><span>互斥重建</span><span>随机 TTL</span><span>二级缓存</span></div>
+      <ul class="whylist">
+        <li><b>先分类再给方案</b>，这是老手的肌肉记忆；混着说会显得只是背过。</li>
+        <li>每类只给<b>一个</b>最常用方案，别堆名词。</li>
+        <li>结尾点出“三种的<b>根因不同</b>”，显示你理解的是机制不是清单。</li>
+      </ul>
+    </div>
+    <div class="say">
+      <span class="sc"><b>04</b>慢 SQL 怎么查</span>
+      <div class="vs">
+        <div><span class="who">菜鸟说</span><span class="said">「我加了索引之后就不慢了。」</span></div>
+        <div><span class="who">老手说</span><span class="said senior">先看<b class="kw">慢查询日志</b>定位 SQL，再用 <b>explain</b> 看 type、rows 和 Extra：<b class="kw">全表扫描</b>、<b class="kw">filesort</b>、<b class="kw">回表</b>太多分别对应不同改法——补<b class="kw">联合索引</b>、<b class="kw">覆盖索引</b>、或者把 where 条件改成能走索引的形式。改完用<b>压测/线上慢查趋势</b><b class="kw">验证</b>，而不是只看执行时间降了。</span></div>
+      </div>
+      <div class="chips"><span>慢查询日志</span><span>explain</span><span>全表扫描</span><span>filesort</span><span>联合索引</span><span>覆盖索引</span><span>回表</span><span>验证</span></div>
+      <ul class="whylist">
+        <li>顺序是<b>定位 → 诊断 → 改 → 验证</b>，四步都有，说明你有一套方法而不是零散经验。</li>
+        <li>说出 explain 里<b>真正要看的字段</b>（type / rows / Extra），比“我用了 explain”强十倍。</li>
+        <li>强调<b>验证</b>，这是区分“改完就完事”和“对结果负责”的地方。</li>
+      </ul>
+    </div>
+    <div class="say">
+      <span class="sc"><b>05</b>分布式锁怎么讲才算讲透</span>
+      <div class="vs">
+        <div><span class="who">菜鸟说</span><span class="said">「我用 Redisson 加锁，加锁就没问题了。」</span></div>
+        <div><span class="who">老手说</span><span class="said senior">锁的粒度按<b>业务维度</b>定，比如按 sku 加，不是按订单号；持锁时长只覆盖<b class="kw">临界区</b>，绝不在锁里做远程调用。Redisson 的 watchdog 负责续期，进程挂了租约自动过期；主从切换可能丢锁，所以最后仍要<b>靠<b class="kw">数据库兜底</b></b>（唯一索引 / CAS）。</span></div>
+      </div>
+      <div class="chips"><span>锁粒度</span><span>临界区</span><span>watchdog 续期</span><span>租约过期</span><span>主从切换丢锁</span><span>数据库兜底</span></div>
+      <ul class="whylist">
+        <li>先讲<b>粒度</b>，因为这是最常见的追问点（锁太粗会串行化）。</li>
+        <li>主动说出<b>锁的失效场景</b>（主从切换），比被问出来强得多。</li>
+        <li>结尾一定要落到“<b>锁不是最终保证</b>”，这是高级感的来源。</li>
+      </ul>
+    </div>
+    <div class="say">
+      <span class="sc"><b>06</b>为什么用 MQ</span>
+      <div class="vs">
+        <div><span class="who">菜鸟说</span><span class="said">「用 MQ 可以异步，快。」</span></div>
+        <div><span class="who">老手说</span><span class="said senior">三个作用分开说：<b>削峰</b>（下单峰值挡住，消费端按能力拉）、<b>解耦</b>（订单不关心下游有几个）、<b>最终一致</b>（<b class="kw">本地消息表</b> + 重试 + <b class="kw">对账</b>）。代价是<b>重复消费</b>和<b>顺序问题</b>，所以消费端必须<b class="kw">幂等</b>，关键业务按业务键分区保证顺序。</span></div>
+      </div>
+      <div class="chips"><span>削峰</span><span>解耦</span><span>最终一致</span><span>本地消息表</span><span>对账</span><span>重复消费</span><span>幂等</span><span>分区顺序</span></div>
+      <ul class="whylist">
+        <li>讲作用讲<b>三条就够</b>，每条一个词，不展开成长篇。</li>
+        <li>主动说<b>代价</b>（重复、乱序），并给出对应的解法——这是从“会用”到“负责”的分水岭。</li>
+        <li>提到<b>对账</b>，说明你想的是“最终一定对得上”，不是“发出去就算完”。</li>
+      </ul>
+    </div>
+    <div class="say">
+      <span class="sc"><b>07</b>限流降级怎么做</span>
+      <div class="vs">
+        <div><span class="who">菜鸟说</span><span class="said">「我们加了限流，超过就拒绝。」</span></div>
+        <div><span class="who">老手说</span><span class="said senior">限流按<b>维度</b>分层：网关层挡总量、服务层按接口/用户挡突刺、核心链路单独配额；算法上单机用<b class="kw">令牌桶</b>平滑突发，集群用 Redis + Lua 保证原子。降级要<b>提前定好</b>哪些能力可以关（评论、推荐、非核心查询），并留开关和<b class="kw">演练</b>记录。</span></div>
+      </div>
+      <div class="chips"><span>限流维度</span><span>令牌桶</span><span>Redis + Lua 原子</span><span>独立配额</span><span>降级开关</span><span>演练</span></div>
+      <ul class="whylist">
+        <li>先分层<b>维度</b>，再说算法，最后说降级——顺序本身就体现设计思路。</li>
+        <li>说“<b>提前定好</b>”和“<b>演练</b>”，面试官会认为你经历过真实的流量事件。</li>
+        <li>避免说“超过就拒绝”，那句话听起来像没考虑用户体验。</li>
+      </ul>
+    </div>
+    <div class="say">
+      <span class="sc"><b>08</b>线上出问题，你怎么排查</span>
+      <div class="vs">
+        <div><span class="who">菜鸟说</span><span class="said">「我看了日志，发现是空指针，改了就上线了。」</span></div>
+        <div><span class="who">老手说</span><span class="said senior">先看<b>监控和告警</b>确认<b class="kw">影响面</b>（哪个接口、多少量、从几点开始），再从<b>链路追踪</b>定位到具体节点，用日志和复现缩小范围；<b>先止血</b>（开关、回滚、扩容），再定位<b class="kw">根因</b>，最后补<b>监控和<b class="kw">回归用例</b></b>，把这次故障变成可预防的。</span></div>
+      </div>
+      <div class="chips"><span>影响面</span><span>链路追踪</span><span>先止血</span><span>根因</span><span>补齐监控</span><span>回归用例</span></div>
+      <ul class="whylist">
+        <li>“<b>先止血再根因</b>”是运维常识，说出这句话立刻显得成熟。</li>
+        <li>顺序里带<b>量化</b>（多少量、几点开始），说明你习惯用数据判断。</li>
+        <li>结尾一定跟<b>复盘动作</b>，把故障变成系统能力。</li>
+      </ul>
+    </div>
+    <div class="say">
+      <span class="sc"><b>09</b>需求评审怎么发言</span>
+      <div class="vs">
+        <div><span class="who">菜鸟说</span><span class="said">「这个需求能做，给我三天。」</span></div>
+        <div><span class="who">老手说</span><span class="said senior">我先确认三件事：<b>目标</b>是什么（<b class="kw">成功指标</b>）、<b>边界</b>在哪（哪些不做）、<b>依赖</b>有哪些（第三方、数据、其他团队）。如果这三件不清楚，评估出来的工期也不可信。另外我建议先做<b><b class="kw">最小可用</b>的一版</b>，<b class="kw">上线看数据</b>再加。</span></div>
+      </div>
+      <div class="chips"><span>成功指标</span><span>范围边界</span><span>外部依赖</span><span>最小可用</span><span>上线看数据</span></div>
+      <ul class="whylist">
+        <li>把“能做/不能做”换成“<b>先确认三件事</b>”，这是资深工程师的默认动作。</li>
+        <li>强调<b>工期不可信的条件</b>，保护自己也保护团队。</li>
+        <li>主动提<b>分阶段交付</b>，说明你关注的是业务结果而不是写完代码。</li>
+      </ul>
+    </div>
+    <div class="say">
+      <span class="sc"><b>10</b>代码评审说什么</span>
+      <div class="vs">
+        <div><span class="who">菜鸟说</span><span class="said">「这个写法不好，改成我这样。」</span></div>
+        <div><span class="who">老手说</span><span class="said senior">分成三类说：<b>必须改</b>（正确性、安全、并发问题）；<b>建议改</b>（<b class="kw">可读性</b>、命名、重复代码）；<b>可以不改</b>（风格偏好）。每条给出理由和影响，能给出<b class="kw">示例代码</b>就给示例，让人看懂“为什么”，而不是只服从我的习惯。</span></div>
+      </div>
+      <div class="chips"><span>正确性/安全/并发</span><span>可读性</span><span>理由与影响</span><span>示例代码</span><span>不按个人偏好</span></div>
+      <ul class="whylist">
+        <li><b>分级</b>是 review 的核心技巧，避免把个人偏好说成必须改。</li>
+        <li>强调“<b>给出理由和影响</b>”，这是协作能力而不是技术能力。</li>
+        <li>最后一句“而不是只服从我的习惯”，是很多面试官想听到的成熟度。</li>
+      </ul>
+    </div>
+    <div class="say">
+      <span class="sc"><b>11</b>汇报工作 / 周会发言</span>
+      <div class="vs">
+        <div><span class="who">菜鸟说</span><span class="said">「这周改了十几个 bug，写了几个接口。」</span></div>
+        <div><span class="who">老手说</span><span class="said senior">这周主要推<b>订单同步</b>这条线：完成两个接口并对接联调，接口 P95 从 800ms 降到 240ms；风险是第三方对账文件晚到，我准备了本地补数脚本兜底；下周做<b>灰度</b>，先切 10% 流量观察。</span></div>
+      </div>
+      <div class="chips"><span>主推一条线</span><span>量化结果</span><span>风险与兜底</span><span>灰度</span><span>下周计划</span></div>
+      <ul class="whylist">
+        <li>结构固定：<b>做了什么 → 结果多少 → 风险 → 下一步</b>，十秒讲完。</li>
+        <li>数字要跟<b>自己的判断</b>一起出现（从多少到多少），而不是罗列工作量。</li>
+        <li>主动讲<b>风险</b>，比被追问“有问题吗”强得多。</li>
+      </ul>
+    </div>
+    <div class="say">
+      <span class="sc"><b>12</b>被问到不会的东西</span>
+      <div class="vs">
+        <div><span class="who">菜鸟说</span><span class="said">「这个我没做过」「这个不太清楚」。</span></div>
+        <div><span class="who">老手说</span><span class="said senior">这块我没有直接做过，我说下我会<b class="kw">怎么验证</b>：先看官方文档里的一致性模型，再用一个最小例子复现；如果时间允许我会先做<b>压测对比</b>再定方案。我比较确定的是<b>结论方向</b>——数据一致性优先，性能可以后补。</span></div>
+      </div>
+      <div class="chips"><span>没直接做过</span><span>怎么验证</span><span>最小复现</span><span>压测对比</span><span>结论方向</span></div>
+      <ul class="whylist">
+        <li><b>“没做过”+“我会怎么验证”</b>是标准答法，比硬编安全得多。</li>
+        <li>给出<b>最小验证路径</b>（文档 → 小例子 → 压测），说明你有方法论。</li>
+        <li>最后给<b>方向性判断</b>，让人看到你不是空手。</li>
+      </ul>
+    </div>
+  </section>
+  <section class="sec">
+    <h2><span class="num">02</span><span class="in-en">How to use this page</span><span class="in-zh">怎么用这一页</span></h2>
+    <ol class="steps">
+      <li><span class="bi-en">Read the left column first — that is probably what you would have said.</span><span class="bi-zh">先读左栏——那大概就是你会说的话。</span></li>
+      <li><span class="bi-en">Read the right column out loud, twice. The words must come out of your mouth.</span><span class="bi-zh">右栏出声念两遍。词必须从你嘴里出来。</span></li>
+      <li><span class="bi-en">Cover the right column and retell it using only the keyword chips.</span><span class="bi-zh">盖住右栏，只看下面的关键词，用自己的话重讲一遍。</span></li>
+      <li><span class="bi-en">If a keyword means nothing to you, that is the next lesson to read.</span><span class="bi-zh">哪个关键词看不懂，那就是你下一节该去看的内容。</span></li>
+    </ol>
+    <p class="note"><span class="bi-en">Twelve cards, three minutes each — one evening. After that, every answer sounds different.</span><span class="bi-zh">十二张卡，一张三分钟，一个晚上。之后你所有回答听起来都不一样。</span></p>
+  </section>
+
+  <p class="log-tip"><a href="questions/index.html"><span class="in-en">Go use it on a question →</span><span class="in-zh">拿一道题去用 →</span></a></p>
+</main>
+
+<footer>
+  <div class="f-left"><span class="in-en">Written for learning English · Wang Tianyu</span><span class="in-zh">为学英语而写 · 王天宇</span></div>
+  <div class="f-right"><a href="index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a><span class="sep">·</span><a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a></div>
+</footer>
+<script src="assets/app.js"></script>
+</body>
+</html>
