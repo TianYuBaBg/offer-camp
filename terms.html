@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="zh-CN" data-lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Terms on this site · Java Notes</title>
+<meta name="description" content="Terms on this site">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="masthead">
+  <div class="mh-left">
+    <a class="mh-mark" href="index.html">Java Notes</a>
+    <nav class="mh-nav">
+      <a href="questions/index.html"><span class="in-en">Questions</span><span class="in-zh">题目</span></a>
+      <a href="basics/array.html"><span class="in-en">Basics</span><span class="in-zh">基础</span></a>
+      <a href="glossary.html"><span class="in-en">Words</span><span class="in-zh">词表</span></a>
+      <a href="terms.html" class="on"><span class="in-en">Terms</span><span class="in-zh">术语</span></a>
+      <a href="speak.html"><span class="in-en">Phrasing</span><span class="in-zh">话术</span></a>
+    </nav>
+  </div>
+  <div class="mh-right">
+    <span class="langswitch">
+      <button type="button" data-lang-set="zh">中文</button>
+      <button type="button" data-lang-set="both">中英</button>
+      <button type="button" data-lang-set="en">English</button>
+    </span>
+  </div>
+</header>
+
+<main>
+  <p class="crumb"><a href="index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a> / <span class="in-en">Terms</span><span class="in-zh">术语</span></p>
+
+  <div class="qhead">
+    <p class="kicker"><span class="in-en">Terms · 56</span><span class="in-zh">术语 · 56 个</span></p>
+    <h1><span class="in-en">Every term on this site, in one place.</span><span class="in-zh">全站出现过的术语，都在这一页。</span></h1>
+    <p class="lede"><span class="in-en">Fifty-six terms. Read the 谐音 out loud first, then the meaning. Do not memorise — recognise.</span><span class="in-zh">五十六个词。先照着谐音读出来，再看含义。不用背，认得就行。</span></p>
+    
+    <p class="tags"><span class="tag"><span class="in-en">56 terms</span><span class="in-zh">56 个</span></span><span class="tag"><span class="in-en">20 English</span><span class="in-zh">20 个英文</span></span><span class="tag"><span class="in-en">36 中文</span><span class="in-zh">36 中文</span></span></p>
+    <button class="listen" data-listen type="button">🔊</button>
+  </div>
+
+  <section class="sec">
+    <h2><span class="num">01</span><span class="in-en">English abbreviations</span><span class="in-zh">英文缩写</span></h2>
+    <div class="wordlist">
+      <div class="word five">
+        <span class="w">CAS</span>
+        <span class="read">凯斯</span>
+        <span class="ipa">/kæs/</span>
+        <span class="mean"><span class="bi-en">compare-and-swap: change the value only if it still looks like this.</span><span class="bi-zh">比较并交换：先比一下还是不是这个样子，是才允许改——所以“判断+修改”是一条 SQL。</span></span>
+        <span class="links"><a class="say" href="https://forvo.com/search/CAS/" target="_blank" rel="noopener">&#9654; Forvo</a><button class="spk" data-say="CAS" type="button" aria-label="say CAS">&#128266;</button></span>
+      </div>
+      <div class="word five">
+        <span class="w">ack</span>
+        <span class="read">阿克</span>
+        <span class="ipa">/æk/</span>
+        <span class="mean"><span class="bi-en">acknowledge: the consumer tells the queue “I finished this one”.</span><span class="bi-zh">确认：消费者告诉队列“这条我处理完了”，没 ack 就会被重投。</span></span>
+        <span class="links"><a class="say" href="https://forvo.com/search/ack/" target="_blank" rel="noopener">&#9654; Forvo</a><button class="spk" data-say="ack" type="button" aria-label="say ack">&#128266;</button></span>
+      </div>
+      <div class="word five">
+        <span class="w">nack</span>
+        <span class="read">那克</span>
+        <span class="ipa">/næk/</span>
+        <span class="mean"><span class="bi-en">negative ack: the consumer says “this one failed”.</span><span class="bi-zh">否认确认：消费者说“这条处理失败了”，配合死信队列做重试。</span></span>
+        <span class="links"><a class="say" href="https://forvo.com/search/nack/" target="_blank" rel="noopener">&#9654; Forvo</a><button class="spk" data-say="nack" type="button" aria-label="say nack">&#128266;</button></span>
+      </div>
+      <div class="word five">
+        <span class="w">idempotent</span>
+        <span class="read">艾登坡腾特</span>
+        <span class="ipa">/ˌaɪdemˈpoʊtnt/</span>
+        <span class="mean"><span class="bi-en">running it twice has the same effect as running it once.</span><span class="bi-zh">幂等：执行两次和执行一次，结果一样。</span></span>
+        <span class="links"><a class="say" href="https://forvo.com/search/idempotent/" target="_blank" rel="noopener">&#9654; Forvo</a><button class="spk" data-say="idempotent" type="button" aria-label="say idempotent">&#128266;</button></span>
+      </div>
+      <div class="word five">
+        <span class="w">uk_trade</span>
+        <span class="read"></span>
+        <span class="ipa"></span>
+        <span class="mean"><span class="bi-en">幂等表上的唯一键，作用是让第二条回调插不进去。</span><span class="bi-zh">幂等表上的唯一键，作用是让第二条回调插不进去。</span></span>
+        <span class="links"><a class="say" href="https://forvo.com/search/uk_trade/" target="_blank" rel="noopener">&#9654; Forvo</a><button class="spk" data-say="uk_trade" type="button" aria-label="say uk_trade">&#128266;</button></span>
+      </div>
+      <div class="word five">
+        <span class="w">TTL</span>
+        <span class="read">提提艾尔</span>
+        <span class="ipa">/ˌtiː tiː ˈel/</span>
+        <span class="mean"><span class="bi-en">time to live: how long a key or message is allowed to exist.</span><span class="bi-zh">存活时间：一个 key / 一条消息最多活多久，到点就自动消失。</span></span>
+        <span class="links"><a class="say" href="https://forvo.com/search/TTL/" target="_blank" rel="noopener">&#9654; Forvo</a><button class="spk" data-say="TTL" type="button" aria-label="say TTL">&#128266;</button></span>
+      </div>
+      <div class="word five">
+        <span class="w">QPS</span>
+        <span class="read">扣皮艾斯</span>
+        <span class="ipa">/ˌkjuː piː ˈes/</span>
+        <span class="mean"><span class="bi-en">queries per second: how many requests land in one second.</span><span class="bi-zh">每秒请求数：衡量流量大小的最常用单位。</span></span>
+        <span class="links"><a class="say" href="https://forvo.com/search/QPS/" target="_blank" rel="noopener">&#9654; Forvo</a><button class="spk" data-say="QPS" type="button" aria-label="say QPS">&#128266;</button></span>
+      </div>
+      <div class="word five">
+        <span class="w">P95</span>
+        <span class="read">P 九五</span>
+        <span class="ipa"></span>
+        <span class="mean"><span class="bi-en">the 95th percentile latency: 95% of requests are faster than this.</span><span class="bi-zh">95 分位延迟：100 个请求里 95 个比它快——看尾部体验，比平均值有用。</span></span>
+        <span class="links"><a class="say" href="https://forvo.com/search/P95/" target="_blank" rel="noopener">&#9654; Forvo</a><button class="spk" data-say="P95" type="button" aria-label="say P95">&#128266;</button></span>
+      </div>
+      <div class="word five">
+        <span class="w">MQ</span>
+        <span class="read">艾姆扣</span>
+        <span class="ipa">/ˌem ˈkjuː/</span>
+        <span class="mean"><span class="bi-en">message queue: producer puts a message in, consumer takes it out.</span><span class="bi-zh">消息队列：生产方塞消息，消费方异步取走处理，用来解耦、削峰。</span></span>
+        <span class="links"><a class="say" href="https://forvo.com/search/MQ/" target="_blank" rel="noopener">&#9654; Forvo</a><button class="spk" data-say="MQ" type="button" aria-label="say MQ">&#128266;</button></span>
+      </div>
+      <div class="word five">
+        <span class="w">RPC</span>
+        <span class="read">阿尔皮西</span>
+        <span class="ipa">/ˌɑːr piː ˈsiː/</span>
+        <span class="mean"><span class="bi-en">remote procedure call: call a function that lives on another machine.</span><span class="bi-zh">远程调用：像调本地方法一样调另一台机器上的接口。</span></span>
+        <span class="links"><a class="say" href="https://forvo.com/search/RPC/" target="_blank" rel="noopener">&#9654; Forvo</a><button class="spk" data-say="RPC" type="button" aria-label="say RPC">&#128266;</button></span>
+      </div>
+      <div class="word five">
+        <span class="w">API</span>
+        <span class="read">诶皮艾</span>
+        <span class="ipa">/ˌeɪ piː ˈaɪ/</span>
+        <span class="mean"><span class="bi-en">application programming interface: the set of endpoints you can call.</span><span class="bi-zh">接口：别人能调你的那些方法/地址。</span></span>
+        <span class="links"><a class="say" href="https://forvo.com/search/API/" target="_blank" rel="noopener">&#9654; Forvo</a><button class="spk" data-say="API" type="button" aria-label="say API">&#128266;</button></span>
+      </div>
+      <div class="word five">
+        <span class="w">SQL</span>
+        <span class="read">艾斯扣艾尔</span>
+        <span class="ipa">/ˌes kjuː ˈel/</span>
+        <span class="mean"><span class="bi-en">structured query language: the language you talk to a relational database in.</span><span class="bi-zh">结构化查询语言：跟关系型数据库说话用的语言。</span></span>
+        <span class="links"><a class="say" href="https://forvo.com/search/SQL/" target="_blank" rel="noopener">&#9654; Forvo</a><button class="spk" data-say="SQL" type="button" aria-label="say SQL">&#128266;</button></span>
+      </div>
+      <div class="word five">
+        <span class="w">JVM</span>
+        <span class="read">J 威艾姆</span>
+        <span class="ipa">/ˌdʒeɪ viː ˈem/</span>
+        <span class="mean"><span class="bi-en">Java virtual machine: the thing that runs your .class files.</span><span class="bi-zh">Java 虚拟机：跑你编译出来的 class 文件的那台“虚拟电脑”。</span></span>
+        <span class="links"><a class="say" href="https://forvo.com/search/JVM/" target="_blank" rel="noopener">&#9654; Forvo</a><button class="spk" data-say="JVM" type="button" aria-label="say JVM">&#128266;</button></span>
+      </div>
+      <div class="word five">
+        <span class="w">GC</span>
+        <span class="read">G 西</span>
+        <span class="ipa">/ˌdʒiː ˈsiː/</span>
+        <span class="mean"><span class="bi-en">garbage collection: the JVM freeing objects you no longer use.</span><span class="bi-zh">垃圾回收：JVM 自动把没人引用的对象清掉，所以要少制造垃圾。</span></span>
+        <span class="links"><a class="say" href="https://forvo.com/search/GC/" target="_blank" rel="noopener">&#9654; Forvo</a><button class="spk" data-say="GC" type="button" aria-label="say GC">&#128266;</button></span>
+      </div>
+    </div>
+  </section>
+  <section class="sec">
+    <h2><span class="num">02</span><span class="in-en">Tools and components</span><span class="in-zh">组件与名字</span></h2>
+    <div class="wordlist">
+      <div class="word five">
+        <span class="w">Redis</span>
+        <span class="read">瑞迪斯</span>
+        <span class="ipa">/ˈredɪs/</span>
+        <span class="mean"><span class="bi-en">an in-memory key-value store, usually used as a cache.</span><span class="bi-zh">内存数据库，常用来做缓存、分布式锁、延时队列。</span></span>
+        <span class="links"><a class="say" href="https://forvo.com/search/Redis/" target="_blank" rel="noopener">&#9654; Forvo</a><button class="spk" data-say="Redis" type="button" aria-label="say Redis">&#128266;</button></span>
+      </div>
+      <div class="word five">
+        <span class="w">MySQL</span>
+        <span class="read">买艾斯扣艾尔</span>
+        <span class="ipa">/ˌmaɪ es kjuː ˈel/</span>
+        <span class="mean"><span class="bi-en">the relational database almost every small company uses.</span><span class="bi-zh">最常用的关系型数据库，数据最终都存在这里。</span></span>
+        <span class="links"><a class="say" href="https://forvo.com/search/MySQL/" target="_blank" rel="noopener">&#9654; Forvo</a><button class="spk" data-say="MySQL" type="button" aria-label="say MySQL">&#128266;</button></span>
+      </div>
+      <div class="word five">
+        <span class="w">RabbitMQ</span>
+        <span class="read">瑞比特 MQ</span>
+        <span class="ipa">/ˈræbɪt ˌem ˈkjuː/</span>
+        <span class="mean"><span class="bi-en">a message broker: exchanges, queues, acks, dead-letter boxes.</span><span class="bi-zh">消息中间件：交换机 + 队列 + 确认机制，适合可靠投递而不是高吞吐日志。</span></span>
+        <span class="links"><a class="say" href="https://forvo.com/search/RabbitMQ/" target="_blank" rel="noopener">&#9654; Forvo</a><button class="spk" data-say="RabbitMQ" type="button" aria-label="say RabbitMQ">&#128266;</button></span>
+      </div>
+      <div class="word five">
+        <span class="w">Redisson</span>
+        <span class="read">瑞迪森</span>
+        <span class="ipa">/ˈredɪsən/</span>
+        <span class="mean"><span class="bi-en">a Redis client that implements proper distributed locks with a watchdog.</span><span class="bi-zh">Redis 的客户端库，提供带 watchdog 续期的分布式锁。</span></span>
+        <span class="links"><a class="say" href="https://forvo.com/search/Redisson/" target="_blank" rel="noopener">&#9654; Forvo</a><button class="spk" data-say="Redisson" type="button" aria-label="say Redisson">&#128266;</button></span>
+      </div>
+      <div class="word five">
+        <span class="w">ZSet</span>
+        <span class="read">泽赛特</span>
+        <span class="ipa">/ˈzed set/</span>
+        <span class="mean"><span class="bi-en">Redis sorted set: members kept in order by a score.</span><span class="bi-zh">有序集合：Redis 里按 score 排好序的结构，score 存时间戳就是延时队列。</span></span>
+        <span class="links"><a class="say" href="https://forvo.com/search/ZSet/" target="_blank" rel="noopener">&#9654; Forvo</a><button class="spk" data-say="ZSet" type="button" aria-label="say ZSet">&#128266;</button></span>
+      </div>
+      <div class="word five">
+        <span class="w">watchdog</span>
+        <span class="read">沃奇道格</span>
+        <span class="ipa">/ˈwɑːtʃdɔːɡ/</span>
+        <span class="mean"><span class="bi-en">a background timer that keeps renewing a lock's lease while you are alive.</span><span class="bi-zh">看门狗：进程还活着就自动给锁续租，进程一死就不再续。</span></span>
+        <span class="links"><a class="say" href="https://forvo.com/search/watchdog/" target="_blank" rel="noopener">&#9654; Forvo</a><button class="spk" data-say="watchdog" type="button" aria-label="say watchdog">&#128266;</button></span>
+      </div>
+    </div>
+  </section>
+  <section class="sec">
+    <h2><span class="num">03</span><span class="in-en">Idempotency and payments</span><span class="in-zh">幂等与支付</span></h2>
+    <div class="wordlist">
+      <div class="word four">
+        <span class="w">幂等</span>
+        <span class="mean"><span class="bi-en">同一个操作执行一次和执行多次，结果一样；靠唯一索引或状态判断做到。</span><span class="bi-zh">同一个操作执行一次和执行多次，结果一样；靠唯一索引或状态判断做到。</span></span>
+        <span class="links"><button class="spk" data-say="幂等" type="button" aria-label="say 幂等">&#128266;</button></span>
+      </div>
+      <div class="word four">
+        <span class="w">幂等性</span>
+        <span class="mean"><span class="bi-en">接口被重复调用也不会出错的属性。</span><span class="bi-zh">接口被重复调用也不会出错的属性。</span></span>
+        <span class="links"><button class="spk" data-say="幂等性" type="button" aria-label="say 幂等性">&#128266;</button></span>
+      </div>
+      <div class="word four">
+        <span class="w">幂等表</span>
+        <span class="mean"><span class="bi-en">专门记录“这笔业务处理过没有”的表，靠唯一索引去重，插不进去就说明是重复。</span><span class="bi-zh">专门记录“这笔业务处理过没有”的表，靠唯一索引去重，插不进去就说明是重复。</span></span>
+        <span class="links"><button class="spk" data-say="幂等表" type="button" aria-label="say 幂等表">&#128266;</button></span>
+      </div>
+      <div class="word four">
+        <span class="w">唯一索引</span>
+        <span class="mean"><span class="bi-en">数据库里“这一列不允许重复”的索引；插入重复值会直接被数据库拒绝，这就是最硬的锁。</span><span class="bi-zh">数据库里“这一列不允许重复”的索引；插入重复值会直接被数据库拒绝，这就是最硬的锁。</span></span>
+        <span class="links"><button class="spk" data-say="唯一索引" type="button" aria-label="say 唯一索引">&#128266;</button></span>
+      </div>
+      <div class="word four">
+        <span class="w">状态 CAS</span>
+        <span class="mean"><span class="bi-en">用 where status='PENDING' 这种条件去改状态，影响 1 行表示抢到，0 行表示别人做过了。</span><span class="bi-zh">用 where status='PENDING' 这种条件去改状态，影响 1 行表示抢到，0 行表示别人做过了。</span></span>
+        <span class="links"><button class="spk" data-say="状态 CAS" type="button" aria-label="say 状态 CAS">&#128266;</button></span>
+      </div>
+      <div class="word four">
+        <span class="w">状态机</span>
+        <span class="mean"><span class="bi-en">订单只能按 PENDING → PAID / CLOSED 这类规则流转，不能乱跳。</span><span class="bi-zh">订单只能按 PENDING → PAID / CLOSED 这类规则流转，不能乱跳。</span></span>
+        <span class="links"><button class="spk" data-say="状态机" type="button" aria-label="say 状态机">&#128266;</button></span>
+      </div>
+      <div class="word four">
+        <span class="w">乐观锁</span>
+        <span class="mean"><span class="bi-en">不加锁，改的时候带个版本号或状态条件，改不到就重试。</span><span class="bi-zh">不加锁，改的时候带个版本号或状态条件，改不到就重试。</span></span>
+        <span class="links"><button class="spk" data-say="乐观锁" type="button" aria-label="say 乐观锁">&#128266;</button></span>
+      </div>
+      <div class="word four">
+        <span class="w">悲观锁</span>
+        <span class="mean"><span class="bi-en">先锁住再改，`select ... for update` 就是它。</span><span class="bi-zh">先锁住再改，`select ... for update` 就是它。</span></span>
+        <span class="links"><button class="spk" data-say="悲观锁" type="button" aria-label="say 悲观锁">&#128266;</button></span>
+      </div>
+    </div>
+  </section>
+  <section class="sec">
+    <h2><span class="num">04</span><span class="in-en">Queues and jobs</span><span class="in-zh">消息与任务</span></h2>
+    <div class="wordlist">
+      <div class="word four">
+        <span class="w">消息队列</span>
+        <span class="mean"><span class="bi-en">生产方塞消息、消费方异步取走处理的中间件，用来解耦、削峰、异步。</span><span class="bi-zh">生产方塞消息、消费方异步取走处理的中间件，用来解耦、削峰、异步。</span></span>
+        <span class="links"><button class="spk" data-say="消息队列" type="button" aria-label="say 消息队列">&#128266;</button></span>
+      </div>
+      <div class="word four">
+        <span class="w">延迟队列</span>
+        <span class="mean"><span class="bi-en">到点才把任务交出来的队列，订单 30 分钟关单就是典型用法。</span><span class="bi-zh">到点才把任务交出来的队列，订单 30 分钟关单就是典型用法。</span></span>
+        <span class="links"><button class="spk" data-say="延迟队列" type="button" aria-label="say 延迟队列">&#128266;</button></span>
+      </div>
+      <div class="word four">
+        <span class="w">延时队列</span>
+        <span class="mean"><span class="bi-en">到点才把任务交出来的队列，订单 30 分钟关单就是典型用法。</span><span class="bi-zh">到点才把任务交出来的队列，订单 30 分钟关单就是典型用法。</span></span>
+        <span class="links"><button class="spk" data-say="延时队列" type="button" aria-label="say 延时队列">&#128266;</button></span>
+      </div>
+      <div class="word four">
+        <span class="w">死信队列</span>
+        <span class="mean"><span class="bi-en">处理失败太多次的消息被转存的地方，避免它一直卡在队头重试。</span><span class="bi-zh">处理失败太多次的消息被转存的地方，避免它一直卡在队头重试。</span></span>
+        <span class="links"><button class="spk" data-say="死信队列" type="button" aria-label="say 死信队列">&#128266;</button></span>
+      </div>
+      <div class="word four">
+        <span class="w">推模式</span>
+        <span class="mean"><span class="bi-en">服务端变化后主动推给客户端，而不是等客户端来拉。</span><span class="bi-zh">服务端变化后主动推给客户端，而不是等客户端来拉。</span></span>
+        <span class="links"><button class="spk" data-say="推模式" type="button" aria-label="say 推模式">&#128266;</button></span>
+      </div>
+      <div class="word four">
+        <span class="w">分片广播</span>
+        <span class="mean"><span class="bi-en">XXL-Job 把一次任务分给多台执行器各跑一片，用来并行处理大数据量。</span><span class="bi-zh">XXL-Job 把一次任务分给多台执行器各跑一片，用来并行处理大数据量。</span></span>
+        <span class="links"><button class="spk" data-say="分片广播" type="button" aria-label="say 分片广播">&#128266;</button></span>
+      </div>
+      <div class="word four">
+        <span class="w">断点续跑</span>
+        <span class="mean"><span class="bi-en">任务中途失败，下次从上次的进度继续，不用从头再来。</span><span class="bi-zh">任务中途失败，下次从上次的进度继续，不用从头再来。</span></span>
+        <span class="links"><button class="spk" data-say="断点续跑" type="button" aria-label="say 断点续跑">&#128266;</button></span>
+      </div>
+    </div>
+  </section>
+  <section class="sec">
+    <h2><span class="num">05</span><span class="in-en">Cache and stock</span><span class="in-zh">缓存与库存</span></h2>
+    <div class="wordlist">
+      <div class="word four">
+        <span class="w">缓存穿透</span>
+        <span class="mean"><span class="bi-en">查一个根本不存在的数据，缓存没有、数据库也没有，每次都空跑。</span><span class="bi-zh">查一个根本不存在的数据，缓存没有、数据库也没有，每次都空跑。</span></span>
+        <span class="links"><button class="spk" data-say="缓存穿透" type="button" aria-label="say 缓存穿透">&#128266;</button></span>
+      </div>
+      <div class="word four">
+        <span class="w">缓存击穿</span>
+        <span class="mean"><span class="bi-en">一个热点 key 过期瞬间，上千个线程同时回源重建。</span><span class="bi-zh">一个热点 key 过期瞬间，上千个线程同时回源重建。</span></span>
+        <span class="links"><button class="spk" data-say="缓存击穿" type="button" aria-label="say 缓存击穿">&#128266;</button></span>
+      </div>
+      <div class="word four">
+        <span class="w">缓存雪崩</span>
+        <span class="mean"><span class="bi-en">大批 key 同一秒过期，或者 Redis 整个挂了。</span><span class="bi-zh">大批 key 同一秒过期，或者 Redis 整个挂了。</span></span>
+        <span class="links"><button class="spk" data-say="缓存雪崩" type="button" aria-label="say 缓存雪崩">&#128266;</button></span>
+      </div>
+      <div class="word four">
+        <span class="w">布隆过滤器</span>
+        <span class="mean"><span class="bi-en">一个很小的位数组，能立刻回答“这个 key 一定不存在”，用来挡穿透。</span><span class="bi-zh">一个很小的位数组，能立刻回答“这个 key 一定不存在”，用来挡穿透。</span></span>
+        <span class="links"><button class="spk" data-say="布隆过滤器" type="button" aria-label="say 布隆过滤器">&#128266;</button></span>
+      </div>
+      <div class="word four">
+        <span class="w">回源</span>
+        <span class="mean"><span class="bi-en">缓存没命中，回过头去数据库查。</span><span class="bi-zh">缓存没命中，回过头去数据库查。</span></span>
+        <span class="links"><button class="spk" data-say="回源" type="button" aria-label="say 回源">&#128266;</button></span>
+      </div>
+      <div class="word four">
+        <span class="w">脏数据</span>
+        <span class="mean"><span class="bi-en">从缓存或副本里读到的旧值，和数据库不一致。</span><span class="bi-zh">从缓存或副本里读到的旧值，和数据库不一致。</span></span>
+        <span class="links"><button class="spk" data-say="脏数据" type="button" aria-label="say 脏数据">&#128266;</button></span>
+      </div>
+      <div class="word four">
+        <span class="w">预扣库存</span>
+        <span class="mean"><span class="bi-en">先在 Redis 里把库存减掉，下单成功后再慢慢落库。</span><span class="bi-zh">先在 Redis 里把库存减掉，下单成功后再慢慢落库。</span></span>
+        <span class="links"><button class="spk" data-say="预扣库存" type="button" aria-label="say 预扣库存">&#128266;</button></span>
+      </div>
+      <div class="word four">
+        <span class="w">回滚库存</span>
+        <span class="mean"><span class="bi-en">订单取消/关闭时把之前预扣的库存加回去。</span><span class="bi-zh">订单取消/关闭时把之前预扣的库存加回去。</span></span>
+        <span class="links"><button class="spk" data-say="回滚库存" type="button" aria-label="say 回滚库存">&#128266;</button></span>
+      </div>
+    </div>
+  </section>
+  <section class="sec">
+    <h2><span class="num">06</span><span class="in-en">Database and stability</span><span class="in-zh">数据库与稳定性</span></h2>
+    <div class="wordlist">
+      <div class="word four">
+        <span class="w">覆盖索引</span>
+        <span class="mean"><span class="bi-en">查询要的列全在索引里，不用回表再查一次。</span><span class="bi-zh">查询要的列全在索引里，不用回表再查一次。</span></span>
+        <span class="links"><button class="spk" data-say="覆盖索引" type="button" aria-label="say 覆盖索引">&#128266;</button></span>
+      </div>
+      <div class="word four">
+        <span class="w">回表</span>
+        <span class="mean"><span class="bi-en">索引里没有要的列，得拿着主键再回主表查一次。</span><span class="bi-zh">索引里没有要的列，得拿着主键再回主表查一次。</span></span>
+        <span class="links"><button class="spk" data-say="回表" type="button" aria-label="say 回表">&#128266;</button></span>
+      </div>
+      <div class="word four">
+        <span class="w">慢查询</span>
+        <span class="mean"><span class="bi-en">执行时间超过阈值的 SQL，通常要开慢日志才能抓到。</span><span class="bi-zh">执行时间超过阈值的 SQL，通常要开慢日志才能抓到。</span></span>
+        <span class="links"><button class="spk" data-say="慢查询" type="button" aria-label="say 慢查询">&#128266;</button></span>
+      </div>
+      <div class="word four">
+        <span class="w">分库分表</span>
+        <span class="mean"><span class="bi-en">一张表数据太大，按某个维度拆到多个库/表里。</span><span class="bi-zh">一张表数据太大，按某个维度拆到多个库/表里。</span></span>
+        <span class="links"><button class="spk" data-say="分库分表" type="button" aria-label="say 分库分表">&#128266;</button></span>
+      </div>
+      <div class="word four">
+        <span class="w">事务</span>
+        <span class="mean"><span class="bi-en">一组操作要么全成功、要么全失败；本地事务靠数据库，跨服务要靠补偿。</span><span class="bi-zh">一组操作要么全成功、要么全失败；本地事务靠数据库，跨服务要靠补偿。</span></span>
+        <span class="links"><button class="spk" data-say="事务" type="button" aria-label="say 事务">&#128266;</button></span>
+      </div>
+      <div class="word four">
+        <span class="w">主从切换</span>
+        <span class="mean"><span class="bi-en">主库挂了，从库顶上——切换瞬间可能有数据没同步过去。</span><span class="bi-zh">主库挂了，从库顶上——切换瞬间可能有数据没同步过去。</span></span>
+        <span class="links"><button class="spk" data-say="主从切换" type="button" aria-label="say 主从切换">&#128266;</button></span>
+      </div>
+      <div class="word four">
+        <span class="w">分布式锁</span>
+        <span class="mean"><span class="bi-en">多台机器之间互斥的一把锁，通常用 Redis 或 ZooKeeper 实现。</span><span class="bi-zh">多台机器之间互斥的一把锁，通常用 Redis 或 ZooKeeper 实现。</span></span>
+        <span class="links"><button class="spk" data-say="分布式锁" type="button" aria-label="say 分布式锁">&#128266;</button></span>
+      </div>
+      <div class="word four">
+        <span class="w">限流</span>
+        <span class="mean"><span class="bi-en">超过阈值的请求直接拒绝，保护后面的系统。</span><span class="bi-zh">超过阈值的请求直接拒绝，保护后面的系统。</span></span>
+        <span class="links"><button class="spk" data-say="限流" type="button" aria-label="say 限流">&#128266;</button></span>
+      </div>
+      <div class="word four">
+        <span class="w">熔断</span>
+        <span class="mean"><span class="bi-en">下游一直失败就先断开一段时间，别让请求堆在那里。</span><span class="bi-zh">下游一直失败就先断开一段时间，别让请求堆在那里。</span></span>
+        <span class="links"><button class="spk" data-say="熔断" type="button" aria-label="say 熔断">&#128266;</button></span>
+      </div>
+      <div class="word four">
+        <span class="w">降级</span>
+        <span class="mean"><span class="bi-en">关键链路挂了，返回一个兜底结果，而不是报错。</span><span class="bi-zh">关键链路挂了，返回一个兜底结果，而不是报错。</span></span>
+        <span class="links"><button class="spk" data-say="降级" type="button" aria-label="say 降级">&#128266;</button></span>
+      </div>
+      <div class="word four">
+        <span class="w">长连接</span>
+        <span class="mean"><span class="bi-en">TCP 连接建立后一直不断，双方随时可以推消息。</span><span class="bi-zh">TCP 连接建立后一直不断，双方随时可以推消息。</span></span>
+        <span class="links"><button class="spk" data-say="长连接" type="button" aria-label="say 长连接">&#128266;</button></span>
+      </div>
+      <div class="word four">
+        <span class="w">心跳</span>
+        <span class="mean"><span class="bi-en">设备每隔几秒发一个包报平安，几个周期没收到就认为掉线。</span><span class="bi-zh">设备每隔几秒发一个包报平安，几个周期没收到就认为掉线。</span></span>
+        <span class="links"><button class="spk" data-say="心跳" type="button" aria-label="say 心跳">&#128266;</button></span>
+      </div>
+      <div class="word four">
+        <span class="w">组播</span>
+        <span class="mean"><span class="bi-en">一份数据发给一组接收者，UDP 组播常用于设备状态广播。</span><span class="bi-zh">一份数据发给一组接收者，UDP 组播常用于设备状态广播。</span></span>
+        <span class="links"><button class="spk" data-say="组播" type="button" aria-label="say 组播">&#128266;</button></span>
+      </div>
+    </div>
+  </section>
+    <p class="note"><span class="bi-en">Ten a day is plenty. Say the 谐音 out loud, then say what it means in one sentence.</span><span class="bi-zh">一天十个就够。照着谐音读出来，再用一句话说出它是什么意思。</span></p>
+
+  <p class="log-tip"><a href="questions/index.html"><span class="in-en">Back to the questions</span><span class="in-zh">回到题目</span></a></p>
+</main>
+
+<footer>
+  <div class="f-left"><span class="in-en">Written for learning English · Wang Tianyu</span><span class="in-zh">为学英语而写 · 王天宇</span></div>
+  <div class="f-right"><a href="index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a><span class="sep">·</span><a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a></div>
+</footer>
+<script src="assets/terms.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>

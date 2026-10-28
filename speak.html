@@ -17,6 +17,7 @@
       <a href="questions/index.html"><span class="in-en">Questions</span><span class="in-zh">题目</span></a>
       <a href="basics/array.html"><span class="in-en">Basics</span><span class="in-zh">基础</span></a>
       <a href="glossary.html"><span class="in-en">Words</span><span class="in-zh">词表</span></a>
+      <a href="terms.html"><span class="in-en">Terms</span><span class="in-zh">术语</span></a>
       <a href="speak.html" class="on"><span class="in-en">Phrasing</span><span class="in-zh">话术</span></a>
     </nav>
   </div>
@@ -48,12 +49,12 @@
       <span class="sc"><b>01</b>支付回调重复 —— 你给的那段，我精修过</span>
       <div class="vs">
         <div><span class="who">菜鸟说</span><span class="said">「微信有时候会重复通知，我在代码里做了个判断，重复的就不处理了。」</span></div>
-        <div><span class="who">老手说</span><span class="said senior">因为网络经常会抖动，微信支付可能因为<b class="kw">超时重试</b>发来多条回调。为了保证<b class="kw">数据一致性</b>，我们在数据库里通过<b class="kw">行锁</b>、<b class="kw"><span class="tm" data-t="乐观锁">乐观锁</span></b>（带状态判断的 <span class="tm" data-t="SQL">SQL</span>），以及给交易号加<b class="kw"><span class="tm" data-t="唯一索引">唯一索引</span></b>，从而实现了接口的<b class="kw"><span class="tm" data-t="幂等性">幂等性</span></b>，保证商品只发一次。</span></div>
+        <div><span class="who">老手说</span><span class="said senior">因为网络经常会抖动，微信支付可能因为<b class="kw">超时重试</b>发来多条回调。为了保证<b class="kw">数据一致性</b>，我们在数据库里通过<b class="kw">行锁</b>、<b class="kw">乐观锁</b>（带状态判断的 SQL），以及给交易号加<b class="kw">唯一索引</b>，从而实现了接口的<b class="kw">幂等性</b>，保证商品只发一次。</span></div>
       </div>
-      <div class="chips"><span>网络抖动</span><span>超时重试</span><span>数据一致性</span><span>行锁</span><span>乐观锁</span><span>唯一索引</span><span><span class="tm" data-t="幂等">幂等</span>性</span></div>
+      <div class="chips"><span>网络抖动</span><span>超时重试</span><span>数据一致性</span><span>行锁</span><span>乐观锁</span><span>唯一索引</span><span>幂等性</span></div>
       <ul class="whylist">
         <li>先讲<b>原因</b>（网络抖动 → 超时重试），不是先讲自己的代码；面试官听到的是“他理解系统的边界”。</li>
-        <li>把手段按<b>从强到弱</b>排：唯一索引（数据库兜底）> 乐观锁 <span class="tm" data-t="CAS">CAS</span> > 行锁，说明你知道哪一层最可靠。</li>
+        <li>把手段按<b>从强到弱</b>排：唯一索引（数据库兜底）> 乐观锁 CAS > 行锁，说明你知道哪一层最可靠。</li>
         <li>最后落在<b>结果</b>（只发一次货），一句话闭环，不拖泥带水。</li>
       </ul>
     </div>
@@ -61,12 +62,12 @@
       <span class="sc"><b>02</b>缓存和数据库不一致怎么办</span>
       <div class="vs">
         <div><span class="who">菜鸟说</span><span class="said">「我改数据库之后就把缓存删掉。」</span></div>
-        <div><span class="who">老手说</span><span class="said senior">我们走的是 <b class="kw">Cache Aside</b>：写库之后<b>删缓存</b>，不是更新缓存。删除失败会进<span class="tm" data-t="延迟队列">延迟队列</span>重试两次，兜底再靠过期时间；<b class="kw">强一致场景</b>不走缓存，直接读主库。</span></div>
+        <div><span class="who">老手说</span><span class="said senior">我们走的是 <b class="kw">Cache Aside</b>：写库之后<b>删缓存</b>，不是更新缓存。删除失败会进延迟队列重试两次，兜底再靠过期时间；<b class="kw">强一致场景</b>不走缓存，直接读主库。</span></div>
       </div>
       <div class="chips"><span>Cache Aside</span><span>删缓存不更新缓存</span><span>延迟双删</span><span>补偿重试</span><span>过期兜底</span><span>强一致场景</span></div>
       <ul class="whylist">
         <li>说清<b>模式名</b>（Cache Aside），面试官立刻知道你不是凭感觉写的。</li>
-        <li>说清<b>为什么删而不是更新</b>：并发更新会写出<span class="tm" data-t="脏数据">脏数据</span>。</li>
+        <li>说清<b>为什么删而不是更新</b>：并发更新会写出脏数据。</li>
         <li>给出<b>兜底</b>（重试 + 过期），最后加一句“强一致就不走缓存”——加一句边界，可信度立刻上来。</li>
       </ul>
     </div>
@@ -74,9 +75,9 @@
       <span class="sc"><b>03</b>穿透、击穿、雪崩，一次说清</span>
       <div class="vs">
         <div><span class="who">菜鸟说</span><span class="said">「就是缓存不管用了，请求都打到数据库。」</span></div>
-        <div><span class="who">老手说</span><span class="said senior">这三种要分开看：<b>穿透</b>是查不存在的数据，每一次都落到库，用<b class="kw"><span class="tm" data-t="布隆过滤器">布隆过滤器</span></b>或<b class="kw">空值缓存</b>挡；<b>击穿</b>是某个热点 key 过期瞬间被打爆，用<b class="kw">逻辑过期</b> + <b class="kw">互斥重建</b>；<b>雪崩</b>是大量 key 同时失效或 <span class="tm" data-t="Redis">Redis</span> 整体挂了，用随机过期时间 + 集群/本地缓存二级兜底。</span></div>
+        <div><span class="who">老手说</span><span class="said senior">这三种要分开看：<b>穿透</b>是查不存在的数据，每一次都落到库，用<b class="kw">布隆过滤器</b>或<b class="kw">空值缓存</b>挡；<b>击穿</b>是某个热点 key 过期瞬间被打爆，用<b class="kw">逻辑过期</b> + <b class="kw">互斥重建</b>；<b>雪崩</b>是大量 key 同时失效或 Redis 整体挂了，用随机过期时间 + 集群/本地缓存二级兜底。</span></div>
       </div>
-      <div class="chips"><span>布隆过滤器</span><span>空值缓存</span><span>逻辑过期</span><span>互斥重建</span><span>随机 <span class="tm" data-t="TTL">TTL</span></span><span>二级缓存</span></div>
+      <div class="chips"><span>布隆过滤器</span><span>空值缓存</span><span>逻辑过期</span><span>互斥重建</span><span>随机 TTL</span><span>二级缓存</span></div>
       <ul class="whylist">
         <li><b>先分类再给方案</b>，这是老手的肌肉记忆；混着说会显得只是背过。</li>
         <li>每类只给<b>一个</b>最常用方案，别堆名词。</li>
@@ -87,7 +88,7 @@
       <span class="sc"><b>04</b>慢 SQL 怎么查</span>
       <div class="vs">
         <div><span class="who">菜鸟说</span><span class="said">「我加了索引之后就不慢了。」</span></div>
-        <div><span class="who">老手说</span><span class="said senior">先看<b class="kw"><span class="tm" data-t="慢查询">慢查询</span>日志</b>定位 SQL，再用 <b>explain</b> 看 type、rows 和 Extra：<b class="kw">全表扫描</b>、<b class="kw">filesort</b>、<b class="kw"><span class="tm" data-t="回表">回表</span></b>太多分别对应不同改法——补<b class="kw">联合索引</b>、<b class="kw"><span class="tm" data-t="覆盖索引">覆盖索引</span></b>、或者把 where 条件改成能走索引的形式。改完用<b>压测/线上慢查趋势</b><b class="kw">验证</b>，而不是只看执行时间降了。</span></div>
+        <div><span class="who">老手说</span><span class="said senior">先看<b class="kw">慢查询日志</b>定位 SQL，再用 <b>explain</b> 看 type、rows 和 Extra：<b class="kw">全表扫描</b>、<b class="kw">filesort</b>、<b class="kw">回表</b>太多分别对应不同改法——补<b class="kw">联合索引</b>、<b class="kw">覆盖索引</b>、或者把 where 条件改成能走索引的形式。改完用<b>压测/线上慢查趋势</b><b class="kw">验证</b>，而不是只看执行时间降了。</span></div>
       </div>
       <div class="chips"><span>慢查询日志</span><span>explain</span><span>全表扫描</span><span>filesort</span><span>联合索引</span><span>覆盖索引</span><span>回表</span><span>验证</span></div>
       <ul class="whylist">
@@ -97,10 +98,10 @@
       </ul>
     </div>
     <div class="say">
-      <span class="sc"><b>05</b><span class="tm" data-t="分布式锁">分布式锁</span>怎么讲才算讲透</span>
+      <span class="sc"><b>05</b>分布式锁怎么讲才算讲透</span>
       <div class="vs">
-        <div><span class="who">菜鸟说</span><span class="said">「我用 <span class="tm" data-t="Redisson">Redisson</span> 加锁，加锁就没问题了。」</span></div>
-        <div><span class="who">老手说</span><span class="said senior">锁的粒度按<b>业务维度</b>定，比如按 sku 加，不是按订单号；持锁时长只覆盖<b class="kw">临界区</b>，绝不在锁里做远程调用。Redisson 的 <span class="tm" data-t="watchdog">watchdog</span> 负责续期，进程挂了租约自动过期；<span class="tm" data-t="主从切换">主从切换</span>可能丢锁，所以最后仍要<b>靠<b class="kw">数据库兜底</b></b>（唯一索引 / CAS）。</span></div>
+        <div><span class="who">菜鸟说</span><span class="said">「我用 Redisson 加锁，加锁就没问题了。」</span></div>
+        <div><span class="who">老手说</span><span class="said senior">锁的粒度按<b>业务维度</b>定，比如按 sku 加，不是按订单号；持锁时长只覆盖<b class="kw">临界区</b>，绝不在锁里做远程调用。Redisson 的 watchdog 负责续期，进程挂了租约自动过期；主从切换可能丢锁，所以最后仍要<b>靠<b class="kw">数据库兜底</b></b>（唯一索引 / CAS）。</span></div>
       </div>
       <div class="chips"><span>锁粒度</span><span>临界区</span><span>watchdog 续期</span><span>租约过期</span><span>主从切换丢锁</span><span>数据库兜底</span></div>
       <ul class="whylist">
@@ -110,7 +111,7 @@
       </ul>
     </div>
     <div class="say">
-      <span class="sc"><b>06</b>为什么用 <span class="tm" data-t="MQ">MQ</span></span>
+      <span class="sc"><b>06</b>为什么用 MQ</span>
       <div class="vs">
         <div><span class="who">菜鸟说</span><span class="said">「用 MQ 可以异步，快。」</span></div>
         <div><span class="who">老手说</span><span class="said senior">三个作用分开说：<b>削峰</b>（下单峰值挡住，消费端按能力拉）、<b>解耦</b>（订单不关心下游有几个）、<b>最终一致</b>（<b class="kw">本地消息表</b> + 重试 + <b class="kw">对账</b>）。代价是<b>重复消费</b>和<b>顺序问题</b>，所以消费端必须<b class="kw">幂等</b>，关键业务按业务键分区保证顺序。</span></div>
@@ -123,7 +124,7 @@
       </ul>
     </div>
     <div class="say">
-      <span class="sc"><b>07</b><span class="tm" data-t="限流">限流</span><span class="tm" data-t="降级">降级</span>怎么做</span>
+      <span class="sc"><b>07</b>限流降级怎么做</span>
       <div class="vs">
         <div><span class="who">菜鸟说</span><span class="said">「我们加了限流，超过就拒绝。」</span></div>
         <div><span class="who">老手说</span><span class="said senior">限流按<b>维度</b>分层：网关层挡总量、服务层按接口/用户挡突刺、核心链路单独配额；算法上单机用<b class="kw">令牌桶</b>平滑突发，集群用 Redis + Lua 保证原子。降级要<b>提前定好</b>哪些能力可以关（评论、推荐、非核心查询），并留开关和<b class="kw">演练</b>记录。</span></div>
@@ -178,7 +179,7 @@
       <span class="sc"><b>11</b>汇报工作 / 周会发言</span>
       <div class="vs">
         <div><span class="who">菜鸟说</span><span class="said">「这周改了十几个 bug，写了几个接口。」</span></div>
-        <div><span class="who">老手说</span><span class="said senior">这周主要推<b>订单同步</b>这条线：完成两个接口并对接联调，接口 <span class="tm" data-t="P95">P95</span> 从 800ms 降到 240ms；风险是第三方对账文件晚到，我准备了本地补数脚本兜底；下周做<b>灰度</b>，先切 10% 流量观察。</span></div>
+        <div><span class="who">老手说</span><span class="said senior">这周主要推<b>订单同步</b>这条线：完成两个接口并对接联调，接口 P95 从 800ms 降到 240ms；风险是第三方对账文件晚到，我准备了本地补数脚本兜底；下周做<b>灰度</b>，先切 10% 流量观察。</span></div>
       </div>
       <div class="chips"><span>主推一条线</span><span>量化结果</span><span>风险与兜底</span><span>灰度</span><span>下周计划</span></div>
       <ul class="whylist">

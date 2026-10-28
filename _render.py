@@ -7,6 +7,11 @@ import _annotate as T
 BASE = "https://tianyubabg.github.io/offer-camp/"
 
 CSS_EXTRA = """
+/* ===== 术语表：五列（词 / 谐音 / 音标 / 含义 / 发音） ===== */
+.word.five{ grid-template-columns: 1.05fr .6fr .82fr 2.1fr auto; }
+.word.four{ grid-template-columns: 240px 1fr auto; }
+.read{ font-family: var(--sans); font-size: 12.5px; color: #8E2B2B; letter-spacing: .02em; }
+.word.five .w{ overflow-wrap: anywhere; }
 /* ===== 术语注解 ===== */
 .tm{background:rgba(163,51,51,.12);border-radius:2px;padding:1px 2px 0;cursor:help;
     text-decoration:underline solid rgba(163,51,51,.85);text-decoration-thickness:2px;
@@ -80,6 +85,8 @@ details.answers[open] summary::before{ content:"－ " }
   .ledger th, .ledger td{ padding: .8mm 1.1mm; white-space: normal; }
   .ledger td:nth-child(1){ font-size: 13px; white-space: normal; }
   .ledger td:nth-child(2){ white-space: normal; }
+  .word.five{ grid-template-columns: 1fr; }
+  .read{ font-family: var(--sans); font-size: 12.5px; color: #8E2B2B; letter-spacing: .02em; }
   .wordlist{ grid-template-columns: 1fr; gap: 3px; }
   .wordlist .word{ grid-template-columns: 1fr; }
   .wordlist .links{ margin-top: 2px; }
@@ -325,6 +332,7 @@ PAGE = """<!doctype html>
       <a href="__QIDX__"__ON_Q__><span class="in-en">Questions</span><span class="in-zh">题目</span></a>
       <a href="__BASICS__"__ON_B__><span class="in-en">Basics</span><span class="in-zh">基础</span></a>
       <a href="__GLOSS__"__ON_W__><span class="in-en">Words</span><span class="in-zh">词表</span></a>
+      <a href="__TERMSP__"__ON_T__><span class="in-en">Terms</span><span class="in-zh">术语</span></a>
       <a href="__SPEAK__"__ON_S__><span class="in-en">Phrasing</span><span class="in-zh">话术</span></a>
     </nav>
   </div>
@@ -435,6 +443,34 @@ def render_one(b):
     raise ValueError("unknown block %r" % (k,))
 
 
+def terms_html(items):
+    """术语行：英文五列（词/谐音/音标/含义/发音），中文三列（词/含义/发音）。"""
+    nl = chr(10)
+    out = []
+    for t in items:
+        k = t["k"]
+        read = t.get("read", "")
+        ipa = t.get("ipa", "")
+        is_en = all(ord(c) < 128 for c in k)
+        en_txt = t.get("en") or t.get("zh") or ""
+        zh_txt = t.get("zh") or t.get("en") or ""
+        cells = ['        <span class="w">%s</span>' % k]
+        if is_en:
+            cells.append('        <span class="read">%s</span>' % read)
+            cells.append('        <span class="ipa">%s</span>' % ipa)
+        cells.append('        <span class="mean"><span class="bi-en">%s</span><span class="bi-zh">%s</span></span>'
+                     % (en_txt, zh_txt))
+        link = ""
+        if is_en:
+            link = ('<a class="say" href="https://forvo.com/search/%s/" target="_blank" rel="noopener">'
+                    '&#9654; Forvo</a>') % urllib.parse.quote(k.replace(" ", "%20"))
+        cells.append('        <span class="links">%s<button class="spk" data-say="%s" type="button" '
+                     'aria-label="say %s">&#128266;</button></span>' % (link, k, k))
+        out.append('      <div class="word %s">%s%s      </div>'
+                   % ("five" if is_en else "four", nl, nl.join(cells) + nl))
+    return nl.join(out)
+
+
 def words_html(words):
     out = []
     for term, ipa, en, zh in words:
@@ -478,7 +514,9 @@ def page(path, data, on="", tail_blocks=None):
     # 先给答案那一段优先标：它是全页最重要的一句
     ans_en = T.annotate(data["answer"][0]) if data.get("answer") else ""
     ans_zh = T.annotate(data["answer"][1]) if data.get("answer") else ""
-    body = T.annotate(render_blocks(data["blocks"]))
+    body = render_blocks(data["blocks"])
+    if not data.get("plain"):
+        body = T.annotate(body)
     if not data.get("plain"):
         body += """
   <section class="sec">
@@ -516,7 +554,9 @@ def page(path, data, on="", tail_blocks=None):
         "__GLOSS__": up + "glossary.html",
         "__GAME__": up + "game/hashmap.html",
         "__SPEAK__": up + "speak.html",
+        "__TERMSP__": up + "terms.html",
         "__ON_S__": ' class="on"' if on == "s" else "",
+        "__ON_T__": ' class="on"' if on == "t" else "",
         "__ON_Q__": ' class="on"' if on == "q" else "",
         "__ON_B__": ' class="on"' if on == "b" else "",
         "__ON_W__": ' class="on"' if on == "w" else "",

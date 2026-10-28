@@ -4,6 +4,8 @@ import io
 import _render as R
 from _content_a import INDEX, L1, L2, L3, L4
 from _content_b import L5, L6, L7, QUESTION, ABOUT, GLOSSARY
+from _content_terms import TERMS_PAGE
+from _terms import TERMS as TERM_DICTS
 from _content_a import SPINE
 from _content_q2 import QUESTION2, QINDEX
 from _content_q3 import QUESTION3
@@ -252,6 +254,22 @@ GLOSSARY["blocks"] = blocks
 enrich(GLOSSARY)
 GLOSSARY["plain"] = True
 R.page("glossary.html", GLOSSARY, on="w")
+
+# 术语表（正文里可点的那些词，单独成页）
+_TD = {t["k"]: t for t in TERM_DICTS}
+_tb = []
+for i, (en, zh, keys) in enumerate(TERMS_PAGE["groups"], 1):
+    items = [_TD[k] for k in keys if k in _TD]
+    rows = R.terms_html(items)
+    _tb.append(("h2", "%02d" % i, en, zh, [
+        ("figure", '<div class="wordlist">\n%s\n    </div>' % rows),
+    ]))
+_tb.append(("note",
+            "Ten a day is plenty. Say the 谐音 out loud, then say what it means in one sentence.",
+            "一天十个就够。照着谐音读出来，再用一句话说出它是什么意思。"))
+TERMS_PAGE["blocks"] = _tb
+TERMS_PAGE["plain"] = True
+R.page("terms.html", TERMS_PAGE, on="t")
 print("all pages built")
 
 
