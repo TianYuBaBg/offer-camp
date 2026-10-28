@@ -11,7 +11,7 @@ INDEX = {
              "So every page gives one idea, five new words, and three questions I answer out loud.",
              "我不懂 Java，而且我想用英文学，不是用中文背。所以每一页只讲一个概念、"
              "给五个新词、三道要出声回答的题。"),
-    "tags": [("7 lessons", "7 节课"), ("1 question", "1 道题"), ("45 words", "45 个词")],
+    "tags": [("7 lessons", "7 节课"), ("1 question", "1 道题"), ("47 words", "47 个词")],
     "blocks": [
         ("h2", "01", "Start here, in this order",
          "从这里开始，按这个顺序读", [
@@ -19,7 +19,7 @@ INDEX = {
                    "then answer the three questions at the bottom.",
               "每节课大约 600 个英文词。先点朗读跟一遍，再回答页面底部的三道题。"),
              ("table",
-              [("Lesson", "第几课"), ("English", "英文标题"), ("中文", "中文")],
+              [("Lesson", "第几课"), ("Title", "标题"), ("What it answers", "讲什么内容")],
               [
                   [("1", "1"), ('<a href="basics/array.html">What is an array?</a>', '数组'), ("什么是数组", "什么是数组")],
                   [("2", "2"), ('<a href="basics/linked-list.html">What is a linked list?</a>', '链表'), ("什么是链表", "什么是链表")],

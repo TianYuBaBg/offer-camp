@@ -63,6 +63,16 @@ details.answers[open] summary::before{ content:"－ " }
   .wordlist .word{ grid-template-columns: 1fr; }
   .wordlist .links{ margin-top: 2px; }
 }
+.mh-nav a.nav-game span{color:#A33}
+.mh-nav a.nav-game{border:1px solid #d9b7ae;border-radius:2px;padding:1px 6px;margin-left:2px}
+.mh-nav a.nav-game:hover{border-color:#A33}
+
+/* 首页“玩装桶小游戏”按钮 */
+.playbtn{display:inline-block;font-family:var(--sans);font-size:14px;letter-spacing:.04em;
+         padding:10px 18px;border:1px solid var(--ink);background:var(--ink);color:var(--paper);
+         text-decoration:none;border-radius:2px}
+.playbtn:hover{background:#3a342c;border-color:#3a342c;color:#fff}
+
 /* 导航与标签里的中文用细体 */
 .in-zh { font-family: var(--serif); }
 .langswitch { display: inline-flex; border: 1px solid var(--line-strong); }
@@ -203,6 +213,7 @@ PAGE = """<!doctype html>
       <a href="__HOME__"__ON_Q__><span class="in-en">Questions</span><span class="in-zh">题目</span></a>
       <a href="__BASICS__"__ON_B__><span class="in-en">Basics</span><span class="in-zh">基础</span></a>
       <a href="__GLOSS__"__ON_W__><span class="in-en">Words</span><span class="in-zh">词表</span></a>
+      <a class="nav-game" href="__GAME__"><span class="in-en">Play</span><span class="in-zh">游戏</span></a>
     </nav>
   </div>
   <div class="mh-right">
@@ -381,6 +392,7 @@ def page(path, data, on=""):
         "__HOME__": up + "index.html",
         "__BASICS__": up + "basics/array.html",
         "__GLOSS__": up + "glossary.html",
+        "__GAME__": up + "game/hashmap.html",
         "__ON_Q__": ' class="on"' if on == "q" else "",
         "__ON_B__": ' class="on"' if on == "b" else "",
         "__ON_W__": ' class="on"' if on == "w" else "",
