@@ -397,6 +397,8 @@ else                          move it to index i + oldCap"""),
             ("Data reporting: the form engine carries dynamic fields in <code>Map&lt;String, Object&gt;</code>, stats by <code>groupingBy</code>.",
              "数据报送：模板化表单用 Map&lt;String, Object&gt; 承载动态字段，统计用 groupingBy。"),
         ]),
+        ("note", "Before you memorise anything: <a href=\"../game/hashmap.html\">play the 5-minute bucket game</a> — you will feel the collision, the resize and the tree.",
+         "背之前先手过一遍：<a href=\"../game/hashmap.html\">玩 5 分钟装桶小游戏</a>——冲突、扩容、树化，手上过一遍就记住了。"),
     ]),
     ("h2", "09", "Eight follow-ups", "八个必答追问", [
         ("table", [("Question", "问题"), ("One line", "一句话答")], [

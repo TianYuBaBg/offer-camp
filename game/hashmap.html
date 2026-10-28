@@ -1,0 +1,534 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HashMap 装桶练习 · 三个小关</title>
+<meta name="description" content="用拖放的方式亲手走一遍 HashMap：算 hash、找桶、撞了就挂链子、装满了扩容、挤满了变红黑树。">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  /* ============ 游戏专用 ============ */
+  .game{max-width:1180px}
+  .ghd{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;
+       padding-bottom:14px;border-bottom:1px solid var(--line)}
+  .ghd h1{margin:0;font-family:var(--serif);font-size:26px;letter-spacing:.02em}
+  .ghd .sub{margin-top:6px;font-family:var(--mono);font-size:11px;letter-spacing:.14em;
+            text-transform:uppercase;color:var(--ink-3)}
+  .hud{display:flex;gap:22px;font-family:var(--mono);font-size:11.5px;color:var(--ink-2);letter-spacing:.06em}
+  .hud b{font-family:var(--serif);font-size:17px;color:var(--ink);margin-left:6px;letter-spacing:0}
+
+  .wrap{display:grid;grid-template-columns:1fr 330px;gap:28px;margin-top:22px;align-items:start}
+
+  /* 木盘：桶 */
+  .board{display:grid;grid-template-columns:repeat(8,1fr);gap:8px}
+  .bucket{position:relative;min-height:96px;cursor:pointer;border:1px solid #cfc7b8;border-radius:3px;
+          background:rgba(255,255,255,.45);padding:22px 5px 10px;transition:border-color .15s,background .15s}
+  .bucket:hover{border-color:var(--ink-3);background:rgba(255,255,255,.55)}
+  .bucket.over{border-color:var(--ink);background:rgba(122,44,44,.06)}
+  .bucket.bad{animation:shake .32s}
+  .bucket.good{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+  .bucket .no{position:absolute;top:4px;left:0;right:0;text-align:center;
+              font-family:var(--mono);font-size:10px;color:#8a8378;letter-spacing:.08em}
+  .bucket .items{display:flex;flex-direction:column;gap:4px;align-items:center}
+  .node{color:#1F1B16;position:relative;width:100%;padding:6px 4px;border:1px solid #6b6459;border-radius:2px;
+        background:#FFFDF7;font-family:var(--mono);font-size:12px;text-align:center;
+        animation:pop .22s ease-out;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .node.tree{border-color:#A33;color:#7A2C2C;background:#FBEAE4}
+  .node+.node::before{content:"";position:absolute;left:50%;top:-5px;width:1px;height:5px;background:#6b6459}
+  .node:last-child .lnk{display:none}
+  .node .badge{display:block;margin-top:2px;font-family:var(--mono);font-size:8.5px;
+               color:var(--ink-2);letter-spacing:.06em;line-height:1}
+  .tag-tree{font-family:var(--mono);font-size:9.5px;color:#A33;letter-spacing:.04em;margin-top:6px;text-align:center;line-height:1.4}
+
+  /* 右面板 */
+  .panel{border:1px solid var(--line);border-radius:3px;padding:18px 18px 16px;background:rgba(255,255,255,.4)}
+  .panel .lb{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+  .keycard{margin:8px 0 14px;padding:14px 12px;border:1px solid var(--ink);border-radius:2px;
+           background:#FBF8F0;text-align:center;font-family:var(--mono);font-size:22px;letter-spacing:.04em}
+  .steps{font-family:var(--mono);font-size:11.5px;line-height:2;color:var(--ink-2);min-height:104px}
+  .steps .row{display:flex;justify-content:space-between;gap:10px;opacity:.25;transition:opacity .2s}
+  .steps .row.on{opacity:1}
+  .steps .row .v{color:var(--ink);font-weight:700}
+  .steps .row.hl .v{color:#7A2C2C}
+  .btnrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  button.g{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;padding:8px 13px;cursor:pointer;
+           border:1px solid var(--ink);border-radius:2px;background:transparent;color:var(--ink);
+           transition:background .15s,color .15s}
+  button.g:hover{background:var(--ink);color:var(--paper)}
+  button.g[disabled]{opacity:.32;cursor:not-allowed}
+  button.g[disabled]:hover{background:transparent;color:var(--ink)}
+  button.g.solid{background:var(--ink);color:var(--paper)}
+  button.g.solid:hover{background:#000}
+
+  .msg{margin-top:16px;min-height:44px;font-size:13.5px;line-height:1.65;color:var(--ink-2);
+       border-left:2px solid var(--line);padding-left:12px}
+  .msg.ok{border-left-color:#2E6B4F;color:#245240}
+  .msg.bad{border-left-color:#A33;color:#7A2C2C}
+
+  /* 关卡说明条 */
+  .ltip{margin-top:16px;font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--ink-3)}
+
+  /* 覆盖层 */
+  .veil{position:fixed;inset:0;background:rgba(246,241,231,.94);display:none;z-index:50;
+        align-items:center;justify-content:center;padding:24px}
+  .veil.on{display:flex}
+  .card2{max-width:520px;border:1px solid var(--ink);border-radius:3px;background:#FBF8F0;padding:28px 30px;
+         box-shadow:8px 8px 0 rgba(31,27,22,.06)}
+  .card2 h2{font-family:var(--serif);font-size:24px;margin:0 0 10px}
+  .card2 p{font-size:14.5px;line-height:1.8;color:var(--ink-2);margin:0 0 10px}
+  .card2 .big{font-family:var(--mono);font-size:12px;letter-spacing:.1em;color:var(--ink-3);margin-bottom:6px}
+
+  .treefig{margin-top:20px;border:1px solid #cfc7b8;border-radius:3px;padding:16px 18px;background:rgba(255,255,255,.45)}
+  .treefig .cap{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#8a8378;margin-bottom:10px}
+  .trow{display:flex;justify-content:center;gap:34px;margin:10px 0}
+  .tcell{border:1px solid #A33;color:#7A2C2C;background:#FBEAE4;font-family:var(--mono);font-size:11px;
+         padding:5px 9px;border-radius:2px;white-space:nowrap}
+  .tnote{margin-top:10px;font-size:12.5px;color:var(--ink-2);line-height:1.7}
+
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}50%{transform:translateX(4px)}75%{transform:translateX(-2px)}}
+  @keyframes pop{from{opacity:.45;transform:translateY(-5px) scale(.97)}to{opacity:1;transform:none}}
+  @keyframes flash{0%{background:rgba(122,44,44,.16)}100%{background:rgba(255,255,255,.35)}}
+  .bucket.flash{animation:flash .9s}
+
+  @media (max-width:900px){
+    .wrap{grid-template-columns:1fr}
+    .board{grid-template-columns:repeat(4,1fr)}
+  }
+</style>
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<main class="wrap-page game" style="padding:26px 28px 40px">
+  <header class="ghd">
+    <div>
+      <div class="sub" style="margin-bottom:6px">
+        <a href="../questions/java-hashmap.html">← 回到第 1 题</a> &nbsp;·&nbsp;
+        <a href="../index.html">首页</a>
+      </div>
+      <h1>HashMap 装桶练习</h1>
+      <div class="sub">three hands-on levels · 手比脑子记得快</div>
+    </div>
+    <div class="hud">
+      <span>关卡<b id="hLevel">1/3</b></span>
+      <span>桶数<b id="hCap">16</b></span>
+      <span>已放<b id="hCount">0</b></span>
+      <span>点错<b id="hMiss">0</b></span>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <section>
+      <div class="board" id="board"></div>
+      <div id="treeFig"></div>
+      <div class="ltip" id="ltip">先点「算 hash」，再点「算位置」，然后点对应的桶。</div>
+    </section>
+
+    <aside class="panel">
+      <div class="lb">Current key</div>
+      <div class="keycard" id="key">—</div>
+
+      <div class="lb">Hash → index</div>
+      <div class="steps" id="steps">
+        <div class="row" id="s1"><span>hashCode</span><span class="v">—</span></div>
+        <div class="row" id="s2"><span>h &gt;&gt;&gt; 16</span><span class="v">—</span></div>
+        <div class="row" id="s3"><span>h ^ (h &gt;&gt;&gt; 16)</span><span class="v">—</span></div>
+        <div class="row" id="s4"><span>&amp; (16 - 1)</span><span class="v">—</span></div>
+      </div>
+
+      <div class="btnrow">
+        <button class="g solid" id="bHash">算 hash</button>
+        <button class="g" id="bIdx" disabled>算位置</button>
+        <button class="g" id="bTree" style="display:none">转成红黑树</button>
+      </div>
+
+      <div class="msg" id="msg">准备好了就点「算 hash」。</div>
+    </aside>
+  </div>
+</main>
+
+<div class="veil" id="veil"><div class="card2" id="veilCard"></div></div>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ---------- Java String.hashCode ---------- */
+  function javaHash(s){
+    var h = 0;
+    for (var i = 0; i < s.length; i++) h = (Math.imul(31, h) + s.charCodeAt(i)) | 0;
+    return h;
+  }
+  function spread(h){ return (h ^ (h >>> 16)) >>> 0; }
+  function bucketOf(key, cap){ return spread(javaHash(key)) & (cap - 1); }
+
+  /* ---------- 关卡数据（每个 key 的落桶位置已用真实 Java 算法核对过） ---------- */
+  var LEVELS = [
+    {
+      id: 1,
+      title: '第一关 · 放进去',
+      sub: '桶是空的就放进去；桶里已经有 key，就挂到链子后面。',
+      cap: 16,
+      seed: [],
+      keys: ['apple', 'order', 'node', 'user', 'token', 'price']
+    },
+    {
+      id: 2,
+      title: '第二关 · 装满就扩容',
+      sub: '数一数装了 12 个（16 的 75%）就要扩容：容量翻倍，每个元素要么留在原位、要么往后挪 16 位。',
+      cap: 16,
+      seed: [],
+      resizeAt: 12,
+      keys: ['stock', 'cart', 'pay', 'spring', 'java', 'thread', 'price', 'user', 'mysql', 'coupon', 'profile', 'phone']
+    },
+    {
+      id: 3,
+      title: '第三关 · 挤满了变红黑树',
+      sub: '这个桶里已经有 7 个（一条长链子）。再放一个到 8 个，就有机会转成红黑树。',
+      cap: 16,
+      seed: ['cart', 'finance', 'redis', 'queue', 'hash', 'key', 'email'],
+      treeifyAt: 8,
+      keys: ['item6']
+    }
+  ];
+
+  var S = {
+    level: 0, cap: 16, buckets: [], queue: [], q: 0,
+    phase: 'idle',            // idle | ready | hashed | placed | done
+    misses: 0, count: 0, treeified: false, resized: false
+  };
+
+  var $ = function(id){ return document.getElementById(id); };
+
+  /* ---------- 渲染 ---------- */
+  function renderTreeFig(bucket){
+    var items = (S.buckets[bucket] || []).slice(0, 8);
+    var rows = [items.slice(0, 1), items.slice(1, 3), items.slice(3, 8)];
+    var html = '<div class="treefig"><div class="cap">Bucket ' + bucket + ' · red-black tree</div>';
+    rows.forEach(function(r){
+      if (!r.length) return;
+      html += '<div class="trow">' + r.map(function(k){ return '<span class="tcell">' + k + '</span>'; }).join('') + '</div>';
+    });
+    html += '<div class="tnote">8 个元素排成三层：查一个 key 最多比 3 次（O(log n)）。链表要一个一个比，8 个最坏 8 次。</div></div>';
+    $('treeFig').innerHTML = html;
+  }
+
+  function renderBoard(){
+    var board = $('board');
+    board.innerHTML = '';
+    for (var i = 0; i < S.cap; i++){
+      var b = document.createElement('div');
+      b.className = 'bucket';
+      b.dataset.i = i;
+      var no = document.createElement('div');
+      no.className = 'no';
+      no.textContent = i;
+      b.appendChild(no);
+      var box = document.createElement('div');
+      box.className = 'items';
+      (S.buckets[i] || []).forEach(function(k){
+        var n = document.createElement('div');
+        n.className = 'node' + (S.treeified && i === S.treeBucket ? ' tree' : '');
+        n.textContent = k;
+        var lnk = document.createElement('i');
+        lnk.className = 'lnk';
+        n.appendChild(lnk);
+        box.appendChild(n);
+      });
+      b.appendChild(box);
+      board.appendChild(b);
+    }
+    $('hCap').textContent = S.cap;
+    $('hCount').textContent = S.count;
+    $('hMiss').textContent = S.misses;
+    $('hLevel').textContent = (S.level + 1) + '/' + LEVELS.length;
+  }
+
+  function paintSteps(step){
+    var L = LEVELS[S.level], key = S.queue[S.q], h = javaHash(key), sp = spread(h);
+    var rows = [['s1', h], ['s2', h >>> 16], ['s3', sp], ['s4', sp & (S.cap - 1)]];
+    rows.forEach(function(r, idx){
+      var el = $(r[0]);
+      el.classList.toggle('on', idx < step);
+      el.classList.toggle('hl', idx === 3 && step > 3);
+      if (idx < step) el.querySelector('.v').textContent = String(r[1]);
+    });
+    $('s4').querySelector('span:first-child').textContent = '& ('.replace('&', '&') + S.cap + ' - 1)';
+  }
+
+  function setMsg(text, kind){
+    var m = $('msg');
+    m.textContent = text;
+    m.className = 'msg' + (kind ? ' ' + kind : '');
+  }
+
+  /* ---------- 一关开始 ---------- */
+  function startLevel(n){
+    S.level = n;
+    var L = LEVELS[n];
+    S.cap = L.cap; S.buckets = []; S.queue = L.keys.slice(); S.q = 0;
+    S.phase = 'ready'; S.count = 0; S.treeified = false; S.resized = false; S.treeBucket = null;
+    for (var i = 0; i < L.cap; i++) S.buckets[i] = [];
+    (L.seed || []).forEach(function(k){
+      S.buckets[bucketOf(k, S.cap)].push(k);
+      S.count++;
+    });
+    $('treeFig').innerHTML = '';
+    $('ltip').textContent = L.title + ' —— ' + L.sub;
+    $('key').textContent = S.queue[0] || '—';
+    ['s1','s2','s3','s4'].forEach(function(id){ $(id).classList.remove('on','hl'); $(id).querySelector('.v').textContent = '—'; });
+    $('bHash').disabled = false; $('bIdx').disabled = true; $('bTree').style.display = 'none';
+    setMsg('这个 key 要放进哪个桶？先点「算 hash」。');
+    renderBoard();
+    if (n === 2) setMsg('这个桶里已经有 7 个了，先点「算 hash」把第 8 个放进去。');
+  }
+
+  /* ---------- 放完一个 ---------- */
+  function advance(){
+    var L = LEVELS[S.level];
+    S.count++;
+    renderBoard();
+
+    // 扩容
+    if (L.resizeAt && S.count >= L.resizeAt && !S.resized){
+      doResize();
+      return;
+    }
+    // 树化条件
+    if (L.treeifyAt && !S.treeified){
+      for (var i = 0; i < S.cap; i++){
+        if (S.buckets[i].length >= L.treeifyAt){ S.treeBucket = i; break; }
+      }
+      if (S.treeBucket !== null){
+        $('bTree').style.display = '';
+        setMsg('桶 ' + S.treeBucket + ' 已经有 ' + L.treeifyAt + ' 个了 → 链子太长了，点「转成红黑树」。', 'ok');
+        return;
+      }
+    }
+    nextKey();
+  }
+
+  function nextKey(){
+    var L = LEVELS[S.level];
+    S.q++;
+    if (S.q >= S.queue.length){ done(); return; }
+    S.phase = 'ready';
+    $('key').textContent = S.queue[S.q];
+    ['s1','s2','s3','s4'].forEach(function(id){ $(id).classList.remove('on','hl'); $(id).querySelector('.v').textContent = '—'; });
+    $('bHash').disabled = false; $('bIdx').disabled = true;
+    paintSteps(0);
+    setMsg('下一个：' + S.queue[S.q] + '。再算一次。');
+  }
+
+  function done(){
+    S.phase = 'done';
+    var L = LEVELS[S.level];
+    var last = (S.level === LEVELS.length - 1);
+    show({
+      big: 'Level ' + (S.level + 1) + ' / ' + LEVELS.length + ' 完成',
+      h2: L.title.replace(/^第.关 · /, '') + '，你已经做过一遍了',
+      p: S.level === 0
+        ? '空桶直接放，撞了就挂到链子末尾。这就是「冲突」——两个不同的 key 抢一个桶，链表负责排队。'
+        : (S.level === 1
+          ? '16 × 0.75 = 12，装到 12 个就扩容成 32。因为容量是 2 的幂，每个元素要么留在原位、要么挪到「原位 + 16」，hash 一次都不用重算。'
+          : '链子到 8 个、容量又不小于 64 时，链表会变成红黑树：查一个 key 从 O(n) 变成 O(log n)。'),
+      btn: last ? '再玩一遍' : '下一关 →',
+      act: last ? function(){ location.reload(); } : function(){ hide(); startLevel(S.level + 1); }
+    });
+  }
+
+  /* ---------- 扩容 ---------- */
+  var PENDING = null;
+
+  function doResize(){
+    var oldCap = S.cap;
+    S.resized = true;
+    S.phase = 'done';
+    var moves = [];
+    var next = [];
+    for (var i = 0; i < oldCap * 2; i++) next[i] = [];
+    for (var b = 0; b < oldCap; b++){
+      (S.buckets[b] || []).forEach(function(k){
+        var to = bucketOf(k, oldCap * 2);
+        next[to].push(k);
+        moves.push([k, to === b ? '原位' : '+16']);
+      });
+    }
+    PENDING = { oldCap: oldCap, next: next, moves: moves };
+    show({
+      big: '16 × 0.75 = 12 · 装满了',
+      h2: '扩容：16 → 32',
+      p: '数组翻倍，' + moves.length + ' 个元素重新分家。注意看每个元素的标签：<b>原位</b> 或者 <b>+16</b> —— 只看 hash 的一位就够了，所以不用重算 hash。',
+      btn: '看它们搬过去',
+      act: function(){ hide(); applyResize(); setTimeout(done, 1400); }
+    });
+  }
+
+  function applyResize(){
+    if (!PENDING) return;
+    var p = PENDING;
+    S.cap = p.oldCap * 2;
+    S.buckets = p.next;
+    renderBoard();
+    document.querySelectorAll('.node').forEach(function(n){
+      var k = n.textContent.replace(/[^a-z0-9\-]/gi, '').trim();
+      for (var m = 0; m < p.moves.length; m++){
+        if (p.moves[m][0] === k){
+          var s = document.createElement('span');
+          s.className = 'badge';
+          s.textContent = p.moves[m][1];
+          n.appendChild(s);
+          break;
+        }
+      }
+    });
+    setMsg('扩容完成：桶数 ' + S.cap + '。标签「原位」= (旧容量 & hash) 这一位是 0；否则就挪到「原位 + 16」。hash 一次都没重算。', 'ok');
+  }
+
+  /* ---------- 覆盖层 ---------- */
+  function show(opt){
+    var c = $('veilCard');
+    c.innerHTML = '<div class="big">' + opt.big + '</div><h2>' + opt.h2 + '</h2><p>' + opt.p + '</p>';
+    var btn = document.createElement('button');
+    btn.className = 'g solid';
+    btn.textContent = opt.btn;
+    btn.onclick = opt.act;
+    c.appendChild(btn);
+    $('veil').classList.add('on');
+  }
+  function hide(){ $('veil').classList.remove('on'); }
+
+  /* ---------- 交互 ---------- */
+  $('bHash').onclick = function(){
+    if (S.phase !== 'ready') return;
+    S.phase = 'hashed';
+    paintSteps(2);
+    this.disabled = true;
+    $('bIdx').disabled = false;
+    setMsg('h 是 hashCode；h >>> 16 把高位挪到低位；两者异或是为了让高位也参与选桶。接着算位置。');
+  };
+
+  $('bIdx').onclick = function(){
+    if (S.phase !== 'hashed') return;
+    S.phase = 'placed';
+    paintSteps(4);
+    this.disabled = true;
+    var key = S.queue[S.q];
+    var b = bucketOf(key, S.cap);
+    setMsg('算出来了，看上面最后一行。现在点它该去的那个桶。', '');
+  };
+
+  $('board').addEventListener('click', function(e){
+    var el = e.target.closest('.bucket');
+    if (!el) return;
+    if (S.phase !== 'placed' && S.phase !== 'hashed') return;
+    var i = Number(el.dataset.i);
+
+    if (S.phase === 'hashed'){
+      setMsg('先算位置，再点桶。', 'bad');
+      return;
+    }
+    var key = S.queue[S.q];
+    var target = bucketOf(key, S.cap);
+
+    if (i !== target){
+      S.misses++; $('hMiss').textContent = S.misses;
+      el.classList.add('bad');
+      setTimeout(function(){ el.classList.remove('bad'); }, 340);
+      setMsg('桶 ' + i + ' 不对。回头看最后一行：hash & ' + (S.cap - 1) + ' 等于几，就点几号。', 'bad');
+      return;
+    }
+
+    // 放进去
+    var existed = S.buckets[i].length;
+    S.buckets[i].push(key);
+    S.phase = 'idle';
+    renderBoard();
+    var cell = document.querySelector('.bucket[data-i="' + i + '"]');
+    if (cell){
+      cell.classList.add('good');
+      setTimeout(function(){ cell.classList.remove('good'); }, 700);
+    }
+    if (existed === 0) setMsg('桶 ' + i + ' 是空的 → 直接放进去。', 'ok');
+    else setMsg('桶 ' + i + ' 里已经有 ' + existed + ' 个 → 冲突！挂在链子末尾，现在是第 ' + (existed + 1) + ' 个。', 'ok');
+    advance();
+  });
+
+  $('bTree').onclick = function(){
+    S.treeified = true;
+    var n = S.buckets[S.treeBucket].length;
+    renderBoard();
+    var cell = document.querySelector('.bucket[data-i="' + S.treeBucket + '"]');
+    if (cell){
+      var t = document.createElement('div');
+      t.className = 'tag-tree';
+      t.textContent = '红黑树 · O(log ' + n + ')';
+      cell.appendChild(t);
+    }
+    $('bTree').style.display = 'none';
+    renderTreeFig(S.treeBucket);
+    setMsg('链子变成了红黑树：查一个 key 从 O(' + n + ') 降到 O(log ' + n + ')。注意——容量小于 64 时只会扩容，不会树化。', 'ok');
+    setTimeout(done, 900);
+  };
+
+  $('veil').addEventListener('click', function(e){ if (e.target === this) {} });
+
+  /* ---------- 测试钩子 ---------- */
+  window.__g = {
+    S: S, LEVELS: LEVELS, startLevel: startLevel, bucketOf: bucketOf, javaHash: javaHash,
+    spread: spread,
+    jump: function(level, opts){
+      opts = opts || {};
+      startLevel(level);
+      var L = LEVELS[level];
+      var n = opts.fill === undefined ? L.keys.length : opts.fill;
+      for (var i = 0; i < n && S.q < S.queue.length; i++){
+        var k = S.queue[S.q];
+        S.buckets[bucketOf(k, S.cap)].push(k);
+        S.count++;
+        S.q++;
+      }
+      S.q = Math.min(S.q, S.queue.length);
+      renderBoard();
+      if (opts.hash){ paintSteps(4); $('bHash').disabled = true; $('bIdx').disabled = true; S.phase = 'placed'; }
+      if (opts.resize) doResize();
+      if (opts.tree){ 
+        for (var b = 0; b < S.cap; b++) if (S.buckets[b].length >= 7){ S.treeBucket = b; break; }
+        if (S.treeBucket !== null){ $('bTree').style.display = ''; }
+      }
+    }
+  };
+
+  var q = new URLSearchParams(location.search);
+  startLevel(q.get('level') ? Number(q.get('level')) - 1 : 0);
+
+  var scene = q.get('scene');
+  if (scene === '1') window.__g.jump(0, { fill: 3, hash: true });
+  if (scene === '2') window.__g.jump(1, { fill: 11 });
+  if (scene === '3') { window.__g.jump(2, { fill: 0 }); }
+  if (scene === '4') {
+    window.__g.jump(2, { fill: 0 });
+    S.buckets[14].push('item6'); S.count++;
+    S.treeBucket = 14; $('bTree').style.display = ''; renderBoard();
+  }
+  if (scene === '6') { window.__g.jump(1, { fill: 12 }); doResize(); }
+  if (scene === '7') { window.__g.jump(1, { fill: 11 }); S.buckets[bucketOf('phone',16)].push('phone'); S.count++; renderBoard(); doResize(); hide(); applyResize(); }
+  if (scene === '8') {
+    window.__g.jump(0, { fill: 0 });
+    $('bHash').click(); $('bIdx').click();
+    var t = bucketOf(S.queue[0], 16);
+    document.querySelector('.bucket[data-i="' + t + '"]').click();
+  }
+  if (scene === '5') {
+    window.__g.jump(2, { fill: 0 });
+    S.buckets[14].push('item6'); S.count++; S.treeBucket = 14;
+    S.treeified = true; renderBoard();
+    var c = document.querySelector('.bucket[data-i="14"]');
+    var t = document.createElement('div'); t.className='tag-tree'; t.textContent='红黑树 · O(log 8)'; c.appendChild(t);
+    renderTreeFig(14);
+  }
+  if (q.get('demo')) window.__g.jump(Number(q.get('demo')) - 1, { fill: 3, hash: true });
+})();
+</script>
+</body>
+</html>
