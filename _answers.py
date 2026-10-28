@@ -3,8 +3,8 @@
 
 ANSWERS = {
     "index.html": {
-        "answer": ("This site teaches Java in English, one idea per page: seven short lessons, then the HashMap interview question.",
-                   "这个站用英文教 Java，一页只讲一个概念：先上七节短课，再读 HashMap 那道面试题。"),
+        "answer": ("This site teaches Java in English, one question per page. Pick a question; when a word or an idea is missing, the page says which lesson to read first.",
+                   "这个站用英文教 Java，一页一个问题。先挑一道题读；卡在哪个词、哪个概念，页面会告诉你先补哪一节课。"),
         "answers": [
             ("I read one page, learn five words, and answer three questions out loud.",
              "今天要做的事：读一页、学五个词、出声答三道题。"),
@@ -136,9 +136,9 @@ ANSWERS = {
         ],
     },
     "about.html": {
-        "answer": ("A plain HTML site with a language switch: seven short lessons, one interview question and a word list. "
+        "answer": ("A plain HTML site with a language switch: seven short lessons, two interview questions and a word list. "
                    "English first; Chinese when a sentence is too hard.",
-                   "一个纯 HTML 小站，带语言切换：七节短课、一道面试题、一份词表。英文优先，句子太难时看中文。"),
+                   "一个纯 HTML 小站，带语言切换：七节短课、两道面试题、一份词表。英文优先，句子太难时看中文。"),
         "answers": [
             ("中文 to understand, 中英 to connect words with meaning, English to test myself.",
              "中文用来读懂，中英用来把词和意思对上，English 用来考试。"),
