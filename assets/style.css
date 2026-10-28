@@ -587,12 +587,12 @@ blockquote.read p{margin:0 0 14px}
 blockquote.read p:last-child{margin-bottom:0}
 /* 首页主线（一个问题的分支） */
 .spine{list-style:none;margin:12px 0 0;padding:0;position:relative}
-.spine:before{content:"";position:absolute;left:14px;top:12px;bottom:18px;width:1px;background:#D6CDBA}
+.spine:before{content:"";position:absolute;left:14px;top:12px;bottom:18px;width:2px;background:#CFC4AF}
 .spine li{position:relative;padding-left:44px}
-.spine .dot{position:absolute;left:6px;top:17px;width:17px;height:17px;border-radius:50%;
-            border:1px solid var(--line);background:#F4EFE3;display:flex;align-items:center;
+.spine .dot{position:absolute;left:6px;top:17px;width:19px;height:19px;border-radius:50%;
+            border:1px solid #B9AD99;background:#F4EFE3;display:flex;align-items:center;
             justify-content:center;font-family:var(--mono);font-size:8.5px;color:var(--ink-3)}
-.spine li.live .dot{border-color:#A33;color:#A33}
+.spine li.live .dot{border-color:#A33;color:#A33;background:#FBF1EC}
 .spine a,.spine .st{display:block;padding:13px 0 14px;border-bottom:1px solid var(--line);
                     text-decoration:none;color:inherit}
 .spine a:hover{background:rgba(255,255,255,.55)}
