@@ -35,6 +35,7 @@
     <p class="kicker"><span class="in-en">Lesson 4 · HashMap</span><span class="in-zh">第 4 课 · HashMap</span></p>
     <h1><span class="in-en">What is a key? A hash? A collision?</span><span class="in-zh">什么是 key？什么是 hash？什么是冲突？</span></h1>
     <p class="lede"><span class="in-en">A key is a name. A hash is a number made from it. A collision is two names with the same number.</span><span class="in-zh">key 是名字；hash 是由它算出来的编号；冲突是两个名字算出了同一个编号。</span></p>
+    <div class="answerbox"><b><span class="in-en">Short answer</span><span class="in-zh">先给答案</span></b><span class="bi-en">A key is the name you look things up by. A hash is a number computed from that key. A collision is two different keys that get the same number, so they share a bucket. HashMap answers a collision with a short list, and with a red-black tree once one bucket holds 8 items.</span><span class="bi-zh">key 是你用来查东西的名字；hash 是由这个 key 算出来的一个数字；冲突是两个不同的 key 算出了同一个数字，于是挤进同一个桶。HashMap 用一条短链处理冲突，桶里攒到 8 个就换成红黑树。</span></div>
     <p class="tags"><span class="tag"><span class="in-en">Basics</span><span class="in-zh">基础</span></span><span class="tag"><span class="in-en">HashMap</span><span class="in-zh">HashMap</span></span><span class="tag"><span class="in-en">must know</span><span class="in-zh">必背</span></span></p>
     <button class="listen" data-listen type="button">🔊</button>
   </div>
@@ -122,7 +123,16 @@ index = (n - 1) & hash          //  which bucket: 0 .. n-1</code></pre>
       <li><span class="bi-en">Two keys collide — what does HashMap do?</span><span class="bi-zh">两个 key 冲突了，HashMap 怎么处理？</span></li>
       <li><span class="bi-en">Why must equals and hashCode agree?</span><span class="bi-zh">为什么 equals 和 hashCode 必须一致？</span></li>
     </ol>
-    <p class="note"><span class="bi-en">Answer out loud, not in your head.</span><span class="bi-zh">出声回答，不要只在心里想。</span></p>
+    <p class="note"><span class="bi-en">Answer out loud first. Only then open the answers below.</span><span class="bi-zh">先自己出声答，再看下面的答案。</span></p>
+  </section>
+
+  <section class="sec">
+    <details class="answers">
+      <summary><span class="in-en">Answers</span><span class="in-zh">参考答案</span></summary>
+      <div class="ans"><span class="an">01</span><span class="bi-en">Key: what you give. Hash: the number computed from it. Bucket: the box that number points to.</span><span class="bi-zh">key：你给的名字；hash：由它算出的编号；桶：编号指向的那一格。</span></div>
+      <div class="ans"><span class="an">02</span><span class="bi-en">Put the new node at the end of that bucket's short list. When the list reaches 8 and capacity is at least 64, that bucket becomes a red-black tree.</span><span class="bi-zh">把新节点挂到该桶短链的末尾。链到 8 个、并且容量至少 64 时，这个桶变成红黑树。</span></div>
+      <div class="ans"><span class="an">03</span><span class="bi-en">Otherwise two keys that are equals() can land in different buckets, and one value looks lost.</span><span class="bi-zh">否则两个 equals() 相同的 key 会落到不同的桶，其中一个值就像丢了。</span></div>
+    </details>
   </section>
 
 

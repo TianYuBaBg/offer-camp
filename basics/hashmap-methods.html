@@ -35,6 +35,7 @@
     <p class="kicker"><span class="in-en">Lesson 6 · Use it</span><span class="in-zh">第 6 课 · 拿来用</span></p>
     <h1><span class="in-en">HashMap methods, and how they look in real code</span><span class="in-zh">HashMap 的常用方法，以及它们在真实代码里长什么样</span></h1>
     <p class="lede"><span class="in-en">Six methods cover almost everything: put, get, getOrDefault, computeIfAbsent, merge, remove.</span><span class="in-zh">六个方法能盖住几乎所有场景：put、get、getOrDefault、computeIfAbsent、merge、remove。</span></p>
+    <div class="answerbox"><b><span class="in-en">Short answer</span><span class="in-zh">先给答案</span></b><span class="bi-en">Six methods cover almost everything: put (add or replace), get (read), getOrDefault (read with a default), computeIfAbsent (compute and store only if missing), merge (combine old and new), remove (delete).</span><span class="bi-zh">六个方法基本够用：put 存或覆盖；get 读；getOrDefault 读不到给默认值；computeIfAbsent 没有才算并存入；merge 合并新旧值；remove 删除。</span></div>
     <p class="tags"><span class="tag"><span class="in-en">Basics</span><span class="in-zh">基础</span></span><span class="tag"><span class="in-en">HashMap</span><span class="in-zh">HashMap</span></span><span class="tag"><span class="in-en">real code</span><span class="in-zh">真实代码</span></span></p>
     <button class="listen" data-listen type="button">🔊</button>
   </div>
@@ -131,7 +132,16 @@ for (Order o : orders) {
       <li><span class="bi-en">Write the one-liner cache with computeIfAbsent.</span><span class="bi-zh">用 computeIfAbsent 写出那一行缓存。</span></li>
       <li><span class="bi-en">How do you count occurrences cleanly?</span><span class="bi-zh">怎么干净地做计数？</span></li>
     </ol>
-    <p class="note"><span class="bi-en">Answer out loud, not in your head.</span><span class="bi-zh">出声回答，不要只在心里想。</span></p>
+    <p class="note"><span class="bi-en">Answer out loud first. Only then open the answers below.</span><span class="bi-zh">先自己出声答，再看下面的答案。</span></p>
+  </section>
+
+  <section class="sec">
+    <details class="answers">
+      <summary><span class="in-en">Answers</span><span class="in-zh">参考答案</span></summary>
+      <div class="ans"><span class="an">01</span><span class="bi-en">get returns null when the key is missing; getOrDefault returns the default you pass.</span><span class="bi-zh">get 没有这个 key 就返回 null；getOrDefault 返回你给的默认值。</span></div>
+      <div class="ans"><span class="an">02</span><span class="bi-en">`cache.computeIfAbsent(id, k -> db.selectById(k))` — one line, no null check.</span><span class="bi-zh">`cache.computeIfAbsent(id, k -> db.selectById(k))`——一行，不用判空。</span></div>
+      <div class="ans"><span class="an">03</span><span class="bi-en">`count.merge(status, 1, Integer::sum)` — old + 1, or 1 the first time.</span><span class="bi-zh">`count.merge(status, 1, Integer::sum)`——老值 +1，第一次出现就给 1。</span></div>
+    </details>
   </section>
 
 

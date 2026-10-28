@@ -35,6 +35,7 @@
     <p class="kicker"><span class="in-en">Lesson 5 · Complexity</span><span class="in-zh">第 5 课 · 复杂度</span></p>
     <h1><span class="in-en">What is O(1), O(n), O(log n)?</span><span class="in-zh">什么是 O(1)、O(n)、O(log n)？</span></h1>
     <p class="lede"><span class="in-en">Big O is not about seconds. It is about how the cost grows when the data grows.</span><span class="in-zh">大 O 说的不是几秒，而是“数据变多时，代价怎么变”。</span></p>
+    <div class="answerbox"><b><span class="in-en">Short answer</span><span class="in-zh">先给答案</span></b><span class="bi-en">Big O is not seconds; it is how the number of steps grows when the data grows. O(1) one step · O(log n) halve each time · O(n) one by one · O(n²) every pair.</span><span class="bi-zh">大 O 说的不是几秒，而是“数据变多时步数怎么长”：O(1) 一步；O(log n) 每次砍一半；O(n) 一个一个来；O(n²) 两两配对。</span></div>
     <p class="tags"><span class="tag"><span class="in-en">Basics</span><span class="in-zh">基础</span></span><span class="tag"><span class="in-en">complexity</span><span class="in-zh">复杂度</span></span><span class="tag"><span class="in-en">must know</span><span class="in-zh">必背</span></span></p>
     <button class="listen" data-listen type="button">🔊</button>
   </div>
@@ -112,7 +113,16 @@
       <li><span class="bi-en">Why is reading an array O(1)?</span><span class="bi-zh">为什么读数组是 O(1)？</span></li>
       <li><span class="bi-en">A bucket with 8 items: how many steps at most?</span><span class="bi-zh">桶里有 8 个元素：最多几步？</span></li>
     </ol>
-    <p class="note"><span class="bi-en">Answer out loud, not in your head.</span><span class="bi-zh">出声回答，不要只在心里想。</span></p>
+    <p class="note"><span class="bi-en">Answer out loud first. Only then open the answers below.</span><span class="bi-zh">先自己出声答，再看下面的答案。</span></p>
+  </section>
+
+  <section class="sec">
+    <details class="answers">
+      <summary><span class="in-en">Answers</span><span class="in-zh">参考答案</span></summary>
+      <div class="ans"><span class="an">01</span><span class="bi-en">Steps grow in a straight line with n: double the data, double the steps.</span><span class="bi-zh">步数和 n 成正比：数据翻倍，步数也翻倍。</span></div>
+      <div class="ans"><span class="an">02</span><span class="bi-en">One multiplication and one addition give the address. No loop, no search.</span><span class="bi-zh">一次乘法加一次加法就算出地址，没有循环、没有查找。</span></div>
+      <div class="ans"><span class="an">03</span><span class="bi-en">If the bucket has treeified: about 3 comparisons (log₂8). If it is still a list: at most 8.</span><span class="bi-zh">已经树化：约 3 次比较（log₂8）；还是链表：最多 8 次。</span></div>
+    </details>
   </section>
 
 

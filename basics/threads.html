@@ -35,6 +35,7 @@
     <p class="kicker"><span class="in-en">Lesson 7 · Concurrency</span><span class="in-zh">第 7 课 · 并发</span></p>
     <h1><span class="in-en">Why is HashMap not thread-safe?</span><span class="in-zh">为什么 HashMap 是线程不安全的？</span></h1>
     <p class="lede"><span class="in-en">Two threads write at the same time, one write is lost. In JDK 7 it could even bend into a circle.</span><span class="in-zh">两个线程同时写，就会丢掉一次写入；在 JDK 7 里甚至能把链表拧成一个圈。</span></p>
+    <div class="answerbox"><b><span class="in-en">Short answer</span><span class="in-zh">先给答案</span></b><span class="bi-en">HashMap is not thread-safe because put is a multi-step write: two threads can overwrite each other's size, lose a node, and in JDK 7 even bend a list into a circle so get loops forever. In a web app use ConcurrentHashMap, which locks only one bucket.</span><span class="bi-zh">HashMap 线程不安全，因为 put 是多步写入：两个线程会互相覆盖 size、丢掉节点；在 JDK 7 里甚至能把链拧成环，让 get 永远转不出来。Web 应用里用 ConcurrentHashMap，它只锁一个桶。</span></div>
     <p class="tags"><span class="tag"><span class="in-en">Basics</span><span class="in-zh">基础</span></span><span class="tag"><span class="in-en">concurrency</span><span class="in-zh">并发</span></span><span class="tag"><span class="in-en">must know</span><span class="in-zh">必背</span></span></p>
     <button class="listen" data-listen type="button">🔊</button>
   </div>
@@ -121,7 +122,16 @@
       <li><span class="bi-en">What was special about JDK 7 resize?</span><span class="bi-zh">JDK 7 的扩容有什么特别之处？</span></li>
       <li><span class="bi-en">What would you use in a Spring service, and why?</span><span class="bi-zh">Spring 服务里你会用什么？为什么？</span></li>
     </ol>
-    <p class="note"><span class="bi-en">Answer out loud, not in your head.</span><span class="bi-zh">出声回答，不要只在心里想。</span></p>
+    <p class="note"><span class="bi-en">Answer out loud first. Only then open the answers below.</span><span class="bi-zh">先自己出声答，再看下面的答案。</span></p>
+  </section>
+
+  <section class="sec">
+    <details class="answers">
+      <summary><span class="in-en">Answers</span><span class="in-zh">参考答案</span></summary>
+      <div class="ans"><span class="an">01</span><span class="bi-en">Both threads read 10 and write 11. Two nodes were added, but the number went up by one.</span><span class="bi-zh">两个线程都读到 10、都写 11。实际加了两个节点，数字只涨了 1。</span></div>
+      <div class="ans"><span class="an">02</span><span class="bi-en">It used head insertion, so the list was reversed during resize. Two threads could make a node point back — a circle.</span><span class="bi-zh">扩容用头插法，链表会被倒置；两个线程同时做，就可能让某个节点指回去，形成环。</span></div>
+      <div class="ans"><span class="an">03</span><span class="bi-en">ConcurrentHashMap: one bucket is locked at a time, so reads stay fast and writes stay safe.</span><span class="bi-zh">ConcurrentHashMap：一次只锁一个桶，读照样快，写也安全。</span></div>
+    </details>
   </section>
 
 

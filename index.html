@@ -35,12 +35,31 @@
     <p class="kicker"><span class="in-en">Java in English · for a complete beginner</span><span class="in-zh">英文 Java · 写给完全零基础</span></p>
     <h1><span class="in-en">One small page. One idea.</span><span class="in-zh">一次只读一页，一次只学一个概念。</span></h1>
     <p class="lede"><span class="in-en">I know nothing about Java. I want to learn it in English, not in Chinese. So every page gives one idea, five new words, and three questions I answer out loud.</span><span class="in-zh">我不懂 Java，而且我想用英文学，不是用中文背。所以每一页只讲一个概念、给五个新词、三道要出声回答的题。</span></p>
+    <div class="answerbox"><b><span class="in-en">Short answer</span><span class="in-zh">先给答案</span></b><span class="bi-en">This site teaches Java in English, one idea per page: seven short lessons, then the HashMap interview question.</span><span class="bi-zh">这个站用英文教 Java，一页只讲一个概念：先上七节短课，再读 HashMap 那道面试题。</span></div>
     <p class="tags"><span class="tag"><span class="in-en">7 lessons</span><span class="in-zh">7 节课</span></span><span class="tag"><span class="in-en">1 question</span><span class="in-zh">1 道题</span></span><span class="tag"><span class="in-en">45 words</span><span class="in-zh">45 个词</span></span></p>
     <button class="listen" data-listen type="button">🔊</button>
   </div>
 
   <section class="sec">
-    <h2><span class="num">01</span><span class="in-en">Start here, in this order</span><span class="in-zh">从这里开始，按这个顺序读</span></h2>
+    <h2><span class="num">01</span><span class="in-en">Your questions, answered in one line</span><span class="in-zh">你的问题，先用一句话回答</span></h2>
+    <p class="note"><span class="bi-en">Every question below has a full page. This table is the 60-second version.</span><span class="bi-zh">下面每个问题都有完整的一页；这张表是 60 秒版。</span></p>
+    <table class="ledger qa">
+      <thead><tr><th><span class="in-en">Question</span><span class="in-zh">问题</span></th><th><span class="in-en">One-line answer</span><span class="in-zh">一句话答案</span></th><th><span class="in-en">Where</span><span class="in-zh">在哪</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="bi-en">What are an array, a linked list and a red-black tree? How are they different?</span><span class="bi-zh">数组、链表、红黑树分别是什么？区别在哪？</span></td><td><span class="bi-en">Array: numbered boxes that touch each other — read fast, insert slow. Linked list: boxes joined by pointers — insert fast, find slow. Red-black tree: a search tree that stays short, so find is O(log n).</span><span class="bi-zh">数组：紧挨着的带编号盒子，读快、中间插慢；链表：用指针串起来的盒子，插快、找慢；红黑树：会自己保持矮的查找树，查找 O(log n)。</span></td><td><span class="bi-en"><a href="basics/array.html">1–3</a></span><span class="bi-zh">1–3</span></td></tr>
+        <tr><td><span class="bi-en">Why do we have to handle hash collisions?</span><span class="bi-zh">为什么必须处理哈希冲突？</span></td><td><span class="bi-en">If we do nothing, 1000 keys can sit in one bucket and lookup falls from O(1) to O(n).</span><span class="bi-zh">不处理的话，一千个 key 可能挤在同一个桶里，查找就从 O(1) 掉到 O(n)。</span></td><td><span class="bi-en"><a href="basics/hash.html">4</a></span><span class="bi-zh">4</span></td></tr>
+        <tr><td><span class="bi-en">What is a linked list, in one line?</span><span class="bi-zh">链表是什么？一句话。</span></td><td><span class="bi-en">A node holds a value and where the next node is. You walk, you cannot jump.</span><span class="bi-zh">一个节点存“值 + 下一个节点在哪”。只能顺着走，不能跳。</span></td><td><span class="bi-en"><a href="basics/linked-list.html">2</a></span><span class="bi-zh">2</span></td></tr>
+        <tr><td><span class="bi-en">Which HashMap methods do I use every day?</span><span class="bi-zh">HashMap 平时用哪些方法？</span></td><td><span class="bi-en">put, get, getOrDefault, computeIfAbsent, merge, remove.</span><span class="bi-zh">put、get、getOrDefault、computeIfAbsent、merge、remove。</span></td><td><span class="bi-en"><a href="basics/hashmap-methods.html">6</a></span><span class="bi-zh">6</span></td></tr>
+        <tr><td><span class="bi-en">What do O(1), O(n) and O(log n) mean?</span><span class="bi-zh">O(1)、O(n)、O(log n) 是什么意思？</span></td><td><span class="bi-en">O(1): one step. O(n): one by one, follows the data. O(log n): halve the range every step.</span><span class="bi-zh">O(1)：一步；O(n)：一个一个来，跟着数据翻倍；O(log n)：每步砍掉一半。</span></td><td><span class="bi-en"><a href="basics/big-o.html">5</a></span><span class="bi-zh">5</span></td></tr>
+        <tr><td><span class="bi-en">What is a key? What is a hash?</span><span class="bi-zh">什么是 key？什么是 hash？</span></td><td><span class="bi-en">Key: the name you look up by. Hash: a number computed from that key, used to pick the bucket.</span><span class="bi-zh">key：你用来查的名字；hash：由 key 算出的编号，用来选桶。</span></td><td><span class="bi-en"><a href="basics/hash.html">4</a></span><span class="bi-zh">4</span></td></tr>
+        <tr><td><span class="bi-en">Why is HashMap not thread-safe?</span><span class="bi-zh">为什么 HashMap 线程不安全？</span></td><td><span class="bi-en">put is a multi-step write: two threads overwrite each other's size or lose a node; JDK 7 could even build a circle and loop forever.</span><span class="bi-zh">put 是多步写入：两个线程会互相覆盖 size、丢节点；JDK 7 里甚至会成环死循环。</span></td><td><span class="bi-en"><a href="basics/threads.html">7</a></span><span class="bi-zh">7</span></td></tr>
+        <tr><td><span class="bi-en">How does HashMap work as a whole?</span><span class="bi-zh">HashMap 整体是怎么工作的？</span></td><td><span class="bi-en">Array of buckets + hash picks the bucket + short list or red-black tree inside + doubles at 75% full + not thread-safe.</span><span class="bi-zh">桶数组 + 用 hash 选桶 + 桶里短链或红黑树 + 75% 时翻倍扩容 + 线程不安全。</span></td><td><span class="bi-en"><a href="questions/java-hashmap.html">题</a></span><span class="bi-zh">题</span></td></tr>
+        <tr><td><span class="bi-en">How should I learn this in English?</span><span class="bi-zh">我该怎么用英文学这些？</span></td><td><span class="bi-en">Read in 中文, switch to 中英 to connect words, finish in English and answer out loud.</span><span class="bi-zh">先用中文读懂，切“中英”把词和意思对上，最后用 English 出声答出来。</span></td><td><span class="bi-en"><a href="about.html">法</a></span><span class="bi-zh">法</span></td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="sec">
+    <h2><span class="num">02</span><span class="in-en">Start here, in this order</span><span class="in-zh">从这里开始，按这个顺序读</span></h2>
     <p><span class="bi-en">Each lesson is about 600 English words. Read it once with the page read aloud, then answer the three questions at the bottom.</span><span class="bi-zh">每节课大约 600 个英文词。先点朗读跟一遍，再回答页面底部的三道题。</span></p>
     <table class="ledger">
       <thead><tr><th><span class="in-en">Lesson</span><span class="in-zh">第几课</span></th><th><span class="in-en">English</span><span class="in-zh">英文标题</span></th><th>中文</th></tr></thead>
@@ -57,7 +76,7 @@
     <p class="note"><span class="bi-en">After lesson 7, read the <a href="questions/java-hashmap.html">HashMap question</a> — it puts all seven lessons into one 60-second answer.</span><span class="bi-zh">七课上完，去读 <a href="questions/java-hashmap.html">HashMap 那道题</a>——它把七课合成一个 60 秒的回答。</span></p>
   </section>
   <section class="sec">
-    <h2><span class="num">02</span><span class="in-en">How to read a page</span><span class="in-zh">怎么读一页</span></h2>
+    <h2><span class="num">03</span><span class="in-en">How to read a page</span><span class="in-zh">怎么读一页</span></h2>
     <ol class="steps">
       <li><span class="bi-en">Press <b>🔊</b> at the top. Follow the words with your eyes. Twice is enough.</span><span class="bi-zh">点页面顶部的 <b>🔊</b>，眼睛跟着字走。两遍就够。</span></li>
       <li><span class="bi-en">Switch to <b>中英</b> if a sentence is too hard. Read the English first, then the Chinese.</span><span class="bi-zh">句子太难就切到 <b>中英</b>：先读英文，再看中文。</span></li>
@@ -67,7 +86,7 @@
     <p class="note"><span class="bi-en">Twenty minutes is enough. One page a day, seven days, then you can explain HashMap.</span><span class="bi-zh">二十分钟就够。一天一页，七天之后你就能讲清 HashMap。</span></p>
   </section>
   <section class="sec">
-    <h2><span class="num">03</span><span class="in-en">Why English, and why so slow</span><span class="in-zh">为什么要英文、为什么这么慢</span></h2>
+    <h2><span class="num">04</span><span class="in-en">Why English, and why so slow</span><span class="in-zh">为什么要英文、为什么这么慢</span></h2>
     <p><span class="bi-en">In an interview the words are English: <i>bucket</i>, <i>collision</i>, <i>resize</i>. If I only know the Chinese word, I hear a sound I cannot follow.</span><span class="bi-zh">面试里蹦出来的是英文词：bucket、collision、resize。如果我只知道中文说法，听到的就是一串抓不住的声音。</span></p>
     <p><span class="bi-en">So this site is slow on purpose. One idea per page, five words, one picture.</span><span class="bi-zh">所以这个网站是故意慢的：一页一个概念、五个词、一张图。</span></p>
   </section>
@@ -115,7 +134,16 @@
       <li><span class="bi-en">Which page are you reading today?</span><span class="bi-zh">今天你读哪一页？</span></li>
       <li><span class="bi-en">Say one word you learned, out loud.</span><span class="bi-zh">说出一个今天学的词，出声。</span></li>
     </ol>
-    <p class="note"><span class="bi-en">Answer out loud, not in your head.</span><span class="bi-zh">出声回答，不要只在心里想。</span></p>
+    <p class="note"><span class="bi-en">Answer out loud first. Only then open the answers below.</span><span class="bi-zh">先自己出声答，再看下面的答案。</span></p>
+  </section>
+
+  <section class="sec">
+    <details class="answers">
+      <summary><span class="in-en">Answers</span><span class="in-zh">参考答案</span></summary>
+      <div class="ans"><span class="an">01</span><span class="bi-en">I read one page, learn five words, and answer three questions out loud.</span><span class="bi-zh">今天要做的事：读一页、学五个词、出声答三道题。</span></div>
+      <div class="ans"><span class="an">02</span><span class="bi-en">Start with Lesson 1, “What is an array?”.</span><span class="bi-zh">从第 1 课开始：什么是数组。</span></div>
+      <div class="ans"><span class="an">03</span><span class="bi-en">bucket — one box of the array.</span><span class="bi-zh">bucket：数组里的一格。</span></div>
+    </details>
   </section>
 
 

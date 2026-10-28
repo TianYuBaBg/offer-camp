@@ -35,6 +35,7 @@
     <p class="kicker"><span class="in-en">Lesson 3 · Data structure</span><span class="in-zh">第 3 课 · 数据结构</span></p>
     <h1><span class="in-en">What is a tree? And what is a red-black tree?</span><span class="in-zh">什么是树？什么是红黑树？</span></h1>
     <p class="lede"><span class="in-en">A list that forks. Each node can have two children, so a search goes left or right.</span><span class="in-zh">会分叉的链表：每个节点有两个孩子，查找时往左或往右。</span></p>
+    <div class="answerbox"><b><span class="in-en">Short answer</span><span class="in-zh">先给答案</span></b><span class="bi-en">A tree is a list that forks: each node has up to two children, left smaller and right bigger, so each comparison halves what is left — O(log n). A red-black tree is a tree that colours its nodes and rotates after inserts so it never becomes a line.</span><span class="bi-zh">树是“会分叉的链表”：每个节点最多两个孩子，左小右大，每比较一次就砍掉一半，所以是 O(log n)。红黑树是一种靠“涂色 + 插入后旋转”保证自己不会退化成一条线的树。</span></div>
     <p class="tags"><span class="tag"><span class="in-en">Basics</span><span class="in-zh">基础</span></span><span class="tag"><span class="in-en">data structure</span><span class="in-zh">数据结构</span></span><span class="tag"><span class="in-en">O(log n)</span><span class="in-zh">O(log n)</span></span></p>
     <button class="listen" data-listen type="button">🔊</button>
   </div>
@@ -107,7 +108,16 @@
       <li><span class="bi-en">What happens if the tree grows only on one side?</span><span class="bi-zh">树只往一边长会怎样？</span></li>
       <li><span class="bi-en">What do the colours in a red-black tree do for us?</span><span class="bi-zh">红黑树里的颜色有什么用？</span></li>
     </ol>
-    <p class="note"><span class="bi-en">Answer out loud, not in your head.</span><span class="bi-zh">出声回答，不要只在心里想。</span></p>
+    <p class="note"><span class="bi-en">Answer out loud first. Only then open the answers below.</span><span class="bi-zh">先自己出声答，再看下面的答案。</span></p>
+  </section>
+
+  <section class="sec">
+    <details class="answers">
+      <summary><span class="in-en">Answers</span><span class="in-zh">参考答案</span></summary>
+      <div class="ans"><span class="an">01</span><span class="bi-en">Each step halves the remaining nodes: 1000 → 500 → 250 → … about 10 steps.</span><span class="bi-zh">每走一步砍掉一半：1000 → 500 → 250……大约 10 步。</span></div>
+      <div class="ans"><span class="an">02</span><span class="bi-en">It becomes a line again, and lookup falls back to O(n).</span><span class="bi-zh">它又变成一条线，查找退化回 O(n)。</span></div>
+      <div class="ans"><span class="an">03</span><span class="bi-en">They keep the height near 2 × log n, so the worst case stays O(log n).</span><span class="bi-zh">颜色规则把高度控制在 2 × log n 左右，最坏情况仍是 O(log n)。</span></div>
+    </details>
   </section>
 
 

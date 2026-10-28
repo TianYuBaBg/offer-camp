@@ -35,6 +35,7 @@
     <p class="kicker"><span class="in-en">Lesson 2 · Data structure</span><span class="in-zh">第 2 课 · 数据结构</span></p>
     <h1><span class="in-en">What is a linked list?</span><span class="in-zh">什么是链表？</span></h1>
     <p class="lede"><span class="in-en">Boxes that hold hands. Each one knows only where the next one is.</span><span class="in-zh">手拉手的一串盒子，每个只知道自己右边是谁。</span></p>
+    <div class="answerbox"><b><span class="in-en">Short answer</span><span class="in-zh">先给答案</span></b><span class="bi-en">A linked list is boxes joined by pointers: each node keeps a value and where the next node is. You cannot jump, you walk. Inserting is O(1) once you stand there; finding that place is O(n).</span><span class="bi-zh">链表是用指针串起来的盒子：每个节点存一个值和下一个节点的位置。不能跳，只能顺着走。已经站在那一点时插入是 O(1)，但找到那一点要 O(n)。</span></div>
     <p class="tags"><span class="tag"><span class="in-en">Basics</span><span class="in-zh">基础</span></span><span class="tag"><span class="in-en">data structure</span><span class="in-zh">数据结构</span></span><span class="tag"><span class="in-en">O(1) insert</span><span class="in-zh">插 O(1)</span></span></p>
     <button class="listen" data-listen type="button">🔊</button>
   </div>
@@ -117,7 +118,16 @@
       <li><span class="bi-en">Insert in the middle: array or linked list? Why?</span><span class="bi-zh">中间插入：数组还是链表？为什么？</span></li>
       <li><span class="bi-en">What does the last pointer hold?</span><span class="bi-zh">最后一个节点的指针指向什么？</span></li>
     </ol>
-    <p class="note"><span class="bi-en">Answer out loud, not in your head.</span><span class="bi-zh">出声回答，不要只在心里想。</span></p>
+    <p class="note"><span class="bi-en">Answer out loud first. Only then open the answers below.</span><span class="bi-zh">先自己出声答，再看下面的答案。</span></p>
+  </section>
+
+  <section class="sec">
+    <details class="answers">
+      <summary><span class="in-en">Answers</span><span class="in-zh">参考答案</span></summary>
+      <div class="ans"><span class="an">01</span><span class="bi-en">There is no index and no formula. The boxes are not next to each other, so you must follow every pointer.</span><span class="bi-zh">没有下标也没有公式。盒子不连续，只能一个指针一个指针地走。</span></div>
+      <div class="ans"><span class="an">02</span><span class="bi-en">Linked list: change two pointers, O(1). An array would shift everything after it, O(n).</span><span class="bi-zh">链表：改两个指针，O(1)。数组要把后面全部挪一遍，O(n)。</span></div>
+      <div class="ans"><span class="an">03</span><span class="bi-en">null — “nothing”. That is how you know the list has ended.</span><span class="bi-zh">null，表示“没有了”。看到它就说明到头了。</span></div>
+    </details>
   </section>
 
 

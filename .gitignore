@@ -1,5 +1,4 @@
+__pycache__/
+*.pyc
 _*.png
-_*.html
-_shot*.png
-.DS_Store
-Thumbs.db
+_edge*/

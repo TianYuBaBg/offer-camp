@@ -23,6 +23,35 @@ html[data-lang="both"] .ledger .bi-en, html[data-lang="both"] .ledger .in-en { d
 html[data-lang="both"] .ledger .bi-zh, html[data-lang="both"] .ledger .in-zh {
   display: inline; font-size: .9em; color: var(--ink-3); margin-left: .4em;
 }
+/* ===== 答案 ===== */
+.answerbox{
+  border: 1px solid var(--line-strong); border-left: 4px solid var(--seal);
+  background: var(--paper-2); padding: 14px 18px; margin: 22px 0 0;
+}
+.answerbox b{ display:block; font-family:var(--sans); font-size:10.5px; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--seal); margin-bottom:6px; }
+.answerbox .bi-en, .answerbox .bi-zh{ font-size:15.5px; line-height:1.7; }
+details.answers{ border-top:1px solid var(--line); padding-top:10px; }
+details.answers summary{
+  cursor:pointer; font-family:var(--sans); font-size:11px; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--seal); padding:6px 0; list-style:none;
+}
+details.answers summary::-webkit-details-marker{ display:none }
+details.answers summary::before{ content:"＋ " }
+details.answers[open] summary::before{ content:"－ " }
+.ans{ display:grid; grid-template-columns:34px 1fr; gap:10px; padding:10px 0; border-bottom:1px dotted var(--line); }
+.ans .an{ font-family:var(--mono); font-size:11px; color:var(--seal); padding-top:3px; }
+/* 首页九问表：控制列宽 */
+.ledger.qa{ table-layout: fixed }
+.ledger.qa th:nth-child(1){ width: 26% }
+.ledger.qa th:nth-child(2){ width: 64% }
+.ledger.qa th:nth-child(3){ width: 10%; white-space: nowrap }
+.ledger.qa td:nth-child(2){ white-space: normal; font-family: var(--serif); letter-spacing: 0; font-size: 14.5px }
+.ledger.qa td:nth-child(3){ white-space: nowrap; font-family: var(--mono); font-size: 12px }
+/* ===== 表格：长文字一律允许换行（首页九问表需要） ===== */
+.ledger{ table-layout: auto; }
+.ledger th, .ledger td{ white-space: normal; word-break: break-word; }
+.ledger td:nth-child(1){ white-space: normal; }
 /* ===== 手机端表格：不隐藏列，改成能读的小字 ===== */
 @media (max-width:820px){
   .ledger th:nth-child(3), .ledger td:nth-child(3){ display: table-cell; }
@@ -192,6 +221,7 @@ PAGE = """<!doctype html>
     <p class="kicker"><span class="in-en">__KICKER_EN__</span><span class="in-zh">__KICKER_ZH__</span></p>
     <h1><span class="in-en">__H1_EN__</span><span class="in-zh">__H1_ZH__</span></h1>
     <p class="lede"><span class="in-en">__LEDE_EN__</span><span class="in-zh">__LEDE_ZH__</span></p>
+    __ANSWERBOX__
     <p class="tags">__TAGS__</p>
     <button class="listen" data-listen type="button">🔊</button>
   </div>
@@ -258,6 +288,7 @@ def render_one(b):
         return ('    <div class="analogy"><b><span class="in-en">%s</span><span class="in-zh">%s</span></b>'
                 '<span class="bi-en">%s</span><span class="bi-zh">%s</span></div>' % (b[1], b[2], b[3], b[4]))
     if k == "table":
+        extra = (" " + b[3]) if len(b) > 3 and b[3] else ""
         def cell_th(e, z):
             return "<th>%s</th>" % e if e == z else ("<th><span class=\"in-en\">%s</span><span class=\"in-zh\">%s</span></th>" % (e, z))
         head = "".join(cell_th(e, z) for e, z in b[1])
@@ -266,8 +297,8 @@ def render_one(b):
             def cell_td(e, z):
                 return "<td>%s</td>" % e if e == z else ("<td><span class=\"bi-en\">%s</span><span class=\"bi-zh\">%s</span></td>" % (e, z))
             rows.append("<tr>" + "".join(cell_td(e, z) for e, z in r) + "</tr>")
-        return ('    <table class="ledger">\n      <thead><tr>%s</tr></thead>\n      <tbody>\n        %s\n      </tbody>\n    </table>'
-                % (head, "\n        ".join(rows)))
+        return ('    <table class="ledger%s">\n      <thead><tr>%s</tr></thead>\n      <tbody>\n        %s\n      </tbody>\n    </table>'
+                % (extra, head, "\n        ".join(rows)))
     if k == "figure":
         return "    " + b[1]
     if k == "note":
@@ -292,6 +323,16 @@ def words_html(words):
             '<button class="spk" data-say="%s" type="button" aria-label="say %s">🔊</button>'
             '</span>\n'
             '      </div>' % (term, ipa, en, zh, q, term, term))
+    return "\n".join(out)
+
+
+def answers_html(answers):
+    if not answers:
+        return ""
+    out = []
+    for i, (e, z) in enumerate(answers, 1):
+        out.append('      <div class="ans"><span class="an">%02d</span>'
+                   '<span class="bi-en">%s</span><span class="bi-zh">%s</span></div>' % (i, e, z))
     return "\n".join(out)
 
 
@@ -323,9 +364,16 @@ def page(path, data, on=""):
     <ol class="checks">
 %s
     </ol>
-    <p class="note"><span class="bi-en">Answer out loud, not in your head.</span><span class="bi-zh">出声回答，不要只在心里想。</span></p>
+    <p class="note"><span class="bi-en">Answer out loud first. Only then open the answers below.</span><span class="bi-zh">先自己出声答，再看下面的答案。</span></p>
   </section>
-""" % (words_html(data["words"]), checks_html(data["checks"]))
+
+  <section class="sec">
+    <details class="answers">
+      <summary><span class="in-en">Answers</span><span class="in-zh">参考答案</span></summary>
+%s
+    </details>
+  </section>
+""" % (words_html(data["words"]), checks_html(data["checks"]), answers_html(data.get("answers", [])))
 
     subs = {
         "__TITLE__": data["title"][0], "__DESC__": data["title"][0],
@@ -341,6 +389,10 @@ def page(path, data, on=""):
         "__H1_EN__": data["h1"][0], "__H1_ZH__": data["h1"][1],
         "__LEDE_EN__": data["lede"][0], "__LEDE_ZH__": data["lede"][1],
         "__TAGS__": tags, "__BODY__": body, "__NEXT__": data["next"],
+        "__ANSWERBOX__": ('<div class="answerbox"><b><span class="in-en">Short answer</span>'
+                          '<span class="in-zh">先给答案</span></b>'
+                          '<span class="bi-en">%s</span><span class="bi-zh">%s</span></div>'
+                          % (data["answer"][0], data["answer"][1])) if data.get("answer") else "",
     }
     html = PAGE
     for k, v in subs.items():

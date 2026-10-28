@@ -35,6 +35,7 @@
     <p class="kicker"><span class="in-en">Question 1 · HashMap</span><span class="in-zh">第 1 题 · HashMap</span></p>
     <h1><span class="in-en">How does HashMap work?</span><span class="in-zh">HashMap 是怎么工作的？</span></h1>
     <p class="lede"><span class="in-en">A box of small boxes. Give it a key, get back a value, very fast.</span><span class="in-zh">一个装着小盒子的盒子：给它 key，它很快还你 value。</span></p>
+    <div class="answerbox"><b><span class="in-en">Short answer</span><span class="in-zh">先给答案</span></b><span class="bi-en">HashMap is an array of buckets. The hash of the key picks the bucket; each bucket holds a short list, which becomes a red-black tree at 8 items (capacity ≥ 64). At 75% full the array doubles, and each item moves by one bit. It is fast (O(1) average) but not thread-safe.</span><span class="bi-zh">HashMap 是一个桶数组：用 key 的 hash 选桶；每个桶里挂一条短链，攒到 8 个（且容量 ≥ 64）就变红黑树；装到 75% 扩容一倍，每个元素只看一位就知道原位还是搬走。它平均 O(1)，但线程不安全。</span></div>
     <p class="tags"><span class="tag"><span class="in-en">Must know</span><span class="in-zh">必背</span></span><span class="tag"><span class="in-en">HashMap</span><span class="in-zh">HashMap</span></span><span class="tag"><span class="in-en">speak 60s</span><span class="in-zh">60 秒口播</span></span><span class="tag"><span class="in-en">7 lessons</span><span class="in-zh">关联 7 课</span></span></p>
     <button class="listen" data-listen type="button">🔊</button>
   </div>
@@ -44,6 +45,21 @@
     <blockquote class="short"><span class="lbl"><span class="in-en">Say this first</span><span class="in-zh">先说这句</span></span>
       <p><span class="bi-en">A HashMap is a box of small boxes. You give it a key, and it gives you back a value very fast. Inside, it uses an array. Each box in the array is called a bucket. When two keys fall into the same bucket, they stand in a line.</span><span class="bi-zh">HashMap 是一个装着小盒子的盒子：给它 key，它很快还你 value。底层是一个数组，数组里每一格叫一个桶。两个 key 落进同一个桶时，就排成一队（链表）。</span></p>
     </blockquote>
+  </section>
+  <section class="sec">
+    <h2><span class="num">01b</span><span class="in-en">The whole thing in nine sentences</span><span class="in-zh">九句话讲清楚（零基础版）</span></h2>
+    <ol class="steps">
+      <li><span class="bi-en">It is a box: you give it a name (key), it gives back the thing (value) — fast.</span><span class="bi-zh">它是个盒子：给它一个名字（key），它很快把对应的东西（value）还给你。</span></li>
+      <li><span class="bi-en">Inside is a row of numbered boxes: an array of 16 buckets, numbered 0–15.</span><span class="bi-zh">里面是一排带编号的格子，共 16 个，编号 0–15。这排格子就叫数组。</span></li>
+      <li><span class="bi-en">When you put something, it computes a number from the key. That number is the hash.</span><span class="bi-zh">放东西时，它拿 key 算出一个数字，这个数字叫 hash。</span></li>
+      <li><span class="bi-en">The hash picks a bucket. Next time you look up the same key, it picks the same bucket — no searching.</span><span class="bi-zh">用 hash 选格子。下次用同样的 key 来拿，还是同一个格子——不用一格格找，所以快。</span></li>
+      <li><span class="bi-en">Two different keys can get the same bucket. That is a collision. The fix: put them in a line inside that bucket.</span><span class="bi-zh">两个不同的 key 可能选中同一个格子，这叫冲突。办法：在这个格子里挂一条队伍。</span></li>
+      <li><span class="bi-en">Looking up a key in a line means comparing names one by one — until the name matches.</span><span class="bi-zh">格子里是队伍时，就顺着队伍一个一个比名字，比到为止。</span></li>
+      <li><span class="bi-en">When one line reaches 8 items, the line becomes a red-black tree, so a lookup takes only a few steps.</span><span class="bi-zh">某一格排到 8 个时，这条队伍变成红黑树——查东西只要几步。</span></li>
+      <li><span class="bi-en">At 75% full, the array doubles from 16 to 32, and items are re-split. No hash is recomputed.</span><span class="bi-zh">装到 75% 满时，数组从 16 格扩成 32 格，东西重新分一遍；技巧是不用重算 hash。</span></li>
+      <li><span class="bi-en">It is not thread-safe: two threads writing at once can overwrite each other. Use ConcurrentHashMap.</span><span class="bi-zh">它线程不安全：两个线程同时写会互相覆盖、丢数据。并发里用 ConcurrentHashMap。</span></li>
+    </ol>
+    <p class="note"><span class="bi-en">If all nine are clear, you can already answer this question in an interview. The rest is detail.</span><span class="bi-zh">这九句都清楚，这道题你已经会答了。剩下的都是细节。</span></p>
   </section>
   <section class="sec">
     <h2><span class="num">02</span><span class="in-en">What is inside</span><span class="in-zh">里面是什么</span></h2>
@@ -121,19 +137,58 @@ else                          move it to index i + oldCap</code></pre>
     <p class="note"><span class="bi-en">Long version: <a href="../basics/threads.html">Lesson 7</a>.</span><span class="bi-zh">完整版：<a href="../basics/threads.html">第 7 课</a>。</span></p>
   </section>
   <section class="sec">
-    <h2><span class="num">07</span><span class="in-en">Say it in 60 seconds</span><span class="in-zh">60 秒照念稿</span></h2>
-    <blockquote class="script"><span class="lbl"><span class="in-en">Read out loud, then say it your own way</span><span class="in-zh">先照着念，再换成自己的话</span></span>
-      <p><span class="bi-en">A HashMap is an array of buckets. You give it a key, it computes a hash, and the hash tells it which bucket to use.</span><span class="bi-zh">HashMap 是一个桶数组。给它 key，它算出一个 hash，hash 决定用哪个桶。</span></p>
-      <p><span class="bi-en">If the bucket is empty, the value goes in. If it already has items with different keys, they stand in a line. When a line reaches 8 items and the array has at least 64 buckets, it becomes a red-black tree, so the worst case is O(log n) instead of O(n).</span><span class="bi-zh">桶是空的就直接放。桶里已经有别的 key，就排成一条链。链到 8 个、且数组至少 64 格，就变成红黑树，最坏情况从 O(n) 降到 O(log n)。</span></p>
-      <p><span class="bi-en">When the map is 75 percent full, the array doubles. Because the size is a power of two, each item either stays or moves to bucket + old size, so no hash is recomputed.</span><span class="bi-zh">装到 75% 就扩容一倍。因为容量是 2 的幂，每个元素要么原位、要么挪到原位 + 旧容量，不用重算 hash。</span></p>
-      <p><span class="bi-en">HashMap is fast but not thread-safe, so in a web application I use ConcurrentHashMap.</span><span class="bi-zh">HashMap 快，但线程不安全，所以 Web 应用里我用 ConcurrentHashMap。</span></p>
-    </blockquote>
-  </section>
-  <section class="sec">
-    <h2><span class="num">08</span><span class="in-en">Go deeper, one idea at a time</span><span class="in-zh">再往下学，一次一个概念</span></h2>
+    <h2><span class="num">07</span><span class="in-en">Go deeper, one idea at a time</span><span class="in-zh">再往下学，一次一个概念</span></h2>
     <ul class="deeper">
       <li><a href="../basics/array.html"><span class="in-en">Lesson 1: What is an array?</span><span class="in-zh">第 1 课：什么是数组</span></a></li><li><a href="../basics/linked-list.html"><span class="in-en">Lesson 2: What is a linked list?</span><span class="in-zh">第 2 课：什么是链表</span></a></li><li><a href="../basics/tree.html"><span class="in-en">Lesson 3: What is a tree? Red-black tree?</span><span class="in-zh">第 3 课：什么是树、红黑树</span></a></li><li><a href="../basics/hash.html"><span class="in-en">Lesson 4: key, hash, collision</span><span class="in-zh">第 4 课：key、hash、冲突</span></a></li><li><a href="../basics/big-o.html"><span class="in-en">Lesson 5: O(1), O(n), O(log n)</span><span class="in-zh">第 5 课：O(1)、O(n)、O(log n)</span></a></li><li><a href="../basics/hashmap-methods.html"><span class="in-en">Lesson 6: HashMap methods in real code</span><span class="in-zh">第 6 课：HashMap 方法与真实用法</span></a></li><li><a href="../basics/threads.html"><span class="in-en">Lesson 7: Why it is not thread-safe</span><span class="in-zh">第 7 课：为什么线程不安全</span></a></li>
     </ul>
+  </section>
+  <section class="sec">
+    <h2><span class="num">08</span><span class="in-en">Interview script</span><span class="in-zh">面试话术（60 秒）</span></h2>
+    <p class="note"><span class="bi-en">Four steps, always in this order: structure → collision → resize → limits.</span><span class="bi-zh">四步，顺序固定：结构 → 冲突 → 扩容 → 边界。</span></p>
+    <ol class="steps">
+      <li><span class="bi-en">Structure: an array of buckets, O(1) lookup.</span><span class="bi-zh">结构：一个数组，每格一个桶，平均 O(1)。</span></li>
+      <li><span class="bi-en">Collision: same bucket → list → tree at 8.</span><span class="bi-zh">冲突：同一个桶 → 链表；8 个转红黑树。</span></li>
+      <li><span class="bi-en">Resize: over 0.75 × capacity → double, no hash recompute.</span><span class="bi-zh">扩容：超过容量 0.75 翻倍，不重算 hash。</span></li>
+      <li><span class="bi-en">Limits: not thread-safe → ConcurrentHashMap.</span><span class="bi-zh">边界：线程不安全 → 用 ConcurrentHashMap。</span></li>
+    </ol>
+    <blockquote class="short"><span class="lbl"><span class="in-en">Say this, 60 seconds</span><span class="in-zh">照这段说，60 秒</span></span>
+      <p><span class="bi-en">HashMap is an array of buckets. To put a value, it computes the key hash code, uses it to pick a bucket, and stores the entry there, so a lookup is O(1) on average.</span><span class="bi-zh">HashMap 底层是一个数组，每一格叫一个桶。放数据时先用 key 的 hashCode 算出 hash，用 hash 定位到桶，所以查找平均是 O(1)。</span></p>
+      <p><span class="bi-en">If two keys land in the same bucket, that is a collision: the bucket keeps a linked list. When a list reaches 8 entries and the array has at least 64 buckets, the list becomes a red-black tree, and lookup drops from O(n) to O(log n).</span><span class="bi-zh">如果两个 key 落到同一个桶，就是哈希冲突：桶里挂一条链表。链表到 8 个、并且容量至少 64 时，会转成红黑树，查找从 O(n) 降到 O(log n)。</span></p>
+      <p><span class="bi-en">When the number of entries passes capacity times 0.75, the array doubles. Because the capacity is a power of two, every entry either stays where it is or moves by the old capacity, so no hash is recomputed.</span><span class="bi-zh">元素超过容量 × 0.75 时扩容一倍。因为容量是 2 的幂，每个元素要么留在原位、要么挪到「原位 + 旧容量」，所以不用重算 hash。</span></p>
+      <p><span class="bi-en">It is not thread-safe: two threads putting at once can lose data. So for shared mutable state I use ConcurrentHashMap, and I keep plain HashMap for read-only dictionaries and grouping.</span><span class="bi-zh">它线程不安全，多线程同时 put 会丢数据，所以共享可变状态我用 ConcurrentHashMap；只有只读的字典和分组统计我才用 HashMap。</span></p>
+    </blockquote>
+    <p><span class="bi-en">Last line, and make it yours — pick one of these from your own projects:</span><span class="bi-zh">最后一句，换成你自己的项目（选一条你说得出口的）：</span></p>
+    <ul>
+      <li><span class="bi-en">Selling machines / satellite stations: <code>ConcurrentHashMap&lt;String, Channel&gt;</code> holds 300+ online devices.</span><span class="bi-zh">智能售货机 / 卫星地面站：用 ConcurrentHashMap 管 300+ 台在线设备的连接和状态。</span></li>
+      <li><span class="bi-en">News ranking: count views in a local ConcurrentHashMap, flush to a Redis sorted set every minute.</span><span class="bi-zh">热搜榜：本地 ConcurrentHashMap 先计数，每分钟刷进 Redis 有序集合算排名。</span></li>
+      <li><span class="bi-en">Order system: index multi-platform orders by platform order id, and cache the status dictionary.</span><span class="bi-zh">订单系统：按平台单号建索引做去重匹配，状态字典放只读 Map 里缓存。</span></li>
+      <li><span class="bi-en">Data reporting: the form engine carries dynamic fields in <code>Map&lt;String, Object&gt;</code>, stats by <code>groupingBy</code>.</span><span class="bi-zh">数据报送：模板化表单用 Map&lt;String, Object&gt; 承载动态字段，统计用 groupingBy。</span></li>
+    </ul>
+  </section>
+  <section class="sec">
+    <h2><span class="num">09</span><span class="in-en">Eight follow-ups</span><span class="in-zh">八个必答追问</span></h2>
+    <table class="ledger">
+      <thead><tr><th><span class="in-en">Question</span><span class="in-zh">问题</span></th><th><span class="in-en">One line</span><span class="in-zh">一句话答</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="bi-en">Why must capacity be a power of two?</span><span class="bi-zh">为什么容量必须是 2 的幂？</span></td><td><span class="bi-en">(n-1) & hash equals modulo but is faster; on resize one bit decides where it goes.</span><span class="bi-zh">因为 (n-1) & hash 等价于取模但更快；扩容时只看一位就知道去哪。</span></td></tr>
+        <tr><td><span class="bi-en">Why 0.75?</span><span class="bi-zh">为什么是 0.75？</span></td><td><span class="bi-en">The trade-off between wasted space and long buckets. Lower wastes memory, higher makes buckets long.</span><span class="bi-zh">空间和冲突的折中：太低浪费内存，太高桶变长、查询退化。</span></td></tr>
+        <tr><td><span class="bi-en">Why 8 for treeify?</span><span class="bi-zh">为什么 8 才树化？</span></td><td><span class="bi-en">With a good hash the chance of 8 in a row is about 6 in 10 million, so 8 means the hash is broken.</span><span class="bi-zh">好的 hash 下链表到 8 的概率约千万分之六，到了说明 hash 有问题。</span></td></tr>
+        <tr><td><span class="bi-en">Why 6 to untreeify?</span><span class="bi-zh">为什么退化是 6？</span></td><td><span class="bi-en">A buffer, so it does not flip between 7 and 8 again and again.</span><span class="bi-zh">留缓冲，避免 7、8 之间来回转。</span></td></tr>
+        <tr><td><span class="bi-en">Why did JDK 7 loop forever?</span><span class="bi-zh">JDK 7 为什么会死循环？</span></td><td><span class="bi-en">Head insertion plus two threads resizing can make a ring in the list; then get never returns.</span><span class="bi-zh">头插法 + 两个线程同时扩容，可能把链表拧成环，get 就永远转不出来。</span></td></tr>
+        <tr><td><span class="bi-en">Why rewrite hashCode with equals?</span><span class="bi-zh">为什么 equals 和 hashCode 要一起重写？</span></td><td><span class="bi-en">Or two equal keys land in two buckets and the value is lost.</span><span class="bi-zh">否则相等的两个 key 会落到两个桶，值就「丢」了。</span></td></tr>
+        <tr><td><span class="bi-en">HashMap vs Hashtable vs ConcurrentHashMap?</span><span class="bi-zh">和 Hashtable、ConcurrentHashMap 的区别？</span></td><td><span class="bi-en">Hashtable locks the whole table; ConcurrentHashMap locks one bucket and reads without locks.</span><span class="bi-zh">Hashtable 整表一把锁，早淘汰了；ConcurrentHashMap 桶级锁，读不加锁。</span></td></tr>
+        <tr><td><span class="bi-en">Why not use HashMap as a cache?</span><span class="bi-zh">为什么不直接用 HashMap 做缓存？</span></td><td><span class="bi-en">No expiry, no size limit, not thread-safe, never collected.</span><span class="bi-zh">没有过期、没有上限、线程不安全、一直在 GC 里活着。</span></td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="sec">
+    <h2><span class="num">10</span><span class="in-en">Three things not to say</span><span class="in-zh">三句别说</span></h2>
+    <ul>
+      <li><span class="bi-en">I read the source code — one question and it shows.</span><span class="bi-zh">「我看过源码，我背过 putVal」——一追问就露。</span></li>
+      <li><span class="bi-en">I tuned the load factor to 0.5 — they will ask for your benchmark data.</span><span class="bi-zh">「我把 loadFactor 调成 0.5 优化过」——会问你要压测数据。</span></li>
+      <li><span class="bi-en">HashMap is thread-safe — that ends the interview.</span><span class="bi-zh">「HashMap 是线程安全的」——直接出局。</span></li>
+    </ul>
+    <p class="note"><span class="bi-en">When you truly do not know: say what you guess, then say you will check the source. Honest plus a direction beats making it up.</span><span class="bi-zh">真不会的时候：说你的推测，再说回去查源码确认。诚实 + 有方向，比你硬编好得多。</span></p>
   </section>
   <section class="sec">
     <h2><span class="num">→</span><span class="in-en">New words</span><span class="in-zh">新词</span></h2>
@@ -186,7 +241,17 @@ else                          move it to index i + oldCap</code></pre>
       <li><span class="bi-en">Why does resize not recompute the hash?</span><span class="bi-zh">为什么扩容不用重算 hash？</span></li>
       <li><span class="bi-en">What would you say if I ask “then why not always use ConcurrentHashMap?”</span><span class="bi-zh">如果我问“那为什么不干脆一直用 ConcurrentHashMap”，你怎么答？</span></li>
     </ol>
-    <p class="note"><span class="bi-en">Answer out loud, not in your head.</span><span class="bi-zh">出声回答，不要只在心里想。</span></p>
+    <p class="note"><span class="bi-en">Answer out loud first. Only then open the answers below.</span><span class="bi-zh">先自己出声答，再看下面的答案。</span></p>
+  </section>
+
+  <section class="sec">
+    <details class="answers">
+      <summary><span class="in-en">Answers</span><span class="in-zh">参考答案</span></summary>
+      <div class="ans"><span class="an">01</span><span class="bi-en">A HashMap is an array of buckets. The hash picks a bucket; a short list or a tree handles keys that collide. It grows at 75% by doubling, and it is not thread-safe, so I use ConcurrentHashMap in a web app.</span><span class="bi-zh">HashMap 是桶数组：hash 选桶，冲突用短链或红黑树。装到 75% 扩容一倍；线程不安全，Web 应用里我用 ConcurrentHashMap。</span></div>
+      <div class="ans"><span class="an">02</span><span class="bi-en">(n - 1) & hash, where n is a power of two — the same as hash % n but faster. The hash is also mixed with ^ (h >>> 16) so high bits take part.</span><span class="bi-zh">用 (n-1) & hash：n 是 2 的幂，等价于 hash % n 但更快；hash 还会 ^ (h>>>16) 把高位混下来。</span></div>
+      <div class="ans"><span class="an">03</span><span class="bi-en">Because capacity doubles, the old index bits do not change. One new bit says: stay, or + old capacity.</span><span class="bi-zh">因为容量翻倍，原来的下标位全都不变，只是多了一位：这一位是 0 就原位，是 1 就搬到 原位 + 旧容量。</span></div>
+      <div class="ans"><span class="an">04</span><span class="bi-en">It is safer but costs more: more memory per node, and CAS/lock overhead. A local map inside one method, or a map used by only one thread, does not need it.</span><span class="bi-zh">它更安全但更贵：每个节点多占内存，还有 CAS/加锁开销。方法内部的局部 map、只被一个线程用的 map 就不必用它。</span></div>
+    </details>
   </section>
 
 

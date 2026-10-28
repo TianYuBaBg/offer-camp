@@ -35,6 +35,7 @@
     <p class="kicker"><span class="in-en">Lesson 1 · Data structure</span><span class="in-zh">第 1 课 · 数据结构</span></p>
     <h1><span class="in-en">What is an array?</span><span class="in-zh">什么是数组？</span></h1>
     <p class="lede"><span class="in-en">A row of boxes with numbers. If you know the number, you jump straight to the box.</span><span class="in-zh">一排带编号的盒子。知道编号，就能一步走到那一格。</span></p>
+    <div class="answerbox"><b><span class="in-en">Short answer</span><span class="in-zh">先给答案</span></b><span class="bi-en">An array is a row of numbered boxes that sit next to each other. You reach a box by its number (index), which starts at 0. Reading is O(1); inserting in the middle is O(n).</span><span class="bi-zh">数组是一排紧挨着、带编号的盒子。用编号（下标，从 0 开始）直接跳到某一格。读是 O(1)，往中间插入是 O(n)。</span></div>
     <p class="tags"><span class="tag"><span class="in-en">Basics</span><span class="in-zh">基础</span></span><span class="tag"><span class="in-en">data structure</span><span class="in-zh">数据结构</span></span><span class="tag"><span class="in-en">O(1) read</span><span class="in-zh">读 O(1)</span></span></p>
     <button class="listen" data-listen type="button">🔊</button>
   </div>
@@ -116,7 +117,16 @@
       <li><span class="bi-en">What has to happen when you insert in the middle?</span><span class="bi-zh">往中间插入时，发生了什么？</span></li>
       <li><span class="bi-en">Which is O(1) and which is O(n): read, insert at the end, insert at the front?</span><span class="bi-zh">哪个是 O(1)、哪个是 O(n)：读、末尾加、最前面插？</span></li>
     </ol>
-    <p class="note"><span class="bi-en">Answer out loud, not in your head.</span><span class="bi-zh">出声回答，不要只在心里想。</span></p>
+    <p class="note"><span class="bi-en">Answer out loud first. Only then open the answers below.</span><span class="bi-zh">先自己出声答，再看下面的答案。</span></p>
+  </section>
+
+  <section class="sec">
+    <details class="answers">
+      <summary><span class="in-en">Answers</span><span class="in-zh">参考答案</span></summary>
+      <div class="ans"><span class="an">01</span><span class="bi-en">Because the address is computed, not searched: start + index × size. One step.</span><span class="bi-zh">因为地址是算出来的，不是找出来的：起始地址 + 下标 × 每格大小，一步到位。</span></div>
+      <div class="ans"><span class="an">02</span><span class="bi-en">Every item after the insert point moves one step to the right: O(n).</span><span class="bi-zh">插入点后面的每一个元素都要往右挪一步：O(n)。</span></div>
+      <div class="ans"><span class="an">03</span><span class="bi-en">Read O(1); add at the end with room O(1); insert at the front or middle O(n).</span><span class="bi-zh">读 O(1)；末尾还有空位时加 O(1)；最前面或中间插 O(n)。</span></div>
+    </details>
   </section>
 
 
