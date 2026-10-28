@@ -3,7 +3,7 @@
 A small website for learning Java **in English**, written for a complete beginner.
 Every page gives one idea, five new words, a picture, and a few questions to check yourself.
 
-Live: **https://offer-camp.pages.dev**
+Live: **https://tianyubabg.github.io/offer-camp/**
 
 ---
 
@@ -57,10 +57,9 @@ If you edit the generated pages, edit the `_build_*.py` script and run `python _
 
 ## Deploy
 
-Cloudflare Pages, connected to this GitHub repo:
+The site is published with **GitHub Pages** from the `main` branch, root folder.
+Every push to `main` republishes it in about a minute.
 
-- Framework preset: **None**
-- Build command: *(empty)*
-- Build output directory: `/`
-
-Every push to `main` republishes the site.
+Optional: you can also connect the same repo to Cloudflare Pages
+(framework preset **None**, build command empty, output directory `/`)
+and get a `*.pages.dev` address with better speed in some regions.
