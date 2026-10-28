@@ -166,7 +166,7 @@ QINDEX = {
     "lede": ("Every question has the same shape: the one-line answer, the mechanism, the follow-ups, "
              "and a script you can read out loud.",
              "每道题结构一样：一句话答案、机制、追问、一份能照着念的稿。"),
-    "tags": [("2 questions", "2 道题"), ("both live", "都已上线")],
+    "tags": [("3 questions", "3 道题"), ("all live", "都已上线")],
     "on": "q",
     "plain": True,
     "blocks": [

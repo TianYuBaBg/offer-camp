@@ -11,15 +11,15 @@ INDEX = {
              "So every page gives one idea, five new words, and three questions I answer out loud.",
              "我不懂 Java，而且我想用英文学，不是用中文背。所以每一页只讲一个概念、"
              "给五个新词、三道要出声回答的题。"),
-    "tags": [("2 questions", "2 道题"), ("7 lessons", "7 节课")],
+    "tags": [("3 questions", "3 道题"), ("7 lessons", "7 节课")],
     "blocks": [
-        ("h2", "01", "Two interview questions", "两道面试题",
+        ("h2", "01", "Three interview questions", "三道面试题",
          [
-             ("p", "Only two for now. Each one is a page: a 60-second answer, the mechanism behind it, and the new questions it opens.",
-              "现在只有两道。一道一页：60 秒答案、背后的机制、以及它又长出了哪些新问题。"),
+             ("p", "Three for now, all taken from my own résumé. Each one is a page: a 60-second answer, the mechanism behind it, and the new questions it opens.",
+              "现在三道，全部从我的简历里挖出来的。一道一页：60 秒答案、背后的机制、以及它又长出了哪些新问题。"),
              ("html", "__QLIST__"),
-             ("note", "A third one gets added when the second one is solid.",
-              "第二道读透了再加第三道。"),
+             ("note", "A fourth one gets added when the third one is solid.",
+              "第三道读透了再加第四道。"),
          ]),
         ("h2", "02", "The ground: seven lessons", "地基：七节课",
          [

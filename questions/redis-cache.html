@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="zh-CN" data-lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Redis in front of the database · Java Notes</title>
+<meta name="description" content="Redis in front of the database">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="masthead">
+  <div class="mh-left">
+    <a class="mh-mark" href="../index.html">Java Notes</a>
+    <nav class="mh-nav">
+      <a href="../questions/index.html" class="on"><span class="in-en">Questions</span><span class="in-zh">题目</span></a>
+      <a href="../basics/array.html"><span class="in-en">Basics</span><span class="in-zh">基础</span></a>
+      <a href="../glossary.html"><span class="in-en">Words</span><span class="in-zh">词表</span></a>
+      <a href="../speak.html"><span class="in-en">Phrasing</span><span class="in-zh">话术</span></a>
+    </nav>
+  </div>
+  <div class="mh-right">
+    <span class="langswitch">
+      <button type="button" data-lang-set="zh">中文</button>
+      <button type="button" data-lang-set="both">中英</button>
+      <button type="button" data-lang-set="en">English</button>
+    </span>
+  </div>
+</header>
+
+<main>
+  <p class="crumb"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a> / <span class="in-en">Question 3: cache</span><span class="in-zh">第 3 题：缓存</span></p>
+
+  <div class="qhead">
+    <p class="kicker"><span class="in-en">Question 3 · must know · cache</span><span class="in-zh">第 3 题 · 必背 · 缓存</span></p>
+    <h1><span class="in-en">One Redis in front, P95 from 800 ms down to 240 ms.</span><span class="in-zh">前面加一层 Redis，P95 从 800 毫秒降到 240 毫秒。</span></h1>
+    <p class="lede"><span class="in-en">A cache does only one thing: stop the same read from reaching the database twice. Everything else is about the three ways it can leak.</span><span class="in-zh">缓存只干一件事：让重复的读不再打到数据库。剩下的全是“它有哪三种漏法”。</span></p>
+    <div class="answerbox"><b><span class="in-en">Short answer</span><span class="in-zh">先给答案</span></b><span class="bi-en">Hit rate decides the win: 92% hits means the database sees 8% of the traffic. Penetration, breakdown and avalanche are three different leaks with three different fixes. Consistency is Cache Aside — delete after writing, delete again with a delay — and if you need strong consistency, do not cache that path at all.</span><span class="bi-zh">收益看命中率：命中 92%，数据库只剩 8% 的流量。穿透、击穿、雪崩是三种不同的漏法，各有各的治。一致性走 Cache Aside：写完删缓存，再延迟删一次；要强一致的那条链路，干脆不缓存。</span></div>
+    <p class="tags"><span class="tag"><span class="in-en">Must know</span><span class="in-zh">必背</span></span><span class="tag"><span class="in-en">cache</span><span class="in-zh">缓存</span></span><span class="tag"><span class="in-en">speak 60s</span><span class="in-zh">60 秒口播</span></span><span class="tag"><span class="in-en">4 follow-ups</span><span class="in-zh">追问 4 个</span></span></p>
+    <button class="listen" data-listen type="button">🔊</button>
+  </div>
+
+  <section class="sec">
+    <h2><span class="num">01</span><span class="in-en">Why the query was slow in the first place</span><span class="in-zh">先说为什么会慢</span></h2>
+    <p><span class="bi-en">A list page does not run one query. It runs <b>one query per row</b>, then a count, then a dictionary lookup — the same data again and again, on every page view.</span><span class="bi-zh">一个列表页不是一条 SQL。它是<b>一行一条查询</b>，再加一个 count，再加几次字典查询——同一批数据，每次刷新都重算一遍。</span></p>
+    <ul>
+      <li><span class="bi-en">Add a cache: the second read of the same page never reaches the database.</span><span class="bi-zh">加缓存：同一页第二次读，根本不到数据库。</span></li>
+      <li><span class="bi-en">Hit rate 92% means only 8% of reads go through — that is the number to quote.</span><span class="bi-zh">命中率 92% 意味着只有 8% 的读穿透下去——这才是该报的数。</span></li>
+      <li><span class="bi-en">The other half of 800 → 240 is SQL: N+1 queries collapsed into one join, plus an index.</span><span class="bi-zh">800 降到 240 的另一半在 SQL：N+1 查询合成一次 join，再加索引。</span></li>
+    </ul>
+    <p class="note"><span class="bi-en">Say both halves. If you only say “I added Redis”, the interviewer will assume you cannot tell the cache apart from the query.</span><span class="bi-zh">两半都要说。只说“我加了 Redis”，面试官会认为你分不清缓存和查询。</span></p>
+  </section>
+  <section class="sec">
+    <h2><span class="num">02</span><span class="in-en">Three ways a cache leaks</span><span class="in-zh">三种漏法，一张表</span></h2>
+    <p><span class="bi-en">They sound similar and are asked together, so keep them apart by <b>what is missing</b>.</span><span class="bi-zh">这三个名字听着像，面试也爱连着问。按<b>“缺的是什么”</b>来分就不会混。</span></p>
+    <table class="ledger">
+      <thead><tr><th><span class="in-en">Leak</span><span class="in-zh">漏的是什么</span></th><th><span class="in-en">What happens</span><span class="in-zh">发生什么</span></th><th><span class="in-en">Fix</span><span class="in-zh">怎么治</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="bi-en">Penetration</span><span class="bi-zh">穿透</span></td><td><span class="bi-en">A key that exists nowhere: cache misses, the database misses too, and every request repeats it.</span><span class="bi-zh">查一个根本不存在的数据：缓存没有，数据库也没有，每次请求都空跑一遍。</span></td><td><span class="bi-en">Cache the empty result (`null` with a short TTL) + a bloom filter in front.</span><span class="bi-zh">空结果也缓存（存 null，短 TTL）+ 前面加布隆过滤器。</span></td></tr>
+        <tr><td><span class="bi-en">Breakdown</span><span class="bi-zh">击穿</span></td><td><span class="bi-en">One hot key expires, and a thousand threads rebuild it at once.</span><span class="bi-zh">某个热点 key 刚好过期，一瞬间上千个线程同时回源重建。</span></td><td><span class="bi-en">Let one thread rebuild (Redisson `tryLock`), or keep the key logically expired and refresh in the background.</span><span class="bi-zh">只让一个线程重建（Redisson tryLock），或者逻辑过期＋后台异步刷新。</span></td></tr>
+        <tr><td><span class="bi-en">Avalanche</span><span class="bi-zh">雪崩</span></td><td><span class="bi-en">Many keys expire at the same second, or Redis itself goes down.</span><span class="bi-zh">大批 key 在同一秒过期，或者 Redis 整个挂了。</span></td><td><span class="bi-en">Randomise the TTL; add a local (Caffeine) layer; add a circuit breaker so the database is not flooded either.</span><span class="bi-zh">过期时间加随机；加一层本地缓存（Caffeine）；加限流熔断，别让数据库跟着被冲垮。</span></td></tr>
+      </tbody>
+    </table>
+    <p class="note"><span class="bi-en">The one-word answer that lands: penetration is <b>fake data</b>, breakdown is <b>one hot key</b>, avalanche is <b>many keys at once</b>.</span><span class="bi-zh">一句话记住：穿透是<b>假数据</b>，击穿是<b>一个热 key</b>，雪崩是<b>一大批 key</b>。</span></p>
+  </section>
+  <section class="sec">
+    <h2><span class="num">03</span><span class="in-en">Keeping it consistent</span><span class="in-zh">和数据库怎么保持一致</span></h2>
+    <p><span class="bi-en">The pattern is <b>Cache Aside</b>: read the cache first; on a miss, read the database and write the value into the cache; on a write, <b>delete</b> the cache — do not update it.</span><span class="bi-zh">模式叫 <b>Cache Aside</b>：读先看缓存，没有就查库并回填；写的时候<b>删缓存</b>，不是更新缓存。</span></p>
+    <ul>
+      <li><span class="bi-en">Why delete instead of update: two concurrent writers can interleave and leave the older value in the cache.</span><span class="bi-zh">为什么删而不是更新：两个并发写交错执行，可能把更旧的值写进缓存。</span></li>
+      <li><span class="bi-en">Why delete twice: between “database committed” and “cache deleted”, a reader can still put the old value back. Delete again after ~500 ms, or send a delayed message.</span><span class="bi-zh">为什么删两次：在“库已提交”和“缓存已删”之间，读请求可能把旧值又放回去。约 500 毫秒后再删一次，或者发一条延迟消息。</span></li>
+      <li><span class="bi-en">The public says “the cache is a stale copy” — so for money and stock, read the primary database and do not cache.</span><span class="bi-zh">对外口径：缓存就是一份旧副本——钱和库存这类，直接读主库，不缓存。</span></li>
+    </ul>
+    <pre><code>-- read
+v = redis.get(k)
+if v == nil:
+    v = db.select(k)
+    redis.set(k, v, ttl=300 + random(0, 60))   -- ★ 加随机，防雪崩
+    if v == nil: redis.set(k, '\0', ttl=60)    -- ★ 空值也缓存，防穿透
+
+-- write
+db.update(...)
+redis.del(k)
+delay(500ms); redis.del(k)                       -- ★ 再删一次</code></pre>
+    <p class="note"><span class="bi-en">If you claim “double delete solves it completely”, you will be caught: there is still a window. Say “it narrows the window to milliseconds, and money paths do not cache”.</span><span class="bi-zh">别说“双删就彻底解决了”，还有窗口。说“它把窗口压到毫秒级，而且钱的链路不缓存”。</span></p>
+  </section>
+  <section class="sec">
+    <h2><span class="num">04</span><span class="in-en">So where did 800 → 240 come from</span><span class="in-zh">那 800 到 240 是怎么来的</span></h2>
+    <p><span class="bi-en">Do the arithmetic out loud; interviewers like numbers that can be checked.</span><span class="bi-zh">把算术说出来，面试官喜欢能对得上的数。</span></p>
+    <table class="ledger">
+      <thead><tr><th><span class="in-en">Change</span><span class="in-zh">改了什么</span></th><th><span class="in-en">Effect</span><span class="in-zh">效果</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="bi-en">Hot list into Redis, 92% hit rate, TTL 5 min + jitter</span><span class="bi-zh">热点列表进 Redis，命中率 92%，TTL 5 分钟 + 随机</span></td><td><span class="bi-en">≈ 92% of reads never touch MySQL; the database goes from 1000 QPS to ~80.</span><span class="bi-zh">约 92% 的读不再碰 MySQL，数据库从 1000 QPS 降到 80 左右。</span></td></tr>
+        <tr><td><span class="bi-en">N+1 queries collapsed into one join + covering index</span><span class="bi-zh">N+1 查询合成一次 join + 覆盖索引</span></td><td><span class="bi-en">The 8% that still reach MySQL each got 3–5× cheaper.</span><span class="bi-zh">仍然打到 MySQL 的那 8%，单次便宜了 3–5 倍。</span></td></tr>
+        <tr><td><span class="bi-en">Connection pool raised, slow SQL removed</span><span class="bi-zh">连接池调大，慢 SQL 清掉</span></td><td><span class="bi-en">Tail latency drops most — P95 is exactly about the tail.</span><span class="bi-zh">尾延迟降得最明显——P95 说的就是尾部。</span></td></tr>
+      </tbody>
+    </table>
+    <p class="note"><span class="bi-en">If you only ever quote “70% faster” without a baseline, it sounds invented. 800 → 240 with the mechanism behind it sounds measured.</span><span class="bi-zh">只报“快了 70%”像编的；说出 800 → 240 加上机制，才像量过。</span></p>
+  </section>
+  <section class="sec">
+    <h2><span class="num">05</span><span class="in-en">Four follow-ups, one line each</span><span class="in-zh">四个追问，一句话一个</span></h2>
+    <table class="ledger">
+      <thead><tr><th><span class="in-en">Follow-up</span><span class="in-zh">追问</span></th><th><span class="in-en">One-line answer</span><span class="in-zh">一句话答案</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="bi-en">What if Redis is down?</span><span class="bi-zh">Redis 挂了怎么办？</span></td><td><span class="bi-en">Local cache + circuit breaker; degrade read-only pages, do not let it hit the database.</span><span class="bi-zh">本地缓存 + 熔断限流；只读页降级，别全冲到数据库。</span></td></tr>
+        <tr><td><span class="bi-en">Hot key on one shard?</span><span class="bi-zh">热 key 打到一个分片上怎么办？</span></td><td><span class="bi-en">Local cache first, then split the key with a random suffix, or use a read replica.</span><span class="bi-zh">先本地缓存，再把 key 加随机后缀打散，或者上只读副本。</span></td></tr>
+        <tr><td><span class="bi-en">Warm up the cache after a deploy?</span><span class="bi-zh">发布后要预热吗？</span></td><td><span class="bi-en">Yes: top-N keys loaded at startup, otherwise the first minute is a stampede.</span><span class="bi-zh">要：启动时把 Top N 的热 key 预加载，否则第一分钟就是雪崩。</span></td></tr>
+        <tr><td><span class="bi-en">Cache the page or the object?</span><span class="bi-zh">缓存页面还是缓存对象？</span></td><td><span class="bi-en">Objects. A page cache is invalidated by any change and gets stale fast.</span><span class="bi-zh">对象。整页缓存一改就失效，很快就是脏数据。</span></td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="sec">
+    <h2><span class="num">06</span><span class="in-en">60-second script</span><span class="in-zh">60 秒照念稿</span></h2>
+    <blockquote class="read"><span class="lbl"><span class="in-en">Read this out loud</span><span class="in-zh">照这段说，60 秒</span></span>
+      <p><span class="bi-en">We put the hot list into Redis with a 5-minute TTL plus random jitter, and the hit rate settled around 92%, so MySQL only sees about 8% of the reads. On top of that we collapsed the N+1 queries into one join with a covering index, so the remaining 8% got cheaper too. That took the list API's P95 from ~800 ms to ~240 ms.
+
+The three failure modes have three fixes: penetration is fake data, so we cache the empty result and put a bloom filter in front; breakdown is one hot key, so only one thread rebuilds it under a Redisson lock; avalanche is many keys or a dead Redis, so TTLs are randomised, there is a local Caffeine layer, and the read path is circuit-broken.
+
+For consistency we use Cache Aside: delete after writing, delete again after 500 ms. Anything about money or stock does not go through the cache at all.</span><span class="bi-zh">我们把热点列表放进 Redis，TTL 5 分钟加随机，命中率稳定在 92% 左右，MySQL 只看到 8% 的读。同时把 N+1 查询合成一次 join 加覆盖索引，剩下这 8% 单次也便宜了。列表接口 P95 从 800 毫秒降到 240 毫秒左右。
+
+三种异常三种治法：穿透是假数据，空结果也缓存、前面加布隆过滤器；击穿是一个热 key，只让一个线程在 Redisson 锁下重建；雪崩是大批 key 或 Redis 挂了，所以 TTL 加随机、本地放一层 Caffeine、读链路加熔断。
+
+一致性走 Cache Aside：写完删缓存，500 毫秒后再删一次。钱和库存那条链路不走缓存。</span></p>
+    </blockquote>
+  </section>
+  <section class="sec">
+    <h2><span class="num">07</span><span class="in-en">Where this sits on my résumé</span><span class="in-zh">怎么挂到我自己的项目上</span></h2>
+    <p><span class="bi-en">Only what is actually in the résumé. This question hangs on two projects:</span><span class="bi-zh">只挑简历里真有的。这道题挂在两个项目上：</span></p>
+    <ul>
+      <li><span class="bi-en">好气网: hot dictionary and list data in Redis + Redisson; response time down 70% (P95 800 → 240 ms), hit rate about 92%.</span><span class="bi-zh">好气网：字典和列表热点数据进 Redis + Redisson；响应时间降低 70%（P95 800 → 240 毫秒），命中率约 92%。</span></li>
+      <li><span class="bi-en">订单系统: cache aside on the order detail page; every write deletes the key, the delayed second delete catches the race.</span><span class="bi-zh">订单系统：订单详情页走 Cache Aside；每次写都删 key，延迟二次删兜住竞态。</span></li>
+      <li><span class="bi-en">数据采集: million-row reports are not cached — they are pre-aggregated by a scheduled job.</span><span class="bi-zh">数据采集：百万行的报表不缓存——用定时任务预聚合。</span></li>
+    </ul>
+  </section>
+  <section class="sec">
+    <h2><span class="num">08</span><span class="in-en">Three things not to say</span><span class="in-zh">三句别说</span></h2>
+    <ul>
+      <li><span class="bi-en">“Cache is consistent with the database.” — It never is; it is a copy with a stale window.</span><span class="bi-zh">“缓存和数据库是一致的。”——从来不是，它是一份有窗口的旧副本。</span></li>
+      <li><span class="bi-en">“Penetration is solved by a TTL.” — A TTL does nothing for data that never existed.</span><span class="bi-zh">“穿透靠设 TTL 解决。”——对不存在的数据，TTL 一点用没有。</span></li>
+      <li><span class="bi-en">“Just restart Redis if it breaks.” — That is exactly the avalanche you are supposed to prevent.</span><span class="bi-zh">“崩了重启 Redis 就行。”——那正是你要防的雪崩。</span></li>
+    </ul>
+  </section>
+  <section class="sec">
+    <h2><span class="num">→</span><span class="in-en">New words</span><span class="in-zh">新词</span></h2>
+    <div class="wordlist">
+      <div class="word">
+        <span class="w">cache</span>
+        <span class="ipa">/kæʃ/</span>
+        <span class="mean"><span class="bi-en">A fast copy kept in front of the slow store.</span><span class="bi-zh">缓存：放在慢库前面的快副本</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/cache/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="cache" type="button" aria-label="say cache">🔊</button></span>
+      </div>
+      <div class="word">
+        <span class="w">hit rate</span>
+        <span class="ipa">/hɪt reɪt/</span>
+        <span class="mean"><span class="bi-en">How often the copy is already there.</span><span class="bi-zh">命中率：多大概率直接命中</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/hit%2520rate/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="hit rate" type="button" aria-label="say hit rate">🔊</button></span>
+      </div>
+      <div class="word">
+        <span class="w">penetration</span>
+        <span class="ipa">/ˌpenəˈtreɪʃn/</span>
+        <span class="mean"><span class="bi-en">Asking for data that does not exist, over and over.</span><span class="bi-zh">穿透：反复查不存在的数据</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/penetration/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="penetration" type="button" aria-label="say penetration">🔊</button></span>
+      </div>
+      <div class="word">
+        <span class="w">breakdown</span>
+        <span class="ipa">/ˈbreɪkdaʊn/</span>
+        <span class="mean"><span class="bi-en">One hot key expires and everyone rebuilds it at once.</span><span class="bi-zh">击穿：一个热 key 过期被同时重建</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/breakdown/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="breakdown" type="button" aria-label="say breakdown">🔊</button></span>
+      </div>
+      <div class="word">
+        <span class="w">avalanche</span>
+        <span class="ipa">/ˈævəlæntʃ/</span>
+        <span class="mean"><span class="bi-en">Many keys expire together, or the cache dies.</span><span class="bi-zh">雪崩：大批 key 同时失效或缓存挂掉</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/avalanche/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="avalanche" type="button" aria-label="say avalanche">🔊</button></span>
+      </div>
+      <div class="word">
+        <span class="w">stale</span>
+        <span class="ipa">/steɪl/</span>
+        <span class="mean"><span class="bi-en">Old data that is still being served.</span><span class="bi-zh">脏数据/过期副本</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/stale/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="stale" type="button" aria-label="say stale">🔊</button></span>
+      </div>
+      <div class="word">
+        <span class="w">jitter</span>
+        <span class="ipa">/ˈdʒɪtər/</span>
+        <span class="mean"><span class="bi-en">A small random offset added to a TTL.</span><span class="bi-zh">抖动：给过期时间加一点随机</span></span>
+        <span class="links"><a class="say" href="https://youglish.com/pronounce/jitter/english" target="_blank" rel="noopener">▶ hear it</a><button class="spk" data-say="jitter" type="button" aria-label="say jitter">🔊</button></span>
+      </div>
+    </div>
+    <p class="note"><span class="bi-en">Click <b>▶ hear it</b> for real people on YouGlish; <b>🔊</b> for the computer voice.</span><span class="bi-zh">点 <b>▶ hear it</b> 听真人发音（YouGlish）；点 <b>🔊</b> 听电脑朗读。</span></p>
+  </section>
+
+  <section class="sec">
+    <h2><span class="num">✓</span><span class="in-en">Check yourself</span><span class="in-zh">自测</span></h2>
+    <ol class="checks">
+      <li><span class="bi-en">穿透、击穿、雪崩，各自缺的是什么？</span><span class="bi-zh">穿透、击穿、雪崩，各自缺的是什么？</span></li>
+      <li><span class="bi-en">为什么写的时候删缓存，而不是更新缓存？</span><span class="bi-zh">为什么写的时候删缓存，而不是更新缓存？</span></li>
+      <li><span class="bi-en">说出 800 → 240 的两半原因。</span><span class="bi-zh">说出 800 → 240 的两半原因。</span></li>
+    </ol>
+    <p class="note"><span class="bi-en">Answer out loud first. Only then open the answers below.</span><span class="bi-zh">先自己出声答，再看下面的答案。</span></p>
+  </section>
+
+  <section class="sec">
+    <details class="answers">
+      <summary><span class="in-en">Answers</span><span class="in-zh">参考答案</span></summary>
+
+    </details>
+  </section>
+
+  <section class="sec">
+    <h2><span class="num">09</span><span class="in-en">New questions this one opened</span><span class="in-zh">这道题又长出了哪些新问题</span></h2>
+    <p class="note"><span class="bi-en">A good answer opens the next question. That is the whole method.</span><span class="bi-zh">一个答案会生出下一个问题——方法就是这个。</span></p>
+    <table class="ledger">
+      <thead><tr><th><span class="in-en">Question</span><span class="in-zh">新问题</span></th><th><span class="in-en">One line</span><span class="in-zh">一句话</span></th><th></th></tr></thead>
+      <tbody>
+        <tr><td>缓存和数据库怎么保持一致？</td><td>Cache Aside：写完删缓存，500 毫秒后再删一次。</td><td><span class="todoq">待写</span></td></tr>
+        <tr><td>穿透和击穿到底差在哪？</td><td>穿透查的是不存在的数据；击穿是一个热 key 过期被同时重建。</td><td><span class="todoq">待写</span></td></tr>
+        <tr><td>Redis 挂了怎么办？</td><td>本地缓存 + 熔断限流，只读页降级。</td><td><span class="todoq">待写</span></td></tr>
+        <tr><td>热 key 打到一个分片怎么办？</td><td>本地缓存，再把 key 加随机后缀打散。</td><td><span class="todoq">待写</span></td></tr>
+        <tr><td>发布后要不要预热？</td><td>要，启动加载 Top N，否则第一分钟就是雪崩。</td><td><span class="todoq">待写</span></td></tr>
+        <tr><td>缓的是页面还是对象？</td><td>对象；整页缓存一改就失效。</td><td><span class="todoq">待写</span></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <p class="log-tip"><a href="pay-callback.html"><span class="in-en">← Question 2: payment callback</span><span class="in-zh">← 第 2 题：支付回调</span></a></p>
+</main>
+
+<footer>
+  <div class="f-left"><span class="in-en">Written for learning English · Wang Tianyu</span><span class="in-zh">为学英语而写 · 王天宇</span></div>
+  <div class="f-right"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a><span class="sep">·</span><a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a></div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

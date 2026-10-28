@@ -6,6 +6,7 @@ from _content_a import INDEX, L1, L2, L3, L4
 from _content_b import L5, L6, L7, QUESTION, ABOUT, GLOSSARY
 from _content_a import SPINE
 from _content_q2 import QUESTION2, QINDEX
+from _content_q3 import QUESTION3
 from _content_speak import SPEAK
 from _content_dir import QLIST, DERIVED, LESSONS, TOOLS
 from _answers import ANSWERS, INDEX_QA_HEAD, INDEX_QA
@@ -213,6 +214,7 @@ def page_tail(page, with_tools=True):
 
 R.page(QUESTION["path"], QUESTION, on="q", tail_blocks=page_tail(QUESTION, with_tools=True))
 R.page(QUESTION2["path"], QUESTION2, on="q", tail_blocks=page_tail(QUESTION2, with_tools=False))
+R.page(QUESTION3["path"], QUESTION3, on="q", tail_blocks=page_tail(QUESTION3, with_tools=False))
 QINDEX["blocks"] = [("h2", "01", "All questions", "全部题目", [
     ("p", "Same list as the home page. Each page ends with the new questions it opened.",
      "和首页同一张表。每页最后会列出“这道题又长出了哪些新问题”。"),
