@@ -38,12 +38,12 @@
     <h1><span class="in-en">同一件事，换一种说法。</span><span class="in-zh">同一件事，换一种说法。</span></h1>
     <p class="lede"><span class="in-en">Left is how a junior says it. Right is how a senior says the same thing — and the reasons under each card are what makes it land. Read them out loud.</span><span class="in-zh">左边是菜鸟的说法，右边是老手的说法。每张卡下面的三条，是这句话为什么站得住。要出声念。</span></p>
     
-    <p class="tags"><span class="tag"><span class="in-en">12 entries</span><span class="in-zh">12 条</span></span><span class="tag"><span class="in-en">read aloud</span><span class="in-zh">都要念</span></span><span class="tag"><span class="in-en">interview-ready</span><span class="in-zh">背完就能说</span></span></p>
+    <p class="tags"><span class="tag"><span class="in-en">27 entries</span><span class="in-zh">27 条</span></span><span class="tag"><span class="in-en">15 from your CV</span><span class="in-zh">15 条来自你简历</span></span><span class="tag"><span class="in-en">read aloud</span><span class="in-zh">都要念</span></span></p>
     <button class="listen" data-listen type="button">🔊</button>
   </div>
 
   <section class="sec">
-    <h2><span class="num">01</span><span class="in-en">Phrasebook: same thing, two people</span><span class="in-zh">对照表：同一件事，两个人怎么说</span></h2>
+    <h2><span class="num">01</span><span class="in-en">General phrasing: same thing, two people</span><span class="in-zh">通用话术：同一件事，两个人怎么说</span></h2>
     <p class="note"><span class="bi-en">Do not memorize the whole sentence. Memorize the <b>three bold words</b> in each senior line — then say it in your own order.</span><span class="bi-zh">不要整句背。记住老手那段的<b>三个关键词</b>，然后用你自己的顺序讲出来。</span></p>
     <div class="say">
       <span class="sc"><b>01</b>支付回调重复 —— 你给的那段，我精修过</span>
@@ -203,14 +203,213 @@
     </div>
   </section>
   <section class="sec">
-    <h2><span class="num">02</span><span class="in-en">How to use this page</span><span class="in-zh">怎么用这一页</span></h2>
+    <h2><span class="num">02</span><span class="in-en">From your own CV: the 15 that will actually be asked</span><span class="in-zh">从你简历里挖出来的 15 条（最可能被问）</span></h2>
+    <p class="note"><span class="bi-en">Each card is a line on your CV. If you cannot say the senior version, that CV line is a liability.</span><span class="bi-zh">每张卡对应你简历上的一行。老手那句说不出来，那一行就是负债——面试官一追就露。</span></p>
+    <div class="say">
+      <span class="sc"><b>13</b>多平台订单（京东/苏宁/政采云）怎么统一</span>
+      <div class="vs">
+        <div><span class="who">菜鸟说</span><span class="said">「每个平台写一套接口，京东走京东的，苏宁走苏宁的，if else 判断一下。」</span></div>
+        <div><span class="who">老手说</span><span class="said senior">先抽象一个<b class="kw">统一订单模型</b>：渠道、渠道单号、买家、商品行、金额、状态。每个渠道一个<b class="kw">适配器</b>，只做三件事——拉单、映射到统一模型、回传结果；状态以我们的<b class="kw">状态机</b>为准，渠道状态只是映射输入。新增一个平台只加一个适配器，主流程一行不改。</span></div>
+      </div>
+      <div class="chips"><span>统一订单模型</span><span>适配器</span><span>状态机</span><span>渠道单号唯一键</span><span>主流程不改</span></div>
+      <ul class="whylist">
+        <li>先说<b>模型</b>再说模式名，面试官立刻知道你想过扩展。</li>
+        <li>「只做三件事」是<b>边界感</b>：适配器不许碰业务规则。</li>
+        <li>「主流程一行不改」是<b>开闭原则</b>的实际收益，比背概念有说服力。</li>
+      </ul>
+    </div>
+    <div class="say">
+      <span class="sc"><b>14</b>50 万条政采云数据怎么爬</span>
+      <div class="vs">
+        <div><span class="who">菜鸟说</span><span class="said">「用 WebMagic 爬的，爬完存数据库，每天跑一次。」</span></div>
+        <div><span class="who">老手说</span><span class="said senior">按公告分类做分页种子，XXL-Job <b class="kw">分片广播</b>把任务拆到多台执行器，每片自己<b class="kw">限速</b>，避免把对方站点打挂。入库按公告号<b class="kw">唯一键 upsert</b>，重复爬到不会多一行；单条失败进重试队列，第二天从上次的页码继续，不用从头再来。</span></div>
+      </div>
+      <div class="chips"><span>分片广播</span><span>限速</span><span>唯一键 upsert</span><span>失败重试</span><span>断点续跑</span></div>
+      <ul class="whylist">
+        <li>先讲<b>怎么拆开跑</b>（分片），再讲怎么不重复（upsert）。</li>
+        <li>限速这句是在<b>替对方考虑</b>，做过生产的人才这么说。</li>
+        <li>断点续跑讲的是<b>可靠性</b>，比「爬得多快」值钱。</li>
+      </ul>
+    </div>
+    <div class="say">
+      <span class="sc"><b>15</b>微信 Native 支付整条链路</span>
+      <div class="vs">
+        <div><span class="who">菜鸟说</span><span class="said">「调微信支付接口，成功了就发货。」</span></div>
+        <div><span class="who">老手说</span><span class="said senior">下单先落本地 PENDING 订单和唯一订单号，调统一下单拿 <b class="kw">code_url</b> 给前端出二维码。回调<b class="kw">验签</b>后三步：<b class="kw">幂等表</b>拦重复、<b class="kw">状态 CAS</b> 改 PAID、扣库存发货。最后再挂一个对账任务拉账单兜底，回调丢了也能补回来。</span></div>
+      </div>
+      <div class="chips"><span>验签</span><span>幂等表</span><span>状态 CAS</span><span>对账兜底</span><span>code_url</span></div>
+      <ul class="whylist">
+        <li>按<b>时间顺序</b>讲链路，听完就知道你亲手做过。</li>
+        <li>主动答「回调丢了怎么办」——这是<b>生产经验</b>的分界线。</li>
+        <li>对账是加分项，多数人只讲到回调就停了。</li>
+      </ul>
+    </div>
+    <div class="say">
+      <span class="sc"><b>16</b>多层级数据权限（集团→区域→站点）</span>
+      <div class="vs">
+        <div><span class="who">菜鸟说</span><span class="said">「每个接口里判断当前用户是什么角色，再拼 where 条件。」</span></div>
+        <div><span class="who">老手说</span><span class="said senior">用 HandlerInterceptor 加<b class="kw">自定义注解</b>：注解上标这个接口管哪张表、哪个字段，<b class="kw">拦截器</b>解析当前用户的<b class="kw">组织路径</b>，统一拼成 where 条件注入到 SQL 里。业务代码一行权限判断都不写，新增接口只要加个注解。</span></div>
+      </div>
+      <div class="chips"><span>自定义注解</span><span>拦截器</span><span>组织路径</span><span>统一注入</span><span>零侵入</span></div>
+      <ul class="whylist">
+        <li>讲<b>统一出口</b>而不是「到处判断」，这是架构意识。</li>
+        <li>零侵入意味着<b>不会漏</b>，漏一个接口就是数据事故。</li>
+        <li>可以顺势延伸到行级权限、多租户，把话题带上你的主场。</li>
+      </ul>
+    </div>
+    <div class="say">
+      <span class="sc"><b>17</b>列表接口 P95 从 800ms 降到 240ms</span>
+      <div class="vs">
+        <div><span class="who">菜鸟说</span><span class="said">「加了 Redis 缓存，快了很多。」</span></div>
+        <div><span class="who">老手说</span><span class="said senior">分两半看：读的一半是热点数据进 Redis，<b class="kw">命中率 92%</b>，数据库只承接 8% 的流量；写的一半是慢 SQL 治理，<b class="kw">N+1</b> 合成一次 join、补<b class="kw">覆盖索引</b>。两个瓶颈<b class="kw">分开治</b>，<b class="kw">P95</b> 从 800 降到 240。</span></div>
+      </div>
+      <div class="chips"><span>命中率 92%</span><span>P95</span><span>N+1</span><span>覆盖索引</span><span>分开治</span></div>
+      <ul class="whylist">
+        <li>数字带<b>口径</b>：P95、命中率，不说「快了好几倍」。</li>
+        <li>主动拆成<b>读和写</b>两半，说明你不是只会上缓存。</li>
+        <li>不把功劳全给缓存——面试官最烦「加了 Redis 就快了」。</li>
+      </ul>
+    </div>
+    <div class="say">
+      <span class="sc"><b>18</b>Redisson 分布式锁到底锁住了什么</span>
+      <div class="vs">
+        <div><span class="who">菜鸟说</span><span class="said">「加个分布式锁，就不会重复扣库存了。」</span></div>
+        <div><span class="who">老手说</span><span class="said senior">锁只包<b class="kw">临界区</b>：读库存、判断、扣减、写回，几毫秒的数据库操作。key 用业务维度 lock:stock:{skuId}，不是订单号。持锁进程挂了靠 <b class="kw">watchdog</b> 停止续租、租约自然过期。所以锁是降冲突，最终正确性还是靠唯一索引和状态 <b class="kw">CAS 兜底</b>。</span></div>
+      </div>
+      <div class="chips"><span>临界区</span><span>业务维度 key</span><span>watchdog</span><span>锁不是最终保障</span><span>CAS 兜底</span></div>
+      <ul class="whylist">
+        <li>先划<b>边界</b>（只包几毫秒），再说 key 设计。</li>
+        <li>watchdog 要能说出<b>它续的是租约</b>，不是锁本身。</li>
+        <li>承认锁会失效、要靠数据库兜底，这是<b>成熟度</b>。</li>
+      </ul>
+    </div>
+    <div class="say">
+      <span class="sc"><b>19</b>百万级报表 3 秒内返回（Oracle）</span>
+      <div class="vs">
+        <div><span class="who">菜鸟说</span><span class="said">「用了 Oracle 存储过程，比 Java 里查快。」</span></div>
+        <div><span class="who">老手说</span><span class="said senior">原来是 Java 里多次查询再内存聚合，改成一次存储过程把聚合<b class="kw">下推</b>到库内，走<b class="kw">分区裁剪</b>加<b class="kw">覆盖索引</b>。再把报表拆成「当日增量 + 历史汇总」，常态只算增量。3 秒是 <b class="kw">P95</b>，不是平均值。</span></div>
+      </div>
+      <div class="chips"><span>下推</span><span>分区裁剪</span><span>覆盖索引</span><span>增量+汇总</span><span>P95</span></div>
+      <ul class="whylist">
+        <li>讲清<b>为什么快</b>（下推 + 裁剪），不是「存储过程就是快」。</li>
+        <li>增量 + 汇总的思路可以复用到任何报表，<b>可迁移</b>。</li>
+        <li>分清 P95 和平均值，一眼看出你真看过监控。</li>
+      </ul>
+    </div>
+    <div class="say">
+      <span class="sc"><b>20</b>模板化表单引擎怎么设计</span>
+      <div class="vs">
+        <div><span class="who">菜鸟说</span><span class="said">「每种表单写一个页面，改需求就改代码。」</span></div>
+        <div><span class="who">老手说</span><span class="said senior">表单结构存成 JSON：字段类型、校验、字典、布局；前端按 JSON 渲染，后端按 JSON 校验并落成「业务主表 + key-value 明细」。新增业务类型只配数据，不改代码。代价是查询要做<b class="kw">行转列</b>，我们用宽表加定时<b class="kw">物化</b>解决。</span></div>
+      </div>
+      <div class="chips"><span>JSON 元数据</span><span>配置驱动</span><span>业务主表+明细</span><span>行转列</span><span>物化</span></div>
+      <ul class="whylist">
+        <li>一句话讲清<b>配置驱动</b>：改数据不改代码。</li>
+        <li>主动说<b>代价</b>（行转列、物化），这是真做过的标志。</li>
+        <li>能顺带说出「哪些场景不适合」，可信度再上一层。</li>
+      </ul>
+    </div>
+    <div class="say">
+      <span class="sc"><b>21</b>Netty 撑 300+ 台售货机长连接</span>
+      <div class="vs">
+        <div><span class="who">菜鸟说</span><span class="said">「用 Netty 连设备，收数据存库。」</span></div>
+        <div><span class="who">老手说</span><span class="said senior">一条 TCP 长连接对应一台机器，编解码器处理<b class="kw">粘包拆包</b>——长度字段加魔数。<b class="kw">心跳</b> 30 秒，两个周期没回就判离线并告警；断线由设备侧重连，服务端用<b class="kw">会话表</b>恢复。指令下发查 Map<设备号, Channel>，写失败降级成待办队列，不丢指令。</span></div>
+      </div>
+      <div class="chips"><span>粘包拆包</span><span>心跳</span><span>会话表</span><span>断线重连</span><span>降级为待办</span></div>
+      <ul class="whylist">
+        <li>粘包拆包是<b>必问点</b>，主动说出来面试官就不追了。</li>
+        <li>心跳 + 会话表讲的是<b>在线状态管理</b>，不是「连上了就行」。</li>
+        <li>写失败降级成待办，说明你考虑过<b>指令不能丢</b>。</li>
+      </ul>
+    </div>
+    <div class="say">
+      <span class="sc"><b>22</b>UDP 组播收设备状态 + 链路智能切换</span>
+      <div class="vs">
+        <div><span class="who">菜鸟说</span><span class="said">「用 UDP 收设备状态，收到就存库。」</span></div>
+        <div><span class="who">老手说</span><span class="said senior">设备状态是广播型数据，一份数据发给一组接收者，所以用<b class="kw">组播</b>而不是点对点，50 台设备只发一次。允许丢包——下一轮状态就覆盖了，所以不上 TCP 重传。链路切换是<b class="kw">打分制</b>：信号质量、带宽利用率、误码率加权，超过阈值才切，避免来回抖。</span></div>
+      </div>
+      <div class="chips"><span>组播</span><span>容忍丢包</span><span>打分制</span><span>加权阈值</span><span>防抖</span></div>
+      <ul class="whylist">
+        <li>先解释<b>为什么是组播</b>，而不是先说技术名。</li>
+        <li>讲清「为什么可以不管丢包」，比背 UDP 特性有说服力。</li>
+        <li>打分制 + 阈值防抖，是<b>工程判断</b>，不是教科书答案。</li>
+      </ul>
+    </div>
+    <div class="say">
+      <span class="sc"><b>23</b>热搜榜怎么实时算（Redis 有序集合）</span>
+      <div class="vs">
+        <div><span class="who">菜鸟说</span><span class="said">「用 Redis 存热搜，定时刷新一下。」</span></div>
+        <div><span class="who">老手说</span><span class="said senior">阅读、评论、转发各给<b class="kw">权重</b>，分钟级增量累加到有序集合的 score；榜单直接 <b class="kw">ZREVRANGE</b> 取 Top N。过期靠<b class="kw">分片 key</b>，每小时一个，旧的分片自然淘汰，不用扫全量。热度做<b class="kw">指数衰减</b>，避免老新闻永远挂在榜上。</span></div>
+      </div>
+      <div class="chips"><span>权重</span><span>ZSet 增量</span><span>ZREVRANGE</span><span>分片 key</span><span>指数衰减</span></div>
+      <ul class="whylist">
+        <li>权重 + 增量是<b>算法层</b>，ZREVRANGE 是<b>实现层</b>，层次清楚。</li>
+        <li>分片 key 解决过期，说明你算过<b>内存和淘汰</b>的账。</li>
+        <li>指数衰减一句话，就把「老新闻霸榜」的坑补上了。</li>
+      </ul>
+    </div>
+    <div class="say">
+      <span class="sc"><b>24</b>基于若依二次开发，怎么讲不显low</span>
+      <div class="vs">
+        <div><span class="who">菜鸟说</span><span class="said">「基于若依改的，其实没什么技术含量。」</span></div>
+        <div><span class="who">老手说</span><span class="said senior">框架给的是<b class="kw">骨架</b>：权限、字典、代码生成。我们在上面做了三件事：<b class="kw">认证链</b>改成多端统一（JWT + 拦截器）、数据权限做成注解驱动的行级过滤、供应商侧独立出准入与结算域。骨架省掉 60% 的样板代码，剩下的全是<b class="kw">业务域建模</b>。</span></div>
+      </div>
+      <div class="chips"><span>骨架</span><span>业务域建模</span><span>认证链</span><span>注解驱动行级</span><span>省 60% 样板</span></div>
+      <ul class="whylist">
+        <li>先<b>承认框架的价值</b>，再讲你加的东西，姿态稳。</li>
+        <li>「剩下的全是业务域建模」把话题拉回你的强项。</li>
+        <li>别贬低自己用过的框架，面试官会怀疑你<b>看不起业务</b>。</li>
+      </ul>
+    </div>
+    <div class="say">
+      <span class="sc"><b>25</b>十秒自我介绍（十年经验）</span>
+      <div class="vs">
+        <div><span class="who">菜鸟说</span><span class="said">「我有十年经验，做过很多项目，什么都能干。」</span></div>
+        <div><span class="who">老手说</span><span class="said senior">我做了十年 Java，一直做 <b class="kw">B 端</b>：订单与<b class="kw">支付链路</b>、燃气采购的资源与<b class="kw">权限</b>、设备侧长连接监控。最近两年在订单系统上把日单量从 3000 做到 7500，支付链路做到可回调、<b class="kw">可对账</b>。这套东西换到你们的业务里，基本能直接用。</span></div>
+      </div>
+      <div class="chips"><span>B 端</span><span>支付链路</span><span>权限</span><span>可对账</span><span>直接可用</span></div>
+      <ul class="whylist">
+        <li>先说<b>领域</b>再说年限，十年是背景不是卖点。</li>
+        <li>一个<b>数字</b>胜过十个形容词（3000 → 7500）。</li>
+        <li>结尾落到「对你们能直接用」，把自我介绍变成<b>解决方案</b>。</li>
+      </ul>
+    </div>
+    <div class="say">
+      <span class="sc"><b>26</b>空档期 / 为什么离职</span>
+      <div class="vs">
+        <div><span class="who">菜鸟说</span><span class="said">「上一家不干了，休息了一阵。」</span></div>
+        <div><span class="who">老手说</span><span class="said senior">上一段项目今年 8 月收尾，我离职后两个月没闲着：把支付幂等、订单状态机、缓存一致性这几块重新梳理了一遍，也写了小工具做验证。现在找的是能<b class="kw">长期</b>做的 B 端业务，不想再频繁换。</span></div>
+      </div>
+      <div class="chips"><span>项目收尾</span><span>主动补齐</span><span>可验证</span><span>长期</span></div>
+      <ul class="whylist">
+        <li>给空档一个<b>具体内容</b>，而不是「休息」。</li>
+        <li>「可验证」很关键——说学了什么，最好有东西能看。</li>
+        <li>结尾说<b>稳定性</b>，正面回应招聘方最担心的事。</li>
+      </ul>
+    </div>
+    <div class="say">
+      <span class="sc"><b>27</b>你最大的缺点是什么</span>
+      <div class="vs">
+        <div><span class="who">菜鸟说</span><span class="said">「我比较追求完美，做事太认真。」</span></div>
+        <div><span class="who">老手说</span><span class="said senior">我容易一头扎进实现，需求边界没确认就开工，有一次因此返工。现在开工前先写三行：谁用、什么场景、验收标准是什么，跟业务对一遍再动手。</span></div>
+      </div>
+      <div class="chips"><span>真实事例</span><span>根因</span><span>机制化改进</span></div>
+      <ul class="whylist">
+        <li>「追求完美」是<b>套话</b>，面试官听腻了。</li>
+        <li>给一个<b>真实但不致命</b>的缺点，再给已落地的改法。</li>
+        <li>重点在「现在怎么做」，展示<b>复盘能力</b>。</li>
+      </ul>
+    </div>
+  </section>
+  <section class="sec">
+    <h2><span class="num">03</span><span class="in-en">How to use this page</span><span class="in-zh">怎么用这一页</span></h2>
     <ol class="steps">
       <li><span class="bi-en">Read the left column first — that is probably what you would have said.</span><span class="bi-zh">先读左栏——那大概就是你会说的话。</span></li>
       <li><span class="bi-en">Read the right column out loud, twice. The words must come out of your mouth.</span><span class="bi-zh">右栏出声念两遍。词必须从你嘴里出来。</span></li>
       <li><span class="bi-en">Cover the right column and retell it using only the keyword chips.</span><span class="bi-zh">盖住右栏，只看下面的关键词，用自己的话重讲一遍。</span></li>
       <li><span class="bi-en">If a keyword means nothing to you, that is the next lesson to read.</span><span class="bi-zh">哪个关键词看不懂，那就是你下一节该去看的内容。</span></li>
     </ol>
-    <p class="note"><span class="bi-en">Twelve cards, three minutes each — one evening. After that, every answer sounds different.</span><span class="bi-zh">十二张卡，一张三分钟，一个晚上。之后你所有回答听起来都不一样。</span></p>
+    <p class="note"><span class="bi-en">Start with the 15 CV cards — those are the ones you will actually be asked. Three minutes each, one evening.</span><span class="bi-zh">先念那 15 张简历卡：那些才是你真会被问的。一张三分钟，一晚上能过完。</span></p>
   </section>
 
   <p class="log-tip"><a href="questions/index.html"><span class="in-en">Go use it on a question →</span><span class="in-zh">拿一道题去用 →</span></a></p>

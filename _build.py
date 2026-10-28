@@ -158,19 +158,26 @@ SPEAK_PAGE = {
     "lede": ("Left is how a junior says it. Right is how a senior says the same thing — "
              "and the reasons under each card are what makes it land. Read them out loud.",
              "左边是菜鸟的说法，右边是老手的说法。每张卡下面的三条，是这句话为什么站得住。要出声念。"),
-    "tags": [("12 entries", "12 条"), ("read aloud", "都要念"), ("interview-ready", "背完就能说")],
+    "tags": [("27 entries", "27 条"), ("15 from your CV", "15 条来自你简历"), ("read aloud", "都要念")],
     "on": "s",
     "plain": True,
     "blocks": [
-        ("h2", "01", "Phrasebook: same thing, two people",
-         "对照表：同一件事，两个人怎么说",
+        ("h2", "01", "General phrasing: same thing, two people",
+         "通用话术：同一件事，两个人怎么说",
          [
              ("note", "Do not memorize the whole sentence. Memorize the <b>three bold words</b> in each senior line — "
                       "then say it in your own order.",
               "不要整句背。记住老手那段的<b>三个关键词</b>，然后用你自己的顺序讲出来。"),
-             ("html", "__SPEAK__"),
+             ("html", "__SPEAK_OLD__"),
          ]),
-        ("h2", "02", "How to use this page", "怎么用这一页",
+        ("h2", "02", "From your own CV: the 15 that will actually be asked",
+         "从你简历里挖出来的 15 条（最可能被问）",
+         [
+             ("note", "Each card is a line on your CV. If you cannot say the senior version, that CV line is a liability.",
+              "每张卡对应你简历上的一行。老手那句说不出来，那一行就是负债——面试官一追就露。"),
+             ("html", "__SPEAK_NEW__"),
+         ]),
+        ("h2", "03", "How to use this page", "怎么用这一页",
          [
              ("ol", [
                  ("Read the left column first — that is probably what you would have said.",
@@ -182,8 +189,8 @@ SPEAK_PAGE = {
                  ("If a keyword means nothing to you, that is the next lesson to read.",
                   "哪个关键词看不懂，那就是你下一节该去看的内容。"),
              ]),
-             ("note", "Twelve cards, three minutes each — one evening. After that, every answer sounds different.",
-              "十二张卡，一张三分钟，一个晚上。之后你所有回答听起来都不一样。"),
+             ("note", "Start with the 15 CV cards — those are the ones you will actually be asked. Three minutes each, one evening.",
+              "先念那 15 张简历卡：那些才是你真会被问的。一张三分钟，一晚上能过完。"),
          ]),
     ],
     "words": [],
@@ -227,11 +234,20 @@ QINDEX["blocks"] = [("h2", "01", "All questions", "全部题目", [
      "灰色的是还没写的。"),
 ])]
 R.page(QINDEX["path"], QINDEX, on="q")
-_speak = speak_html(SPEAK)
+from _speak_more import MORE as SPEAK_MORE
+_speak_old = speak_html(SPEAK)
+_speak_new = speak_html(SPEAK_MORE)
 _sb = []
 for b in SPEAK_PAGE["blocks"]:
     if b[0] == "h2":
-        body = [("html", _speak) if (x[0] == "html" and x[1] == "__SPEAK__") else x for x in b[4]]
+        body = []
+        for x in b[4]:
+            if x[0] == "html" and x[1] == "__SPEAK_OLD__":
+                body.append(("html", _speak_old))
+            elif x[0] == "html" and x[1] == "__SPEAK_NEW__":
+                body.append(("html", _speak_new))
+            else:
+                body.append(x)
         b = (b[0], b[1], b[2], b[3], body)
     _sb.append(b)
 SPEAK_PAGE["blocks"] = _sb
