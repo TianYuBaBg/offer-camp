@@ -43,13 +43,13 @@
 
   <section class="sec">
     <h2><span class="num">01</span><span class="in-en">Why the query was slow in the first place</span><span class="in-zh">先说为什么会慢</span></h2>
-    <p><span class="bi-en">A list page does not run one query. It runs <b>one query per row</b>, then a count, then a dictionary lookup — the same data again and again, on every page view.</span><span class="bi-zh">一个列表页不是一条 SQL。它是<b>一行一条查询</b>，再加一个 count，再加几次字典查询——同一批数据，每次刷新都重算一遍。</span></p>
+    <p><span class="bi-en">A list page does not run one query. It runs <b>one query per row</b>, then a count, then a dictionary lookup — the same data again and again, on every page view.</span><span class="bi-zh">一个列表页不是一条 <span class="tm" data-t="SQL">SQL</span>。它是<b>一行一条查询</b>，再加一个 count，再加几次字典查询——同一批数据，每次刷新都重算一遍。</span></p>
     <ul>
       <li><span class="bi-en">Add a cache: the second read of the same page never reaches the database.</span><span class="bi-zh">加缓存：同一页第二次读，根本不到数据库。</span></li>
       <li><span class="bi-en">Hit rate 92% means only 8% of reads go through — that is the number to quote.</span><span class="bi-zh">命中率 92% 意味着只有 8% 的读穿透下去——这才是该报的数。</span></li>
-      <li><span class="bi-en">The other half of 800 → 240 is SQL: N+1 queries collapsed into one join, plus an index.</span><span class="bi-zh">800 降到 240 的另一半在 SQL：N+1 查询合成一次 join，再加索引。</span></li>
+      <li><span class="bi-en">The other half of 800 → 240 is <span class="tm" data-t="SQL">SQL</span>: N+1 queries collapsed into one join, plus an index.</span><span class="bi-zh">800 降到 240 的另一半在 SQL：N+1 查询合成一次 join，再加索引。</span></li>
     </ul>
-    <p class="note"><span class="bi-en">Say both halves. If you only say “I added Redis”, the interviewer will assume you cannot tell the cache apart from the query.</span><span class="bi-zh">两半都要说。只说“我加了 Redis”，面试官会认为你分不清缓存和查询。</span></p>
+    <p class="note"><span class="bi-en">Say both halves. If you only say “I added <span class="tm" data-t="Redis">Redis</span>”, the interviewer will assume you cannot tell the cache apart from the query.</span><span class="bi-zh">两半都要说。只说“我加了 <span class="tm" data-t="Redis">Redis</span>”，面试官会认为你分不清缓存和查询。</span></p>
   </section>
   <section class="sec">
     <h2><span class="num">02</span><span class="in-en">Three ways a cache leaks</span><span class="in-zh">三种漏法，一张表</span></h2>
@@ -57,9 +57,9 @@
     <table class="ledger">
       <thead><tr><th><span class="in-en">Leak</span><span class="in-zh">漏的是什么</span></th><th><span class="in-en">What happens</span><span class="in-zh">发生什么</span></th><th><span class="in-en">Fix</span><span class="in-zh">怎么治</span></th></tr></thead>
       <tbody>
-        <tr><td><span class="bi-en">Penetration</span><span class="bi-zh">穿透</span></td><td><span class="bi-en">A key that exists nowhere: cache misses, the database misses too, and every request repeats it.</span><span class="bi-zh">查一个根本不存在的数据：缓存没有，数据库也没有，每次请求都空跑一遍。</span></td><td><span class="bi-en">Cache the empty result (`null` with a short TTL) + a bloom filter in front.</span><span class="bi-zh">空结果也缓存（存 null，短 TTL）+ 前面加布隆过滤器。</span></td></tr>
-        <tr><td><span class="bi-en">Breakdown</span><span class="bi-zh">击穿</span></td><td><span class="bi-en">One hot key expires, and a thousand threads rebuild it at once.</span><span class="bi-zh">某个热点 key 刚好过期，一瞬间上千个线程同时回源重建。</span></td><td><span class="bi-en">Let one thread rebuild (Redisson `tryLock`), or keep the key logically expired and refresh in the background.</span><span class="bi-zh">只让一个线程重建（Redisson tryLock），或者逻辑过期＋后台异步刷新。</span></td></tr>
-        <tr><td><span class="bi-en">Avalanche</span><span class="bi-zh">雪崩</span></td><td><span class="bi-en">Many keys expire at the same second, or Redis itself goes down.</span><span class="bi-zh">大批 key 在同一秒过期，或者 Redis 整个挂了。</span></td><td><span class="bi-en">Randomise the TTL; add a local (Caffeine) layer; add a circuit breaker so the database is not flooded either.</span><span class="bi-zh">过期时间加随机；加一层本地缓存（Caffeine）；加限流熔断，别让数据库跟着被冲垮。</span></td></tr>
+        <tr><td><span class="bi-en">Penetration</span><span class="bi-zh">穿透</span></td><td><span class="bi-en">A key that exists nowhere: cache misses, the database misses too, and every request repeats it.</span><span class="bi-zh">查一个根本不存在的数据：缓存没有，数据库也没有，每次请求都空跑一遍。</span></td><td><span class="bi-en">Cache the empty result (`null` with a short <span class="tm" data-t="TTL">TTL</span>) + a bloom filter in front.</span><span class="bi-zh">空结果也缓存（存 null，短 <span class="tm" data-t="TTL">TTL</span>）+ 前面加<span class="tm" data-t="布隆过滤器">布隆过滤器</span>。</span></td></tr>
+        <tr><td><span class="bi-en">Breakdown</span><span class="bi-zh">击穿</span></td><td><span class="bi-en">One hot key expires, and a thousand threads rebuild it at once.</span><span class="bi-zh">某个热点 key 刚好过期，一瞬间上千个线程同时<span class="tm" data-t="回源">回源</span>重建。</span></td><td><span class="bi-en">Let one thread rebuild (<span class="tm" data-t="Redisson">Redisson</span> `tryLock`), or keep the key logically expired and refresh in the background.</span><span class="bi-zh">只让一个线程重建（<span class="tm" data-t="Redisson">Redisson</span> tryLock），或者逻辑过期＋后台异步刷新。</span></td></tr>
+        <tr><td><span class="bi-en">Avalanche</span><span class="bi-zh">雪崩</span></td><td><span class="bi-en">Many keys expire at the same second, or Redis itself goes down.</span><span class="bi-zh">大批 key 在同一秒过期，或者 Redis 整个挂了。</span></td><td><span class="bi-en">Randomise the TTL; add a local (Caffeine) layer; add a circuit breaker so the database is not flooded either.</span><span class="bi-zh">过期时间加随机；加一层本地缓存（Caffeine）；加<span class="tm" data-t="限流">限流</span><span class="tm" data-t="熔断">熔断</span>，别让数据库跟着被冲垮。</span></td></tr>
       </tbody>
     </table>
     <p class="note"><span class="bi-en">The one-word answer that lands: penetration is <b>fake data</b>, breakdown is <b>one hot key</b>, avalanche is <b>many keys at once</b>.</span><span class="bi-zh">一句话记住：穿透是<b>假数据</b>，击穿是<b>一个热 key</b>，雪崩是<b>一大批 key</b>。</span></p>
@@ -91,9 +91,9 @@ delay(500ms); redis.del(k)                       -- ★ 再删一次</code></pre
     <table class="ledger">
       <thead><tr><th><span class="in-en">Change</span><span class="in-zh">改了什么</span></th><th><span class="in-en">Effect</span><span class="in-zh">效果</span></th></tr></thead>
       <tbody>
-        <tr><td><span class="bi-en">Hot list into Redis, 92% hit rate, TTL 5 min + jitter</span><span class="bi-zh">热点列表进 Redis，命中率 92%，TTL 5 分钟 + 随机</span></td><td><span class="bi-en">≈ 92% of reads never touch MySQL; the database goes from 1000 QPS to ~80.</span><span class="bi-zh">约 92% 的读不再碰 MySQL，数据库从 1000 QPS 降到 80 左右。</span></td></tr>
-        <tr><td><span class="bi-en">N+1 queries collapsed into one join + covering index</span><span class="bi-zh">N+1 查询合成一次 join + 覆盖索引</span></td><td><span class="bi-en">The 8% that still reach MySQL each got 3–5× cheaper.</span><span class="bi-zh">仍然打到 MySQL 的那 8%，单次便宜了 3–5 倍。</span></td></tr>
-        <tr><td><span class="bi-en">Connection pool raised, slow SQL removed</span><span class="bi-zh">连接池调大，慢 SQL 清掉</span></td><td><span class="bi-en">Tail latency drops most — P95 is exactly about the tail.</span><span class="bi-zh">尾延迟降得最明显——P95 说的就是尾部。</span></td></tr>
+        <tr><td><span class="bi-en">Hot list into Redis, 92% hit rate, TTL 5 min + jitter</span><span class="bi-zh">热点列表进 Redis，命中率 92%，TTL 5 分钟 + 随机</span></td><td><span class="bi-en">≈ 92% of reads never touch <span class="tm" data-t="MySQL">MySQL</span>; the database goes from 1000 <span class="tm" data-t="QPS">QPS</span> to ~80.</span><span class="bi-zh">约 92% 的读不再碰 <span class="tm" data-t="MySQL">MySQL</span>，数据库从 1000 <span class="tm" data-t="QPS">QPS</span> 降到 80 左右。</span></td></tr>
+        <tr><td><span class="bi-en">N+1 queries collapsed into one join + covering index</span><span class="bi-zh">N+1 查询合成一次 join + <span class="tm" data-t="覆盖索引">覆盖索引</span></span></td><td><span class="bi-en">The 8% that still reach MySQL each got 3–5× cheaper.</span><span class="bi-zh">仍然打到 MySQL 的那 8%，单次便宜了 3–5 倍。</span></td></tr>
+        <tr><td><span class="bi-en">Connection pool raised, slow SQL removed</span><span class="bi-zh">连接池调大，慢 SQL 清掉</span></td><td><span class="bi-en">Tail latency drops most — <span class="tm" data-t="P95">P95</span> is exactly about the tail.</span><span class="bi-zh">尾延迟降得最明显——<span class="tm" data-t="P95">P95</span> 说的就是尾部。</span></td></tr>
       </tbody>
     </table>
     <p class="note"><span class="bi-en">If you only ever quote “70% faster” without a baseline, it sounds invented. 800 → 240 with the mechanism behind it sounds measured.</span><span class="bi-zh">只报“快了 70%”像编的；说出 800 → 240 加上机制，才像量过。</span></p>
@@ -103,17 +103,17 @@ delay(500ms); redis.del(k)                       -- ★ 再删一次</code></pre
     <table class="ledger">
       <thead><tr><th><span class="in-en">Follow-up</span><span class="in-zh">追问</span></th><th><span class="in-en">One-line answer</span><span class="in-zh">一句话答案</span></th></tr></thead>
       <tbody>
-        <tr><td><span class="bi-en">What if Redis is down?</span><span class="bi-zh">Redis 挂了怎么办？</span></td><td><span class="bi-en">Local cache + circuit breaker; degrade read-only pages, do not let it hit the database.</span><span class="bi-zh">本地缓存 + 熔断限流；只读页降级，别全冲到数据库。</span></td></tr>
+        <tr><td><span class="bi-en">What if Redis is down?</span><span class="bi-zh">Redis 挂了怎么办？</span></td><td><span class="bi-en">Local cache + circuit breaker; degrade read-only pages, do not let it hit the database.</span><span class="bi-zh">本地缓存 + 熔断限流；只读页<span class="tm" data-t="降级">降级</span>，别全冲到数据库。</span></td></tr>
         <tr><td><span class="bi-en">Hot key on one shard?</span><span class="bi-zh">热 key 打到一个分片上怎么办？</span></td><td><span class="bi-en">Local cache first, then split the key with a random suffix, or use a read replica.</span><span class="bi-zh">先本地缓存，再把 key 加随机后缀打散，或者上只读副本。</span></td></tr>
         <tr><td><span class="bi-en">Warm up the cache after a deploy?</span><span class="bi-zh">发布后要预热吗？</span></td><td><span class="bi-en">Yes: top-N keys loaded at startup, otherwise the first minute is a stampede.</span><span class="bi-zh">要：启动时把 Top N 的热 key 预加载，否则第一分钟就是雪崩。</span></td></tr>
-        <tr><td><span class="bi-en">Cache the page or the object?</span><span class="bi-zh">缓存页面还是缓存对象？</span></td><td><span class="bi-en">Objects. A page cache is invalidated by any change and gets stale fast.</span><span class="bi-zh">对象。整页缓存一改就失效，很快就是脏数据。</span></td></tr>
+        <tr><td><span class="bi-en">Cache the page or the object?</span><span class="bi-zh">缓存页面还是缓存对象？</span></td><td><span class="bi-en">Objects. A page cache is invalidated by any change and gets stale fast.</span><span class="bi-zh">对象。整页缓存一改就失效，很快就是<span class="tm" data-t="脏数据">脏数据</span>。</span></td></tr>
       </tbody>
     </table>
   </section>
   <section class="sec">
     <h2><span class="num">06</span><span class="in-en">60-second script</span><span class="in-zh">60 秒照念稿</span></h2>
     <blockquote class="read"><span class="lbl"><span class="in-en">Read this out loud</span><span class="in-zh">照这段说，60 秒</span></span>
-      <p><span class="bi-en">We put the hot list into Redis with a 5-minute TTL plus random jitter, and the hit rate settled around 92%, so MySQL only sees about 8% of the reads. On top of that we collapsed the N+1 queries into one join with a covering index, so the remaining 8% got cheaper too. That took the list API's P95 from ~800 ms to ~240 ms.
+      <p><span class="bi-en">We put the hot list into Redis with a 5-minute TTL plus random jitter, and the hit rate settled around 92%, so MySQL only sees about 8% of the reads. On top of that we collapsed the N+1 queries into one join with a covering index, so the remaining 8% got cheaper too. That took the list <span class="tm" data-t="API">API</span>'s P95 from ~800 ms to ~240 ms.
 
 The three failure modes have three fixes: penetration is fake data, so we cache the empty result and put a bloom filter in front; breakdown is one hot key, so only one thread rebuilds it under a Redisson lock; avalanche is many keys or a dead Redis, so TTLs are randomised, there is a local Caffeine layer, and the read path is circuit-broken.
 
@@ -230,6 +230,7 @@ For consistency we use Cache Aside: delete after writing, delete again after 500
   <div class="f-left"><span class="in-en">Written for learning English · Wang Tianyu</span><span class="in-zh">为学英语而写 · 王天宇</span></div>
   <div class="f-right"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a><span class="sep">·</span><a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a></div>
 </footer>
+<script src="../assets/terms.js"></script>
 <script src="../assets/app.js"></script>
 </body>
 </html>

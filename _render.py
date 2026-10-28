@@ -1,10 +1,29 @@
 # -*- coding: utf-8 -*-
 """渲染器：把 _content_a / _content_b 里的双语内容渲染成 HTML。"""
-import io, os, urllib.parse
+import io, os, json, urllib.parse
+
+import _annotate as T
 
 BASE = "https://tianyubabg.github.io/offer-camp/"
 
 CSS_EXTRA = """
+/* ===== 术语注解 ===== */
+.tm{border-bottom:1px dotted rgba(163,51,51,.5);cursor:help}
+.tm:hover{background:#F6E6DF}
+#pop{position:fixed;z-index:80;width:330px;max-width:calc(100vw - 32px);display:none;
+     background:#FBF7EC;border:1px solid #C9BEAA;border-radius:3px;padding:13px 15px;
+     box-shadow:0 12px 32px rgba(40,30,10,.16)}
+#pop .hd{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+#pop .k{font-family:var(--mono);font-size:15px;letter-spacing:.02em;color:var(--ink)}
+#pop .r{color:#A33;font-size:13.5px;letter-spacing:.04em}
+#pop .ipa{font-family:var(--mono);font-size:11px;color:#8a8378}
+#pop .zh{margin-top:9px;font-size:13px;line-height:1.75;color:var(--ink)}
+#pop .en{margin-top:7px;font-size:11.5px;line-height:1.6;color:#6b6459;font-family:var(--mono)}
+#pop .act{margin-top:11px;display:flex;gap:8px;flex-wrap:wrap}
+#pop .act a,#pop .act button{font-family:var(--mono);font-size:10px;letter-spacing:.08em;
+     border:1px solid #C9BEAA;background:transparent;color:var(--ink);padding:4px 8px;cursor:pointer;text-decoration:none}
+#pop .act a:hover,#pop .act button:hover{border-color:#A33;color:#A33}
+
 /* ===== 语言切换 ===== */
 html[data-lang="zh"] .bi-en, html[data-lang="zh"] .in-en { display: none !important; }
 html[data-lang="en"] .bi-zh, html[data-lang="en"] .in-zh { display: none !important; }
@@ -337,6 +356,7 @@ __BODY__
   <div class="f-left"><span class="in-en">Written for learning English · Wang Tianyu</span><span class="in-zh">为学英语而写 · 王天宇</span></div>
   <div class="f-right"><a href="__HOME__"><span class="in-en">Home</span><span class="in-zh">首页</span></a><span class="sep">·</span><a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a></div>
 </footer>
+<script src="__TERMS__"></script>
 <script src="__JS__"></script>
 </body>
 </html>
@@ -452,7 +472,8 @@ def page(path, data, on="", tail_blocks=None):
         '<span class="tag"><span class="in-en">%s</span><span class="in-zh">%s</span></span>' % (e, z)
         for e, z in data["tags"])
 
-    body = render_blocks(data["blocks"])
+    T.reset()
+    body = T.annotate(render_blocks(data["blocks"]))
     if not data.get("plain"):
         body += """
   <section class="sec">
@@ -483,7 +504,7 @@ def page(path, data, on="", tail_blocks=None):
 
     subs = {
         "__TITLE__": data["title"][0], "__DESC__": data["title"][0],
-        "__CSS__": up + "assets/style.css", "__JS__": up + "assets/app.js",
+        "__CSS__": up + "assets/style.css", "__JS__": up + "assets/app.js", "__TERMS__": up + "assets/terms.js",
         "__HOME__": up + "index.html",
         "__QIDX__": up + "questions/index.html",
         "__BASICS__": up + "basics/array.html",
@@ -502,7 +523,8 @@ def page(path, data, on="", tail_blocks=None):
         "__ANSWERBOX__": ('<div class="answerbox"><b><span class="in-en">Short answer</span>'
                           '<span class="in-zh">先给答案</span></b>'
                           '<span class="bi-en">%s</span><span class="bi-zh">%s</span></div>'
-                          % (data["answer"][0], data["answer"][1])) if data.get("answer") else "",
+                          % (T.annotate(data["answer"][0]), T.annotate(data["answer"][1])))
+                         if data.get("answer") else "",
     }
     html = PAGE
     for k, v in subs.items():
@@ -517,5 +539,103 @@ def write_assets():
     if "/* ===== 语言切换 ===== */" in css:
         css = css[:css.index("/* ===== 语言切换 ===== */")]
     io.open("assets/style.css", "w", encoding="utf-8").write(css.rstrip() + "\n" + CSS_EXTRA)
-    io.open("assets/app.js", "w", encoding="utf-8").write(JS)
+    io.open("assets/app.js", "w", encoding="utf-8").write(JS + JS_EXTRA)
+    from _terms import TERMS
+    payload = json.dumps({t["k"]: t for t in TERMS}, ensure_ascii=False, indent=0)
+    io.open("assets/terms.js", "w", encoding="utf-8").write(
+        "window.TERMS = " + payload + ";" + chr(10))
     print("assets updated")
+
+
+JS_EXTRA = r"""
+/* ===== 术语注解：点一下看谐音和含义 ===== */
+(function(){
+  var T = window.TERMS || {};
+  var pop = document.createElement('div');
+  pop.id = 'pop';
+  document.body.appendChild(pop);
+  var anchor = null;
+
+  function dictUrl(key){
+    var w = String(key).replace(/[^A-Za-z ]/g,'').trim() || key;
+    return 'https://forvo.com/search/' + encodeURIComponent(w) + '/';
+  }
+
+  function place(){
+    if(!anchor || pop.style.display !== 'block') return;
+    var r = anchor.getBoundingClientRect();
+    var vw = document.documentElement.clientWidth;
+    var vh = window.innerHeight;
+    var w = pop.offsetWidth || 330;
+    var h = pop.offsetHeight || 190;
+    var left = r.left;
+    var top = r.bottom + 8;
+    if(top + h > vh - 12) top = Math.max(12, r.top - h - 8);
+    if(left + w > vw - 16) left = vw - w - 16;
+    pop.style.top = Math.max(12, top) + 'px';
+    pop.style.left = Math.max(12, left) + 'px';
+  }
+
+  function build(k){
+    var d = T[k];
+    if(!d) return '';
+    var html = '<div class="hd"><span class="k">' + k + '</span>';
+    if(d.read) html += '<span class="r">' + d.read + '</span>';
+    if(d.ipa) html += '<span class="ipa">' + d.ipa + '</span>';
+    html += '</div>';
+    if(d.zh) html += '<div class="zh">' + d.zh + '</div>';
+    if(d.en) html += '<div class="en">' + d.en + '</div>';
+    html += '<div class="act">';
+    if(d.read) html += '<button type="button" data-say="' + k + '">🔊 读一遍</button>';
+    html += '<a href="' + dictUrl(k) + '" target="_blank" rel="noopener">▶ 真人发音</a>';
+    html += '</div>';
+    return html;
+  }
+
+  function open(el){
+    var k = el.getAttribute('data-t');
+    var html = build(k);
+    if(!html) return;
+    anchor = el;
+    pop.innerHTML = html;
+    pop.style.display = 'block';
+    place();
+    var btn = pop.querySelector('[data-say]');
+    if(btn) btn.onclick = function(){ say(k); };
+    if(document.fonts && document.fonts.ready) document.fonts.ready.then(place);
+    requestAnimationFrame(function(){ requestAnimationFrame(place); });
+  }
+
+  function say(text){
+    if(!('speechSynthesis' in window)) return;
+    speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US';
+    u.rate = .85;
+    speechSynthesis.speak(u);
+  }
+
+  function close(){ pop.style.display = 'none'; anchor = null; }
+
+  document.addEventListener('click', function(e){
+    var el = e.target.closest ? e.target.closest('.tm') : null;
+    if(el){ e.preventDefault(); open(el); return; }
+    if(e.target.closest && !e.target.closest('#pop')) close();
+  });
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape') close(); });
+  window.addEventListener('resize', close);
+  window.addEventListener('wheel', close, {passive:true});
+  window.addEventListener('touchmove', close, {passive:true});
+
+  function autoOpen(){
+    if(location.hash.indexOf('#t-') !== 0) return;
+    var key = decodeURIComponent(location.hash.slice(3));
+    var nodes = document.querySelectorAll('.tm[data-t="' + key + '"]');
+    for(var i = 0; i < nodes.length; i++){
+      if(nodes[i].getClientRects().length){ open(nodes[i]); return; }
+    }
+  }
+  if(document.readyState === 'complete') autoOpen();
+  else window.addEventListener('load', autoOpen);
+})();
+"""

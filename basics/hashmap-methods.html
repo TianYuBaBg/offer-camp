@@ -60,7 +60,7 @@
     <pre><code>// 没有就查数据库，再放进缓存（最常见的写法）
 User user = cache.computeIfAbsent(userId, id -> userMapper.selectById(id));</code></pre>
     <p><span class="bi-en">One line: read the cache, miss → query the database → write back. No null check, no two lookups.</span><span class="bi-zh">一行：读缓存，没命中——查库——写回。不用判空，也不用查两次。</span></p>
-    <p class="note"><span class="bi-en">In a real service add an expiry (Caffeine or Redis). computeIfAbsent keeps the map small, but it never forgets.</span><span class="bi-zh">真实服务里还要加过期（Caffeine 或 Redis）。computeIfAbsent 只是让它懒加载，但不会自己忘。</span></p>
+    <p class="note"><span class="bi-en">In a real service add an expiry (Caffeine or <span class="tm" data-t="Redis">Redis</span>). computeIfAbsent keeps the map small, but it never forgets.</span><span class="bi-zh">真实服务里还要加过期（Caffeine 或 <span class="tm" data-t="Redis">Redis</span>）。computeIfAbsent 只是让它懒加载，但不会自己忘。</span></p>
   </section>
   <section class="sec">
     <h2><span class="num">03</span><span class="in-en">Real code: counting</span><span class="in-zh">真实代码：计数</span></h2>
@@ -78,7 +78,7 @@ Map<Long,List<Order>> byUser = new HashMap<>();
 for (Order o : orders) {
     byUser.computeIfAbsent(o.getUserId(), k -> new ArrayList<>()).add(o);
 }</code></pre>
-    <p><span class="bi-en">Or with the stream API: <code>orders.stream().collect(Collectors.groupingBy(Order::getUserId))</code> — it does the same thing internally.</span><span class="bi-zh">也可以用 stream：<code>orders.stream().collect(Collectors.groupingBy(Order::getUserId))</code>，内部做的就是同一件事。</span></p>
+    <p><span class="bi-en">Or with the stream <span class="tm" data-t="API">API</span>: <code>orders.stream().collect(Collectors.groupingBy(Order::getUserId))</code> — it does the same thing internally.</span><span class="bi-zh">也可以用 stream：<code>orders.stream().collect(Collectors.groupingBy(Order::getUserId))</code>，内部做的就是同一件事。</span></p>
   </section>
   <section class="sec">
     <h2><span class="num">05</span><span class="in-en">Four things that bite</span><span class="in-zh">四个坑</span></h2>
@@ -153,6 +153,7 @@ for (Order o : orders) {
   <div class="f-left"><span class="in-en">Written for learning English · Wang Tianyu</span><span class="in-zh">为学英语而写 · 王天宇</span></div>
   <div class="f-right"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a><span class="sep">·</span><a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a></div>
 </footer>
+<script src="../assets/terms.js"></script>
 <script src="../assets/app.js"></script>
 </body>
 </html>

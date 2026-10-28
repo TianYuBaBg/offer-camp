@@ -105,3 +105,94 @@
     synth.speak(u);
   });
 })();
+
+/* ===== 术语注解：点一下看谐音和含义 ===== */
+(function(){
+  var T = window.TERMS || {};
+  var pop = document.createElement('div');
+  pop.id = 'pop';
+  document.body.appendChild(pop);
+  var anchor = null;
+
+  function dictUrl(key){
+    var w = String(key).replace(/[^A-Za-z ]/g,'').trim() || key;
+    return 'https://forvo.com/search/' + encodeURIComponent(w) + '/';
+  }
+
+  function place(){
+    if(!anchor || pop.style.display !== 'block') return;
+    var r = anchor.getBoundingClientRect();
+    var vw = document.documentElement.clientWidth;
+    var vh = window.innerHeight;
+    var w = pop.offsetWidth || 330;
+    var h = pop.offsetHeight || 190;
+    var left = r.left;
+    var top = r.bottom + 8;
+    if(top + h > vh - 12) top = Math.max(12, r.top - h - 8);
+    if(left + w > vw - 16) left = vw - w - 16;
+    pop.style.top = Math.max(12, top) + 'px';
+    pop.style.left = Math.max(12, left) + 'px';
+  }
+
+  function build(k){
+    var d = T[k];
+    if(!d) return '';
+    var html = '<div class="hd"><span class="k">' + k + '</span>';
+    if(d.read) html += '<span class="r">' + d.read + '</span>';
+    if(d.ipa) html += '<span class="ipa">' + d.ipa + '</span>';
+    html += '</div>';
+    if(d.zh) html += '<div class="zh">' + d.zh + '</div>';
+    if(d.en) html += '<div class="en">' + d.en + '</div>';
+    html += '<div class="act">';
+    if(d.read) html += '<button type="button" data-say="' + k + '">🔊 读一遍</button>';
+    html += '<a href="' + dictUrl(k) + '" target="_blank" rel="noopener">▶ 真人发音</a>';
+    html += '</div>';
+    return html;
+  }
+
+  function open(el){
+    var k = el.getAttribute('data-t');
+    var html = build(k);
+    if(!html) return;
+    anchor = el;
+    pop.innerHTML = html;
+    pop.style.display = 'block';
+    place();
+    var btn = pop.querySelector('[data-say]');
+    if(btn) btn.onclick = function(){ say(k); };
+    if(document.fonts && document.fonts.ready) document.fonts.ready.then(place);
+    requestAnimationFrame(function(){ requestAnimationFrame(place); });
+  }
+
+  function say(text){
+    if(!('speechSynthesis' in window)) return;
+    speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US';
+    u.rate = .85;
+    speechSynthesis.speak(u);
+  }
+
+  function close(){ pop.style.display = 'none'; anchor = null; }
+
+  document.addEventListener('click', function(e){
+    var el = e.target.closest ? e.target.closest('.tm') : null;
+    if(el){ e.preventDefault(); open(el); return; }
+    if(e.target.closest && !e.target.closest('#pop')) close();
+  });
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape') close(); });
+  window.addEventListener('resize', close);
+  window.addEventListener('wheel', close, {passive:true});
+  window.addEventListener('touchmove', close, {passive:true});
+
+  function autoOpen(){
+    if(location.hash.indexOf('#t-') !== 0) return;
+    var key = decodeURIComponent(location.hash.slice(3));
+    var nodes = document.querySelectorAll('.tm[data-t="' + key + '"]');
+    for(var i = 0; i < nodes.length; i++){
+      if(nodes[i].getClientRects().length){ open(nodes[i]); return; }
+    }
+  }
+  if(document.readyState === 'complete') autoOpen();
+  else window.addEventListener('load', autoOpen);
+})();

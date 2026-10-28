@@ -43,7 +43,7 @@
 
   <section class="sec">
     <h2><span class="num">01</span><span class="in-en">Why not just scan the table every minute</span><span class="in-zh">为什么不能每分钟扫全表</span></h2>
-    <p><span class="bi-en">The naive version is one query: <code>select id from orders where status='PENDING' and create_time &lt; now() - interval 30 minute</code>. Every minute. Forever.</span><span class="bi-zh">最朴素的写法就是一条 SQL：<code>select id from orders where status='PENDING' and create_time &lt; now() - interval 30 minute</code>。每分钟一次，永远跑。</span></p>
+    <p><span class="bi-en">The naive version is one query: <code>select id from orders where status='PENDING' and create_time &lt; now() - interval 30 minute</code>. Every minute. Forever.</span><span class="bi-zh">最朴素的写法就是一条 <span class="tm" data-t="SQL">SQL</span>：<code>select id from orders where status='PENDING' and create_time &lt; now() - interval 30 minute</code>。每分钟一次，永远跑。</span></p>
     <ul>
       <li><span class="bi-en">It scans rows that are <b>not</b> due yet — most of the table, most of the time.</span><span class="bi-zh">它扫的是<b>还没到期</b>的行——绝大多数时候，扫的是整张表。</span></li>
       <li><span class="bi-en">The index only helps if you also store a “due at” column; with <code>create_time + 30m</code> the range is not sargable.</span><span class="bi-zh">索引只有在有“到期时间”这一列时才帮得上；用 <code>create_time + 30 分钟</code> 算出来的范围用不上索引。</span></li>
@@ -58,8 +58,8 @@
       <thead><tr><th><span class="in-en">Approach</span><span class="in-zh">做法</span></th><th><span class="in-en">Good</span><span class="in-zh">好处</span></th><th><span class="in-en">Price</span><span class="in-zh">代价</span></th></tr></thead>
       <tbody>
         <tr><td><span class="bi-en">Scan the table</span><span class="bi-zh">定时扫全表</span></td><td><span class="bi-en">Dead simple, no new component.</span><span class="bi-zh">最简单，不需要新组件。</span></td><td><span class="bi-en">Database pressure, coarse precision, poor use of the index.</span><span class="bi-zh">压数据库、精度差、用不上索引。</span></td></tr>
-        <tr><td><span class="bi-en">MQ delay queue</span><span class="bi-zh">MQ 延迟队列</span></td><td><span class="bi-en">Accurate, retries built in, dead-letter box.</span><span class="bi-zh">精度高，自带重试和死信。</span></td><td><span class="bi-en">Another component to run; TTL+DLX or a plugin for RabbitMQ; you still must handle duplicate delivery.</span><span class="bi-zh">多一套中间件；RabbitMQ 要靠 TTL+DLX 或插件；重复投递还是得自己兜。</span></td></tr>
-        <tr><td><span class="bi-en">Redis sorted set</span><span class="bi-zh">Redis ZSet</span></td><td><span class="bi-en">Already in the project, one line to enqueue, second-level precision, one query to pull due items.</span><span class="bi-zh">项目里已有；入队一行代码；秒级精度；一条命令捞出到期的。</span></td><td><span class="bi-en">Polling; no delivery guarantee — a failover can lose an entry, so you need a compensation scan.</span><span class="bi-zh">要轮询；不保证投递——主从切换可能丢条目，所以要补偿扫描。</span></td></tr>
+        <tr><td><span class="bi-en"><span class="tm" data-t="MQ">MQ</span> delay queue</span><span class="bi-zh"><span class="tm" data-t="MQ">MQ</span> <span class="tm" data-t="延迟队列">延迟队列</span></span></td><td><span class="bi-en">Accurate, retries built in, dead-letter box.</span><span class="bi-zh">精度高，自带重试和死信。</span></td><td><span class="bi-en">Another component to run; <span class="tm" data-t="TTL">TTL</span>+DLX or a plugin for <span class="tm" data-t="RabbitMQ">RabbitMQ</span>; you still must handle duplicate delivery.</span><span class="bi-zh">多一套中间件；<span class="tm" data-t="RabbitMQ">RabbitMQ</span> 要靠 <span class="tm" data-t="TTL">TTL</span>+DLX 或插件；重复投递还是得自己兜。</span></td></tr>
+        <tr><td><span class="bi-en"><span class="tm" data-t="Redis">Redis</span> sorted set</span><span class="bi-zh"><span class="tm" data-t="Redis">Redis</span> <span class="tm" data-t="ZSet">ZSet</span></span></td><td><span class="bi-en">Already in the project, one line to enqueue, second-level precision, one query to pull due items.</span><span class="bi-zh">项目里已有；入队一行代码；秒级精度；一条命令捞出到期的。</span></td><td><span class="bi-en">Polling; no delivery guarantee — a failover can lose an entry, so you need a compensation scan.</span><span class="bi-zh">要轮询；不保证投递——<span class="tm" data-t="主从切换">主从切换</span>可能丢条目，所以要补偿扫描。</span></td></tr>
       </tbody>
     </table>
     <p class="note"><span class="bi-en">The interview answer that scores: pick one, then say what you gave up and how you covered it. “We used Redis because we already had it; we covered the reliability gap with a nightly compensation scan.”</span><span class="bi-zh">能拿分的说法：选一个，然后说清放弃了什么、怎么补上。“选 Redis 是因为项目已有；可靠性缺口用每日补偿扫描兜住。”</span></p>
@@ -82,7 +82,7 @@ if lock.tryLock():
     lock.unlock()</code></pre>
     <ul>
       <li><span class="bi-en"><b>score is the due timestamp</b> — that is why a sorted set is the right structure: it is already sorted by time.</span><span class="bi-zh"><b>score 就是到期时间戳</b>——这就是为什么用有序集合：它本身按时间排好了。</span></li>
-      <li><span class="bi-en"><b>LIMIT 100</b>: never pull everything at once; a burst of 10k due orders becomes 100 batches instead of one long transaction.</span><span class="bi-zh"><b>LIMIT 100</b>：一次不捞太多；一万单到期变成 100 批，而不是一个长事务。</span></li>
+      <li><span class="bi-en"><b>LIMIT 100</b>: never pull everything at once; a burst of 10k due orders becomes 100 batches instead of one long transaction.</span><span class="bi-zh"><b>LIMIT 100</b>：一次不捞太多；一万单到期变成 100 批，而不是一个长<span class="tm" data-t="事务">事务</span>。</span></li>
       <li><span class="bi-en"><b>zrem only after success</b>: if the process dies mid-way, the entry is still there and the next tick retries it.</span><span class="bi-zh"><b>成功才 zrem</b>：进程中途挂了条目还在，下一秒自然重试。</span></li>
       <li><span class="bi-en"><b>lock is per order</b>: not one global lock, or you serialise every order in the system.</span><span class="bi-zh"><b>锁按订单加</b>：不要一把全局锁，否则全站订单排队。</span></li>
     </ul>
@@ -93,14 +93,14 @@ if lock.tryLock():
     <table class="ledger">
       <thead><tr><th><span class="in-en">Race</span><span class="in-zh">竞态</span></th><th><span class="in-en">Who wins</span><span class="in-zh">谁赢</span></th><th><span class="in-en">What you do</span><span class="in-zh">怎么做</span></th></tr></thead>
       <tbody>
-        <tr><td><span class="bi-en">Timer closes it, then the payment callback arrives</span><span class="bi-zh">关单先改成功，支付回调后到</span></td><td><span class="bi-en">The order is already CLOSED, so the CAS updates 0 rows.</span><span class="bi-zh">订单已是 CLOSED，CAS 影响 0 行。</span></td><td><span class="bi-en">Money arrived for a closed order — <b>refund</b>, and say it out loud in the interview.</span><span class="bi-zh">钱到了但单子关了——<b>走退款</b>，面试时要把这句话说出来。</span></td></tr>
+        <tr><td><span class="bi-en">Timer closes it, then the payment callback arrives</span><span class="bi-zh">关单先改成功，支付回调后到</span></td><td><span class="bi-en">The order is already CLOSED, so the <span class="tm" data-t="CAS">CAS</span> updates 0 rows.</span><span class="bi-zh">订单已是 CLOSED，<span class="tm" data-t="CAS">CAS</span> 影响 0 行。</span></td><td><span class="bi-en">Money arrived for a closed order — <b>refund</b>, and say it out loud in the interview.</span><span class="bi-zh">钱到了但单子关了——<b>走退款</b>，面试时要把这句话说出来。</span></td></tr>
         <tr><td><span class="bi-en">Callback marks it PAID, then the timer fires</span><span class="bi-zh">回调先改成 PAID，定时任务后到</span></td><td><span class="bi-en">The CAS condition <code>status='PENDING'</code> fails, so the timer does nothing.</span><span class="bi-zh">CAS 条件是 <code>status='PENDING'</code>，不成立，定时任务什么都不做。</span></td></tr>
       </tbody>
     </table>
     <p class="note"><span class="bi-en">Both directions are handled by the same <code>where status='PENDING'</code>. That is why the interview answer must include the CAS even though the question is about a timer.</span><span class="bi-zh">两个方向都被同一个 <code>where status='PENDING'</code> 挡住了。所以哪怕问的是定时器，答案里也必须带 CAS。</span></p>
     <p><span class="bi-en">And the second race: two app instances polling the same Redis. Both see the same order id.</span><span class="bi-zh">第二个竞态：两个实例轮询同一个 Redis，同时捞到同一个订单号。</span></p>
     <ul>
-      <li><span class="bi-en">The distributed lock makes only one of them work on it.</span><span class="bi-zh">分布式锁让只有一个实例真的去处理。</span></li>
+      <li><span class="bi-en">The distributed lock makes only one of them work on it.</span><span class="bi-zh"><span class="tm" data-t="分布式锁">分布式锁</span>让只有一个实例真的去处理。</span></li>
       <li><span class="bi-en">Even if the lock is lost (failover), the CAS still makes the second one a no-op.</span><span class="bi-zh">就算锁丢了（主从切换），CAS 也会让第二个变成空操作。</span></li>
       <li><span class="bi-en">Two layers, and neither of them is “I added a lock, done”.</span><span class="bi-zh">两层，而且都不是“我加了把锁就完事”。</span></li>
     </ul>
@@ -120,11 +120,11 @@ if lock.tryLock():
   <section class="sec">
     <h2><span class="num">06</span><span class="in-en">60-second script</span><span class="in-zh">60 秒照念稿</span></h2>
     <blockquote class="read"><span class="lbl"><span class="in-en">Read this out loud</span><span class="in-zh">照这段说，60 秒</span></span>
-      <p><span class="bi-en">We do not scan the table. At checkout the order id goes into a Redis sorted set with the due timestamp as the score; a job runs once a second, pulls up to 100 due ids, and for each one takes a Redisson lock, closes it with an update whose where-clause is status='PENDING', rolls the stock back, and only then removes the entry from the set.
+      <p><span class="bi-en">We do not scan the table. At checkout the order id goes into a Redis sorted set with the due timestamp as the score; a job runs once a second, pulls up to 100 due ids, and for each one takes a <span class="tm" data-t="Redisson">Redisson</span> lock, closes it with an update whose where-clause is status='PENDING', rolls the stock back, and only then removes the entry from the set.
 
 The where-clause is the important part: if the payment callback already marked it paid, the update touches 0 rows and we do nothing; if we closed it first and the callback arrives after, the money is there for a closed order and we refund.
 
-We chose this over a RabbitMQ delay queue because the project already had Redis and adding TTL+DLX or the delayed-message plugin is another thing to operate. The trade-off is polling and no delivery guarantee, so there is a daily compensation scan over stale pending orders, and the CAS makes a double close harmless.</span><span class="bi-zh">我们不扫表。下单时把订单号写进 Redis 有序集合，score 存到期时间戳；一个每秒跑的任务一次捞最多 100 个到期的 id，逐个加 Redisson 锁，用 where 条件里带 status='PENDING' 的更新去关单、回滚库存，成功后才从集合里删掉。
+We chose this over a RabbitMQ delay queue because the project already had Redis and adding TTL+DLX or the delayed-message plugin is another thing to operate. The trade-off is polling and no delivery guarantee, so there is a daily compensation scan over stale pending orders, and the CAS makes a double close harmless.</span><span class="bi-zh">我们不扫表。下单时把订单号写进 Redis 有序集合，score 存到期时间戳；一个每秒跑的任务一次捞最多 100 个到期的 id，逐个加 <span class="tm" data-t="Redisson">Redisson</span> 锁，用 where 条件里带 status='PENDING' 的更新去关单、<span class="tm" data-t="回滚库存">回滚库存</span>，成功后才从集合里删掉。
 
 那个 where 条件是关键：如果支付回调已经把它改成已支付，这条更新影响 0 行，我们什么都不做；如果我们先关了、回调后到，钱到了但单子已关，就走退款。
 
@@ -135,10 +135,10 @@ We chose this over a RabbitMQ delay queue because the project already had Redis 
     <h2><span class="num">07</span><span class="in-en">Where this sits on my résumé</span><span class="in-zh">怎么挂到我自己的项目上</span></h2>
     <p><span class="bi-en">One line on the résumé, four things you can now defend:</span><span class="bi-zh">简历上只有一行，现在你能守住四件事：</span></p>
     <ul>
-      <li><span class="bi-en">The line: “用 Redis 延时队列做订单超时关单，替代轮询：超时 30 分钟自动取消并回滚库存”.</span><span class="bi-zh">原句：“用 Redis 延时队列做订单超时关单，替代轮询：超时 30 分钟自动取消并回滚库存”。</span></li>
+      <li><span class="bi-en">The line: “用 Redis <span class="tm" data-t="延时队列">延时队列</span>做订单超时关单，替代轮询：超时 30 分钟自动取消并<span class="tm" data-t="回滚库存">回滚库存</span>”.</span><span class="bi-zh">原句：“用 Redis <span class="tm" data-t="延时队列">延时队列</span>做订单超时关单，替代轮询：超时 30 分钟自动取消并回滚库存”。</span></li>
       <li><span class="bi-en">Why not scan: index, pressure, one-cycle latency.</span><span class="bi-zh">为什么不扫表：用不上索引、压库、差一个周期。</span></li>
       <li><span class="bi-en">Why not MQ: the project already had Redis; TTL+DLX or a plugin is extra machinery.</span><span class="bi-zh">为什么不用 MQ：项目已有 Redis；TTL+DLX 或插件是多出来的运维。</span></li>
-      <li><span class="bi-en">How it stays safe: per-order lock + status CAS + daily compensation scan.</span><span class="bi-zh">怎么保证不出错：按单加锁 + 状态 CAS + 每日补偿扫描。</span></li>
+      <li><span class="bi-en">How it stays safe: per-order lock + status CAS + daily compensation scan.</span><span class="bi-zh">怎么保证不出错：按单加锁 + <span class="tm" data-t="状态 CAS">状态 CAS</span> + 每日补偿扫描。</span></li>
     </ul>
     <p class="note"><span class="bi-en">订单系统和好气网都用了 Redisson, so “I know Redisson” is already on the résumé — this question is where it turns from a keyword into a mechanism.</span><span class="bi-zh">订单系统和好气网都写了 Redisson，所以“我会 Redisson”本来就在简历上——这道题就是把那个词变成机制的地方。</span></p>
   </section>
@@ -233,6 +233,7 @@ We chose this over a RabbitMQ delay queue because the project already had Redis 
   <div class="f-left"><span class="in-en">Written for learning English · Wang Tianyu</span><span class="in-zh">为学英语而写 · 王天宇</span></div>
   <div class="f-right"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a><span class="sep">·</span><a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a></div>
 </footer>
+<script src="../assets/terms.js"></script>
 <script src="../assets/app.js"></script>
 </body>
 </html>

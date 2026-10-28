@@ -38,6 +38,8 @@ INDEX = {
                   "先读 60 秒答案，再读机制。新问题在同一页的底部。"),
                  ("Answer the three questions at the end <b>out loud</b>, not in your head.",
                   "最后三道自测要<b>出声</b>回答，不要只在心里想。"),
+                 ("Words with a dotted red underline (CAS, ack, 唯一索引…) can be clicked: 谐音, IPA, one-line meaning, and a play button.",
+                  "带红色虚线的词（<b>CAS</b>、<b>ack</b>、<b>唯一索引</b> 这种）点一下：谐音 + 音标 + 一句含义，还能读出来。"),
              ]),
              ("note", "Twenty minutes a page. One page a day is enough.",
               "一页二十分钟。一天一页就够。"),
