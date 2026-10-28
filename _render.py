@@ -8,8 +8,10 @@ BASE = "https://tianyubabg.github.io/offer-camp/"
 
 CSS_EXTRA = """
 /* ===== 术语注解 ===== */
-.tm{border-bottom:1px dotted rgba(163,51,51,.5);cursor:help}
-.tm:hover{background:#F6E6DF}
+.tm{background:rgba(163,51,51,.12);border-radius:2px;padding:1px 2px 0;cursor:help;
+    text-decoration:underline solid rgba(163,51,51,.85);text-decoration-thickness:2px;
+    text-underline-offset:3px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.tm:hover{background:rgba(163,51,51,.26);text-decoration-color:#8E2B2B}
 #pop{position:fixed;z-index:80;width:330px;max-width:calc(100vw - 32px);display:none;
      background:#FBF7EC;border:1px solid #C9BEAA;border-radius:3px;padding:13px 15px;
      box-shadow:0 12px 32px rgba(40,30,10,.16)}
@@ -473,6 +475,9 @@ def page(path, data, on="", tail_blocks=None):
         for e, z in data["tags"])
 
     T.reset()
+    # 先给答案那一段优先标：它是全页最重要的一句
+    ans_en = T.annotate(data["answer"][0]) if data.get("answer") else ""
+    ans_zh = T.annotate(data["answer"][1]) if data.get("answer") else ""
     body = T.annotate(render_blocks(data["blocks"]))
     if not data.get("plain"):
         body += """
@@ -523,7 +528,7 @@ def page(path, data, on="", tail_blocks=None):
         "__ANSWERBOX__": ('<div class="answerbox"><b><span class="in-en">Short answer</span>'
                           '<span class="in-zh">先给答案</span></b>'
                           '<span class="bi-en">%s</span><span class="bi-zh">%s</span></div>'
-                          % (T.annotate(data["answer"][0]), T.annotate(data["answer"][1])))
+                          % (ans_en, ans_zh))
                          if data.get("answer") else "",
     }
     html = PAGE

@@ -48,9 +48,9 @@
       <span class="sc"><b>01</b>支付回调重复 —— 你给的那段，我精修过</span>
       <div class="vs">
         <div><span class="who">菜鸟说</span><span class="said">「微信有时候会重复通知，我在代码里做了个判断，重复的就不处理了。」</span></div>
-        <div><span class="who">老手说</span><span class="said senior">因为网络经常会抖动，微信支付可能因为<b class="kw">超时重试</b>发来多条回调。为了保证<b class="kw">数据一致性</b>，我们在数据库里通过<b class="kw">行锁</b>、<b class="kw"><span class="tm" data-t="乐观锁">乐观锁</span></b>（带状态判断的 <span class="tm" data-t="SQL">SQL</span>），以及给交易号加<b class="kw"><span class="tm" data-t="唯一索引">唯一索引</span></b>，从而实现了接口的<b class="kw"><span class="tm" data-t="幂等">幂等</span>性</b>，保证商品只发一次。</span></div>
+        <div><span class="who">老手说</span><span class="said senior">因为网络经常会抖动，微信支付可能因为<b class="kw">超时重试</b>发来多条回调。为了保证<b class="kw">数据一致性</b>，我们在数据库里通过<b class="kw">行锁</b>、<b class="kw"><span class="tm" data-t="乐观锁">乐观锁</span></b>（带状态判断的 <span class="tm" data-t="SQL">SQL</span>），以及给交易号加<b class="kw"><span class="tm" data-t="唯一索引">唯一索引</span></b>，从而实现了接口的<b class="kw"><span class="tm" data-t="幂等性">幂等性</span></b>，保证商品只发一次。</span></div>
       </div>
-      <div class="chips"><span>网络抖动</span><span>超时重试</span><span>数据一致性</span><span>行锁</span><span>乐观锁</span><span>唯一索引</span><span><span class="tm" data-t="幂等性">幂等性</span></span></div>
+      <div class="chips"><span>网络抖动</span><span>超时重试</span><span>数据一致性</span><span>行锁</span><span>乐观锁</span><span>唯一索引</span><span><span class="tm" data-t="幂等">幂等</span>性</span></div>
       <ul class="whylist">
         <li>先讲<b>原因</b>（网络抖动 → 超时重试），不是先讲自己的代码；面试官听到的是“他理解系统的边界”。</li>
         <li>把手段按<b>从强到弱</b>排：唯一索引（数据库兜底）> 乐观锁 <span class="tm" data-t="CAS">CAS</span> > 行锁，说明你知道哪一层最可靠。</li>

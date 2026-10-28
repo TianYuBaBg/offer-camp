@@ -60,8 +60,8 @@ def _annotate_plain(part, bucket="zh", limit=3):
     if not hits:
         return part
 
-    # 从前往后取，互相不重叠
-    hits.sort()
+    # 从前往后取，互相不重叠；同一位置优先更长的词（幂等表 > 幂等）
+    hits.sort(key=lambda h: (h[0], -h[1]))
     picked, cursor = [], -1
     for s, e, k in hits:
         if s < cursor:

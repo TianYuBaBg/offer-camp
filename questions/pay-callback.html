@@ -36,7 +36,7 @@
     <p class="kicker"><span class="in-en">Question 2 · must know · payments</span><span class="in-zh">第 2 题 · 必背 · 支付链路</span></p>
     <h1><span class="in-en">WeChat fires the callback three times: ship once, deduct once.</span><span class="in-zh">微信回调同时来三条：只发一次货、库存只扣一次。</span></h1>
     <p class="lede"><span class="in-en">One payment, three callbacks. Two of them must do nothing — and must still answer OK.</span><span class="in-zh">一次支付，三条回调。其中两条必须什么都不做，而且还得回“成功”。</span></p>
-    <div class="answerbox"><b><span class="in-en">Short answer</span><span class="in-zh">先给答案</span></b><span class="bi-en">Three layers, in this order: a unique-index <span class="tm" data-t="idempotent">idempotent</span> table catches the duplicate, a status CAS makes the order move forward exactly once, and a distributed lock only covers the small critical section that touches stock.</span><span class="bi-zh">三层，顺序不能反：唯一索引的幂等表拦住重复；状态 CAS 让订单只能往前走一次；分布式锁只包住动库存的那一小段。</span></div>
+    <div class="answerbox"><b><span class="in-en">Short answer</span><span class="in-zh">先给答案</span></b><span class="bi-en">Three layers, in this order: a unique-index <span class="tm" data-t="idempotent">idempotent</span> table catches the duplicate, a status <span class="tm" data-t="CAS">CAS</span> makes the order move forward exactly once, and a distributed lock only covers the small critical section that touches stock.</span><span class="bi-zh">三层，顺序不能反：<span class="tm" data-t="唯一索引">唯一索引</span>的<span class="tm" data-t="幂等表">幂等表</span>拦住重复；<span class="tm" data-t="状态 CAS">状态 CAS</span> 让订单只能往前走一次；分布式锁只包住动库存的那一小段。</span></div>
     <p class="tags"><span class="tag"><span class="in-en">Must know</span><span class="in-zh">必背</span></span><span class="tag"><span class="in-en">payments</span><span class="in-zh">支付</span></span><span class="tag"><span class="in-en">speak 60s</span><span class="in-zh">60 秒口播</span></span><span class="tag"><span class="in-en">4 follow-ups</span><span class="in-zh">追问 4 个</span></span></p>
     <button class="listen" data-listen type="button">🔊</button>
   </div>
@@ -63,7 +63,7 @@
   unique key uk_trade (out_trade_no, source)
 );</code></pre>
     <p><span class="bi-en">In code it is just <code>insert</code>, and on <code>DuplicateKeyException</code> return success. The second callback <b>does no work</b> and still tells the platform “done”.</span><span class="bi-zh">代码里就是 insert，撞到 <code>DuplicateKeyException</code> 就直接回成功：第二条回调<b>不干活</b>，却仍然告诉平台“已处理”。</span></p>
-    <p class="note"><span class="bi-en">Why not <code>select</code> then <code>insert</code>: two threads can both see “not there”. The unique index is the only thing the database itself polices.</span><span class="bi-zh">为什么不用 <code>select</code> 再 <code>insert</code>：两个线程能同时查出“不存在”。<span class="tm" data-t="唯一索引">唯一索引</span>是数据库自己把门的东西。</span></p>
+    <p class="note"><span class="bi-en">Why not <code>select</code> then <code>insert</code>: two threads can both see “not there”. The unique index is the only thing the database itself polices.</span><span class="bi-zh">为什么不用 <code>select</code> 再 <code>insert</code>：两个线程能同时查出“不存在”。唯一索引是数据库自己把门的东西。</span></p>
   </section>
   <section class="sec">
     <h2><span class="num">03</span><span class="in-en">Layer two: status CAS</span><span class="in-zh">第二层：状态 CAS（比较再交换）</span></h2>
@@ -98,7 +98,7 @@
       <tbody>
         <tr><td><span class="bi-en">Where is the lock, and what is the key?</span><span class="bi-zh">锁加在哪，key 是什么？</span></td><td><span class="bi-en">Around the stock deduction only; the key is the sku id.</span><span class="bi-zh">只包扣库存那段；key 是 sku id。</span></td></tr>
         <tr><td><span class="bi-en">What if the holder dies?</span><span class="bi-zh">持锁的进程挂了怎么办？</span></td><td><span class="bi-en">The lease expires; watchdog stops renewing. Never rely on a bare expire.</span><span class="bi-zh">租约自动过期，watchdog 不再续期。别用裸的 expire。</span></td></tr>
-        <tr><td><span class="bi-en">Master fails over and the lock is lost?</span><span class="bi-zh"><span class="tm" data-t="主从切换">主从切换</span>丢锁怎么办？</span></td><td><span class="bi-en">Fall back on the database: unique key and <span class="tm" data-t="CAS">CAS</span> still hold.</span><span class="bi-zh">靠数据库兜底：唯一键和 <span class="tm" data-t="CAS">CAS</span> 仍然守得住。</span></td></tr>
+        <tr><td><span class="bi-en">Master fails over and the lock is lost?</span><span class="bi-zh"><span class="tm" data-t="主从切换">主从切换</span>丢锁怎么办？</span></td><td><span class="bi-en">Fall back on the database: unique key and <span class="tm" data-t="CAS">CAS</span> still hold.</span><span class="bi-zh">靠数据库兜底：唯一键和 CAS 仍然守得住。</span></td></tr>
         <tr><td><span class="bi-en">Could you do it without a lock?</span><span class="bi-zh">能不能不上锁？</span></td><td><span class="bi-en">Yes: <code>update stock set qty = qty - 1 where qty &gt; 0</code>, then check the rows.</span><span class="bi-zh">能：<code>update ... where qty &gt; 0</code>，看影响行数。</span></td></tr>
       </tbody>
     </table>
@@ -107,8 +107,8 @@
     <h2><span class="num">06</span><span class="in-en">The 60-second answer</span><span class="in-zh">60 秒照念稿</span></h2>
     <blockquote class="read"><span class="lbl"><span class="in-en">Say it in this order</span><span class="in-zh">照着念，再换成自己的话</span></span>
       <p><span class="bi-en">First: duplicates are normal. The platform retries until it hears success, and two instances can get it at once.</span><span class="bi-zh">先说重复是常态：平台没收到成功就一直重试，两台机器也可能同时收到。</span></p>
-      <p><span class="bi-en">Layer one: insert the trade number into a table with a unique index; a duplicate key just returns success.</span><span class="bi-zh">第一层：拿流水号往唯一索引的<span class="tm" data-t="幂等表">幂等表</span>里插，撞键就直接回成功。</span></p>
-      <p><span class="bi-en">Layer two: a status CAS — only PENDING may become PAID; zero rows means someone else already did it.</span><span class="bi-zh">第二层：<span class="tm" data-t="状态 CAS">状态 CAS</span>，只有待支付能改成已支付；影响 0 行说明别人做过了。</span></p>
+      <p><span class="bi-en">Layer one: insert the trade number into a table with a unique index; a duplicate key just returns success.</span><span class="bi-zh">第一层：拿流水号往唯一索引的幂等表里插，撞键就直接回成功。</span></p>
+      <p><span class="bi-en">Layer two: a status CAS — only PENDING may become PAID; zero rows means someone else already did it.</span><span class="bi-zh">第二层：状态 CAS，只有待支付能改成已支付；影响 0 行说明别人做过了。</span></p>
       <p><span class="bi-en">Layer three: a Redisson lock keyed by sku id around the deduct and write-back; if it is lost on failover, the first two layers still hold.</span><span class="bi-zh">第三层：Redisson 按 sku 加锁护住扣减写回；就算主从切换丢锁，前两层还兜着。</span></p>
       <p><span class="bi-en">Stock is deducted once because the CAS decides which callback owns the order, and the idempotent row turns the rest into cheap no-ops.</span><span class="bi-zh">库存只扣一次，是因为 CAS 决定这条回调归谁，幂等表把其余的变成廉价空转。</span></p>
     </blockquote>
