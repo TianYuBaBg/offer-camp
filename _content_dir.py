@@ -12,6 +12,9 @@ QLIST = [
     {"n": "03", "t": "前面加一层 Redis，P95 从 800 毫秒降到 240 毫秒——缓存怎么用？",
      "a": "命中率、穿透/击穿/雪崩、Cache Aside——缓存那道。",
      "m": "60 秒", "href": "questions/redis-cache.html"},
+    {"n": "04", "t": "订单 30 分钟没付，怎么自动关掉？为什么不用 MQ 的延迟队列？",
+     "a": "Redis ZSet 延时队列、按单加锁、状态 CAS、补偿扫描——订单那道。",
+     "m": "60 秒", "href": "questions/order-timeout.html"},
 ]
 
 DERIVED = {
@@ -25,6 +28,14 @@ DERIVED = {
         ("并发场景到底用哪个？", "ConcurrentHashMap：桶级锁 + CAS，读不加锁。", "basics/threads.html"),
         ("它能当缓存用吗？", "本机临时缓存可以，但它没上限、没过期、不是线程安全——正经缓存用 Redis。", ""),
         ("缓存会出什么问题？", "穿透、击穿、雪崩，三种根因不同、治法不同。", ""),
+    ],
+    "questions/order-timeout.html": [
+        ("为什么 ZSet 能做延时队列？", "score 就是到期时间戳，范围查询天然按时间有序。", None),
+        ("两个实例会不会重复关单？", "分布式锁让只有一个处理，CAS 让重复变空操作。", None),
+        ("关单和支付回调撞上怎么办？", "谁先改到状态谁赢，后到的走退款。", None),
+        ("ZSet 里十万条会慢吗？", "按分钟分桶建 key，入队批量写。", None),
+        ("RabbitMQ 做延迟队列有哪两种方式？", "消息 TTL + 死信交换机；或 delayed-message 插件。", None),
+        ("消息丢了怎么兜底？", "每日补偿扫描 PENDING 超时单，配合幂等。", None),
     ],
     "questions/redis-cache.html": [
         ("缓存和数据库怎么保持一致？", "Cache Aside：写完删缓存，500 毫秒后再删一次。", None),
