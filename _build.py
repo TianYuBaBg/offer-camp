@@ -12,6 +12,8 @@ from _content_q3 import QUESTION3
 from _content_q4 import QUESTION4
 from _content_speak import SPEAK
 from _content_dir import QLIST, DERIVED, LESSONS, TOOLS
+from _content_d2 import D2
+from _content_d2b import D2B
 from _answers import ANSWERS, INDEX_QA_HEAD, INDEX_QA
 
 R.write_assets()
@@ -124,12 +126,12 @@ def derived_section(path, number):
                 '<div class="dqb"><p class="bi-en">%s</p><p class="bi-zh">%s</p></div></details>'
                 % (href.lstrip("#"), i, q, en_t, zh_t))
         elif href:
-            where = '<a class="dqlink" href="%s">打开</a>' % href
+            where = '<a class="dqlink" href="%s">打开这一页</a>' % href
         else:
             where = '<span class="todoq">待写</span>'
         rows.append([(q_html, q_html), (a_html, a_html), (where, where)])
-    body = [("note", "A good answer opens the next question. Click any row to unfold the answer.",
-             "一个答案会生出下一个问题。点任意一行，答案就在原地展开。"),
+    body = [("note", "Each one has its own page — click to read the long version.",
+             "每条都有自己的一页，点进去看完整版。"),
             ("table", [("Question", "新问题"), ("One line", "一句话"), ("", "")], rows)]
     if blocks:
         joined = chr(10).join(blocks)
@@ -245,6 +247,9 @@ def page_tail(page, with_tools=True):
 
 R.page(QUESTION["path"], QUESTION, on="q", tail_blocks=page_tail(QUESTION, with_tools=True))
 R.page(QUESTION2["path"], QUESTION2, on="q", tail_blocks=page_tail(QUESTION2, with_tools=False))
+
+for _b in D2 + D2B:
+    R.page(_b["path"], _b, on="q")
 R.page(QUESTION3["path"], QUESTION3, on="q", tail_blocks=page_tail(QUESTION3, with_tools=False))
 R.page(QUESTION4["path"], QUESTION4, on="q", tail_blocks=page_tail(QUESTION4, with_tools=False))
 QINDEX["blocks"] = [("h2", "01", "All questions", "全部题目", [

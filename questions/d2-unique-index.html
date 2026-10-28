@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="zh-CN" data-lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Why a unique index works as a lock · Java Notes</title>
+<meta name="description" content="Why a unique index works as a lock">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="masthead">
+  <div class="mh-left">
+    <a class="mh-mark" href="../index.html">Java Notes</a>
+    <nav class="mh-nav">
+      <a href="../questions/index.html" class="on"><span class="in-en">Questions</span><span class="in-zh">题目</span></a>
+      <a href="../basics/array.html"><span class="in-en">Basics</span><span class="in-zh">基础</span></a>
+      <a href="../glossary.html"><span class="in-en">Words</span><span class="in-zh">词表</span></a>
+      <a href="../terms.html"><span class="in-en">Terms</span><span class="in-zh">术语</span></a>
+      <a href="../speak.html"><span class="in-en">Phrasing</span><span class="in-zh">话术</span></a>
+    </nav>
+  </div>
+  <div class="mh-right">
+    <span class="langswitch">
+      <button type="button" data-lang-set="zh">中文</button>
+      <button type="button" data-lang-set="both">中英</button>
+      <button type="button" data-lang-set="en">English</button>
+    </span>
+  </div>
+</header>
+
+<main>
+  <p class="crumb"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a> / <a href="pay-callback.html"><span class="in-en">Q2</span><span class="in-zh">第 2 题</span></a> / <span class="in-en">Unique index as a lock</span><span class="in-zh">唯一索引当锁</span></p>
+
+  <div class="qhead">
+    <p class="kicker"><span class="in-en">Follow-up 01</span><span class="in-zh">追问 01</span></p>
+    <h1><span class="in-en">Why check-then-insert is broken, and the index is not.</span><span class="in-zh">为什么“先查再插”有漏洞，而唯一索引没有。</span></h1>
+    <p class="lede"><span class="in-en">The window is not in your code — it sits between two statements. The database closes it for you.</span><span class="in-zh">漏洞不在你的代码里，而在两条 SQL 之间。数据库替你把这段窗口关掉了。</span></p>
+    <div class="answerbox"><b><span class="in-en">Short answer</span><span class="in-zh">先给答案</span></b><span class="bi-en">Two transactions can both see “not there yet” and both move on. The unique index does the conflict test inside the B+tree at insert time, atomically — so exactly one wins and the other gets a duplicate-key error.</span><span class="bi-zh">两个<span class="tm" data-t="事务">事务</span>都能查到“不存在”，于是都往下走。<span class="tm" data-t="唯一索引">唯一索引</span>把冲突检测放进 B+tree、放进 insert 那一刻，是原子的——所以只有一个能成，另一个拿到 duplicate key。</span></div>
+    <p class="tags"><span class="tag"><span class="in-en">must know</span><span class="in-zh">必背</span></span><span class="tag"><span class="in-en">3 min</span><span class="in-zh">3 分钟</span></span></p>
+    <button class="listen" data-listen type="button">🔊</button>
+  </div>
+
+  <section class="sec">
+    <h2><span class="num">01</span><span class="in-en">The window you cannot see</span><span class="in-zh">看不见的那段窗口</span></h2>
+    <p><span class="bi-en">Under READ COMMITTED a plain <code>select</code> cannot see another transaction's uncommitted row, so “check” and “insert” are two separate moments with a gap between them.</span><span class="bi-zh">READ COMMITTED 下普通 <code>select</code> 看不见别人未提交的行，所以“查”和“插”是两个时刻，中间有缝。</span></p>
+    <pre><code>T1: select * from pay_idempotent where out_trade_no = 'T100'   -- 空
+T2: select * from pay_idempotent where out_trade_no = 'T100'   -- 也是空
+T1: insert ...                                                  -- 成功
+T2: insert ...                                                  -- 被唯一索引拒绝
+
+-- 先查再插：两个都通过了检查，第二个插进去时才发现重复
+-- 唯一索引把它变成数据库层的互斥，不需要你先查</code></pre>
+    <p><span class="bi-en">Repeating the check inside a transaction does not help either. To make the check meaningful you would need <code>select ... for update</code> — a pessimistic lock. If you are going to lock anyway, the unique index is cheaper and harder to get wrong.</span><span class="bi-zh">在事务里再查一次也没用。要让“查”有意义，得 <code>select ... for update</code> 变成<span class="tm" data-t="悲观锁">悲观锁</span>——既然都要锁，唯一索引更便宜也更不容易写错。</span></p>
+  </section>
+  <section class="sec">
+    <h2><span class="num">02</span><span class="in-en">What the index actually does</span><span class="in-zh">索引到底做了什么</span></h2>
+    <ul>
+      <li><span class="bi-en">InnoDB keeps the unique key in a B+tree. The insert walks to the leaf and must not find an equal key.</span><span class="bi-zh">InnoDB 把唯一键放在 B+tree 里。insert 走到叶子节点，必须找不到相同的键。</span></li>
+      <li><span class="bi-en">The check happens <b>inside</b> the insert — there is no gap for another session to sneak in.</span><span class="bi-zh">这个检查发生在 insert <b>内部</b>——没有缝给别的会话钻。</span></li>
+      <li><span class="bi-en">The loser gets error 1062 (Duplicate entry) and can treat it as “someone else already owns this”.</span><span class="bi-zh">输的那个拿到 1062（Duplicate entry），可以直接当成“这份活已经有人认领”。</span></li>
+    </ul>
+    <p class="note"><span class="bi-en">One statement, one decision. That is why it is the strongest layer you have.</span><span class="bi-zh">一条语句一个决定。这就是它比任何应用层判断都硬的原因。</span></p>
+  </section>
+  <section class="sec">
+    <h2><span class="num">03</span><span class="in-en">The code you actually write</span><span class="in-zh">代码就这么写</span></h2>
+    <pre><code>try {
+    mapper.insert(new PayIdempotent(outTradeNo, source));
+} catch (DuplicateKeyException e) {
+    return OK;              // 第二条回调：不干活，但必须回成功
+}
+
+-- 或者一条 SQL 搞定，用影响行数判断
+insert into pay_idempotent(out_trade_no, source, created_at)
+values(?, ?, now())
+on duplicate key update source = source;   -- 0 行 = 重复</code></pre>
+    <p><span class="bi-en">Both versions give you the same thing: a single statement whose result tells you whether you own this job.</span><span class="bi-zh">两种写法结果一样：一条语句，返回值就告诉你这份活归不归你。</span></p>
+  </section>
+  <section class="sec">
+    <h2><span class="num">04</span><span class="in-en">Where people get it wrong</span><span class="in-zh">最容易踩的坑</span></h2>
+    <ul>
+      <li><span class="bi-en">Using the auto-increment id as the unique key. Use the <b>business number</b> (out_trade_no), or a retry slips straight through.</span><span class="bi-zh">拿自增 id 当唯一键。要用<b>业务号</b>（out_trade_no），否则重试能溜过去。</span></li>
+      <li><span class="bi-en">A composite unique key containing a nullable column. In <span class="tm" data-t="MySQL">MySQL</span>, NULL is never equal to NULL — duplicates get in.</span><span class="bi-zh">联合唯一键里带可空列。<span class="tm" data-t="MySQL">MySQL</span> 里 NULL 不等于 NULL，重复能溜进来。</span></li>
+      <li><span class="bi-en">Catching the duplicate and then <b>not</b> answering success. The platform keeps retrying for hours.</span><span class="bi-zh">捕到重复却<b>不回成功</b>。平台会一直重试，重试到明天。</span></li>
+    </ul>
+  </section>
+  <section class="sec">
+    <h2><span class="num">05</span><span class="in-en">Say it like this</span><span class="in-zh">面试这么说</span></h2>
+    <blockquote class="read"><span class="lbl"><span class="in-en">Say it like this</span><span class="in-zh">面试就这么说</span></span>
+      <p><span class="bi-en">两个<span class="tm" data-t="事务">事务</span>都能查到“不存在”，所以先查再插一定有窗口。我们用<span class="tm" data-t="唯一索引">唯一索引</span>把冲突检测交给数据库，插入那一刻就决定了归属；捕到 duplicate key 就直接回成功，但业务一步都不做。</span><span class="bi-zh">两个事务都能查到“不存在”，所以先查再插一定有窗口。我们用唯一索引把冲突检测交给数据库，插入那一刻就决定了归属；捕到 duplicate key 就直接回成功，但业务一步都不做。</span></p>
+    </blockquote>
+  </section>
+
+  <p class="log-tip"><a href="pay-callback.html"><span class="in-en">&#8592; Back to question 2</span><span class="in-zh">&#8592; 回到第 2 题</span></a></p>
+</main>
+
+<footer>
+  <div class="f-left"><span class="in-en">Written for learning English · Wang Tianyu</span><span class="in-zh">为学英语而写 · 王天宇</span></div>
+  <div class="f-right"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a><span class="sep">·</span><a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a></div>
+</footer>
+<script src="../assets/terms.js"></script>
+<script src="../assets/app.js"></script>
+</body>
+</html>

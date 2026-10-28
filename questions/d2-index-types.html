@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="zh-CN" data-lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What other indexes exist · Java Notes</title>
+<meta name="description" content="What other indexes exist">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="masthead">
+  <div class="mh-left">
+    <a class="mh-mark" href="../index.html">Java Notes</a>
+    <nav class="mh-nav">
+      <a href="../questions/index.html" class="on"><span class="in-en">Questions</span><span class="in-zh">题目</span></a>
+      <a href="../basics/array.html"><span class="in-en">Basics</span><span class="in-zh">基础</span></a>
+      <a href="../glossary.html"><span class="in-en">Words</span><span class="in-zh">词表</span></a>
+      <a href="../terms.html"><span class="in-en">Terms</span><span class="in-zh">术语</span></a>
+      <a href="../speak.html"><span class="in-en">Phrasing</span><span class="in-zh">话术</span></a>
+    </nav>
+  </div>
+  <div class="mh-right">
+    <span class="langswitch">
+      <button type="button" data-lang-set="zh">中文</button>
+      <button type="button" data-lang-set="both">中英</button>
+      <button type="button" data-lang-set="en">English</button>
+    </span>
+  </div>
+</header>
+
+<main>
+  <p class="crumb"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a> / <a href="pay-callback.html"><span class="in-en">Q2</span><span class="in-zh">第 2 题</span></a> / <span class="in-en">Other indexes</span><span class="in-zh">其他索引</span></p>
+
+  <div class="qhead">
+    <p class="kicker"><span class="in-en">Follow-up 08</span><span class="in-zh">追问 08</span></p>
+    <h1><span class="in-en">Unique is one of seven. Most of the value is in three of them.</span><span class="in-zh">唯一索引只是七种之一，真正天天用的是其中三种。</span></h1>
+    <p class="lede"><span class="in-en">Split by purpose first, then by structure. Interviewers usually want the purpose list plus why B+tree won.</span><span class="in-zh">先按作用分，再按结构分。面试官通常想听作用那七种，以及 B+ 树为什么赢。</span></p>
+    <div class="answerbox"><b><span class="in-en">Short answer</span><span class="in-zh">先给答案</span></b><span class="bi-en">By purpose: primary (clustered), unique, normal, composite (leftmost prefix), covering, prefix, fulltext. By structure: mostly B+tree; Memory engine has hash; InnoDB adds adaptive hash. Daily work uses primary + composite on query order + covering; every index slows writes.</span><span class="bi-zh">按作用：主键（聚簇）、唯一、普通、联合（最左前缀）、覆盖、前缀、全文。按结构：基本 B+ 树，Memory 引擎有哈希，InnoDB 还有自适应哈希。生产天天用的是主键 + 按查询顺序的联合索引 + <span class="tm" data-t="覆盖索引">覆盖索引</span>；索引越多写入越慢。</span></div>
+    <p class="tags"><span class="tag"><span class="in-en">must know</span><span class="in-zh">必背</span></span><span class="tag"><span class="in-en">3 min</span><span class="in-zh">3 分钟</span></span></p>
+    <button class="listen" data-listen type="button">🔊</button>
+  </div>
+
+  <section class="sec">
+    <h2><span class="num">01</span><span class="in-en">Seven by purpose</span><span class="in-zh">按作用分七种</span></h2>
+    <table class="ledger">
+      <thead><tr><th><span class="in-en">Index</span><span class="in-zh">索引</span></th><th><span class="in-en">What it is for</span><span class="in-zh">干什么用</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="bi-en">primary / clustered</span><span class="bi-zh">主键 / 聚簇</span></td><td><span class="bi-en">the table itself in InnoDB; leaf holds the whole row</span><span class="bi-zh">InnoDB 里就是表本身，叶子存整行</span></td></tr>
+        <tr><td><span class="bi-en">unique</span><span class="bi-zh">唯一</span></td><td><span class="bi-en">enforces uniqueness; NULL is not equal to NULL</span><span class="bi-zh">管唯一性；NULL 彼此不相等</span></td></tr>
+        <tr><td><span class="bi-en">normal (secondary)</span><span class="bi-zh">普通（二级）</span></td><td><span class="bi-en">speeds up lookups, leaf holds the primary key</span><span class="bi-zh">只加速查询，叶子存主键</span></td></tr>
+        <tr><td><span class="bi-en">composite</span><span class="bi-zh">联合</span></td><td><span class="bi-en">multi-column, usable by leftmost prefix</span><span class="bi-zh">多列，按最左前缀生效</span></td></tr>
+        <tr><td><span class="bi-en">covering</span><span class="bi-zh">覆盖</span></td><td><span class="bi-en">all selected columns inside the index, no row lookup</span><span class="bi-zh">查询列全在索引里，不<span class="tm" data-t="回表">回表</span></span></td></tr>
+        <tr><td><span class="bi-en">prefix</span><span class="bi-zh">前缀</span></td><td><span class="bi-en">long strings indexed by the first N chars</span><span class="bi-zh">长字符串只索引前几位</span></td></tr>
+        <tr><td><span class="bi-en">fulltext</span><span class="bi-zh">全文</span></td><td><span class="bi-en">inverted index for search</span><span class="bi-zh">倒排索引，做搜索</span></td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="sec">
+    <h2><span class="num">02</span><span class="in-en">Why B+tree won</span><span class="in-zh">B+ 树为什么赢</span></h2>
+    <ul>
+      <li><span class="bi-en">Short tree: three or four levels cover tens of millions of rows, so three disk reads.</span><span class="bi-zh">树矮：三四层覆盖几千万行，也就是三次磁盘读。</span></li>
+      <li><span class="bi-en">Leaves are linked in order, so range scans and <code>order by</code> read sequentially.</span><span class="bi-zh">叶子有序且相连，范围扫描和 order by 都是顺序读。</span></li>
+      <li><span class="bi-en">Hash is O(1) but only equality — no range, no sorting, no leftmost prefix.</span><span class="bi-zh">哈希是 O(1) 但只支持等值——没有范围、没有排序、没有最左前缀。</span></li>
+    </ul>
+    <p class="note"><span class="bi-en">So: hash for a pure point lookup in memory, B+tree for everything else.</span><span class="bi-zh">结论：纯内存点查可以用哈希，其余一律 B+ 树。</span></p>
+  </section>
+  <section class="sec">
+    <h2><span class="num">03</span><span class="in-en">Clustered vs secondary, in one picture</span><span class="in-zh">聚簇 vs 二级，一张图</span></h2>
+    <pre><code>primary key (clustered):   leaf -> (id, name, price, qty, ...)    整行
+secondary index on name:   leaf -> (name, id)  ->  拿 id 回主键树再查一次（回表）
+covering (name, price):    leaf -> (name, price)  ->  够了，不回表</code></pre>
+    <p><span class="bi-en">“Covering” is just a secondary index that already holds everything the query needs. It is the cheapest big win in real systems.</span><span class="bi-zh">“覆盖”就是二级索引里已经带齐了查询要的列——这是线上最便宜的一次大优化。</span></p>
+  </section>
+  <section class="sec">
+    <h2><span class="num">04</span><span class="in-en">The rules that matter in practice</span><span class="in-zh">实战里真正要记的</span></h2>
+    <ul>
+      <li><span class="bi-en">Build composite indexes in the order you filter: equality columns first, range last.</span><span class="bi-zh">联合索引按查询顺序建：等值列在前，范围列放最后。</span></li>
+      <li><span class="bi-en">Each extra index costs write throughput and disk. Keep the ones that earn their keep.</span><span class="bi-zh">多一个索引就多一份写放大和磁盘，只留真正有用的。</span></li>
+      <li><span class="bi-en">Watch the plan: <code>explain</code> shows whether the index is used, and “Using index” means covering.</span><span class="bi-zh">看执行计划：<code>explain</code> 里 key 是关键，“Using index” 就是覆盖。</span></li>
+    </ul>
+  </section>
+  <section class="sec">
+    <h2><span class="num">05</span><span class="in-en">Say it like this</span><span class="in-zh">面试这么说</span></h2>
+    <blockquote class="read"><span class="lbl"><span class="in-en">Say it like this</span><span class="in-zh">面试就这么说</span></span>
+      <p><span class="bi-en">索引按作用分七种：主键、唯一、普通、联合、覆盖、前缀、全文；按结构基本是 B+ 树，Memory 引擎有哈希，InnoDB 有自适应哈希。生产里真正天天用的是主键加按查询顺序建的联合索引，再加<span class="tm" data-t="覆盖索引">覆盖索引</span>避免<span class="tm" data-t="回表">回表</span>。索引不是越多越好，每个都在拖慢写入。</span><span class="bi-zh">索引按作用分七种：主键、唯一、普通、联合、覆盖、前缀、全文；按结构基本是 B+ 树，Memory 引擎有哈希，InnoDB 有自适应哈希。生产里真正天天用的是主键加按查询顺序建的联合索引，再加覆盖索引避免回表。索引不是越多越好，每个都在拖慢写入。</span></p>
+    </blockquote>
+  </section>
+
+  <p class="log-tip"><a href="pay-callback.html"><span class="in-en">&#8592; Back to question 2</span><span class="in-zh">&#8592; 回到第 2 题</span></a></p>
+</main>
+
+<footer>
+  <div class="f-left"><span class="in-en">Written for learning English · Wang Tianyu</span><span class="in-zh">为学英语而写 · 王天宇</span></div>
+  <div class="f-right"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a><span class="sep">·</span><a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a></div>
+</footer>
+<script src="../assets/terms.js"></script>
+<script src="../assets/app.js"></script>
+</body>
+</html>

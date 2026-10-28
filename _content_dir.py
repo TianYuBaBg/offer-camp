@@ -105,3 +105,24 @@ TOOLS = [
     ("术语词表", "47 个词：音标 + 意思 + 真人发音", "glossary.html", "47 词"),
     ("装桶小游戏", "三关：放进去 / 扩容 / 树化，电脑上玩", "game/hashmap.html", "3 关"),
 ]
+
+# 第 2 题：8 个追问各自成页（d2-*.html），这里只留“一句话 + 去哪看”
+DERIVED["questions/pay-callback.html"] = [
+    ("为什么用唯一索引当锁，而不是先查再插？",
+     "两个线程能同时查出“不存在”；唯一索引是数据库自己把门的。", "d2-unique-index.html"),
+    ("幂等记录插进去了，但业务崩了怎么办？",
+     "靠状态 CAS 兜底：只允许 PENDING → PAID，重试影响 0 行就按已处理返回。", "d2-crash-after-idempotent.html"),
+    ("钱到了但订单已经关闭，怎么处理？",
+     "CAS 影响 0 行且状态 CLOSED → 比时间戳，走退款或复活订单。", "d2-paid-but-closed.html"),
+    ("Redisson 的 watchdog 到底在续什么？",
+     "续的是锁的租约：线程活着才续，进程挂掉租约自然过期。", "d2-watchdog.html"),
+    ("主从切换把锁丢了怎么办？",
+     "异步复制下锁可能没同步过去；靠数据库兜底（条件更新 + fencing token）。",
+     "d2-lock-lost-on-failover.html"),
+    ("MQ 消费重复和这个是一回事吗？",
+     "同一类病：所有 MQ 都是至少一次，去重必须在消费端做。", "d2-mq-duplicate.html"),
+    ("那库存怎么保证只扣一次、还不超卖？",
+     "条件更新 where qty >= 1 防超卖；CAS 成功之后才扣，保证只扣一次。", "d2-stock-once.html"),
+    ("数据库里除了唯一索引，还有哪些索引？",
+     "按作用七种：主键/唯一/普通/联合/覆盖/前缀/全文；结构基本 B+ 树。", "d2-index-types.html"),
+]

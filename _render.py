@@ -429,8 +429,12 @@ def render_one(b):
     if k == "pre":
         return "    <pre><code>%s</code></pre>" % b[1]
     if k == "quote":
-        head = '<span class="in-en">%s</span><span class="in-zh">%s</span>' % (b[2], b[3])
-        ps = "\n".join("      " + bisp(e, z) for e, z in b[4])
+        if len(b) == 4:          # ("quote", "read", en, zh) 简写
+            head = '<span class="in-en">Say it like this</span><span class="in-zh">面试就这么说</span>'
+            ps = "      " + bisp(b[2], b[3])
+        else:
+            head = '<span class="in-en">%s</span><span class="in-zh">%s</span>' % (b[2], b[3])
+            ps = "\n".join("      " + bisp(e, z) for e, z in b[4])
         return '    <blockquote class="%s"><span class="lbl">%s</span>\n%s\n    </blockquote>' % (b[1], head, ps)
     if k == "analogy":
         return ('    <div class="analogy"><b><span class="in-en">%s</span><span class="in-zh">%s</span></b>'
@@ -533,7 +537,7 @@ def page(path, data, on="", tail_blocks=None):
     body = render_blocks(data["blocks"])
     if not data.get("plain"):
         body = T.annotate(body)
-    if not data.get("plain"):
+    if not data.get("plain") and data.get("words"):
         body += """
   <section class="sec">
     <h2><span class="num">→</span><span class="in-en">New words</span><span class="in-zh">新词</span></h2>
@@ -541,23 +545,23 @@ def page(path, data, on="", tail_blocks=None):
 %s
     </div>
     <p class="note"><span class="bi-en">Click <b>▶ hear it</b> for real people on YouGlish; <b>🔊</b> for the computer voice.</span><span class="bi-zh">点 <b>▶ hear it</b> 听真人发音（YouGlish）；点 <b>🔊</b> 听电脑朗读。</span></p>
-  </section>
-
-  <section class="sec">
+  </section>""" % words_html(data["words"])
+    if not data.get("plain") and data.get("checks"):
+        body += """  <section class="sec">
     <h2><span class="num">✓</span><span class="in-en">Check yourself</span><span class="in-zh">自测</span></h2>
     <ol class="checks">
 %s
     </ol>
     <p class="note"><span class="bi-en">Answer out loud first. Only then open the answers below.</span><span class="bi-zh">先自己出声答，再看下面的答案。</span></p>
-  </section>
-
-  <section class="sec">
+  </section>""" % checks_html(data["checks"])
+    if not data.get("plain") and data.get("answers"):
+        body += """  <section class="sec">
     <details class="answers">
       <summary><span class="in-en">Answers</span><span class="in-zh">参考答案</span></summary>
 %s
     </details>
-  </section>
-""" % (words_html(data["words"]), checks_html(data["checks"]), answers_html(data.get("answers", [])))
+  </section>""" % answers_html(data["answers"])
+
         if tail_blocks:
             body += "\n" + render_blocks(tail_blocks)
 

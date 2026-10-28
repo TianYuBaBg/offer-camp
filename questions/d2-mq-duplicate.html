@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="zh-CN" data-lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MQ delivery is at-least-once · Java Notes</title>
+<meta name="description" content="MQ delivery is at-least-once">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="masthead">
+  <div class="mh-left">
+    <a class="mh-mark" href="../index.html">Java Notes</a>
+    <nav class="mh-nav">
+      <a href="../questions/index.html" class="on"><span class="in-en">Questions</span><span class="in-zh">题目</span></a>
+      <a href="../basics/array.html"><span class="in-en">Basics</span><span class="in-zh">基础</span></a>
+      <a href="../glossary.html"><span class="in-en">Words</span><span class="in-zh">词表</span></a>
+      <a href="../terms.html"><span class="in-en">Terms</span><span class="in-zh">术语</span></a>
+      <a href="../speak.html"><span class="in-en">Phrasing</span><span class="in-zh">话术</span></a>
+    </nav>
+  </div>
+  <div class="mh-right">
+    <span class="langswitch">
+      <button type="button" data-lang-set="zh">中文</button>
+      <button type="button" data-lang-set="both">中英</button>
+      <button type="button" data-lang-set="en">English</button>
+    </span>
+  </div>
+</header>
+
+<main>
+  <p class="crumb"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a> / <a href="pay-callback.html"><span class="in-en">Q2</span><span class="in-zh">第 2 题</span></a> / <span class="in-en">MQ duplicate</span><span class="in-zh">MQ 重复</span></p>
+
+  <div class="qhead">
+    <p class="kicker"><span class="in-en">Follow-up 06</span><span class="in-zh">追问 06</span></p>
+    <h1><span class="in-en">Same disease, different delivery channel.</span><span class="in-zh">同一个病，只是换了个投递渠道。</span></h1>
+    <p class="lede"><span class="in-en">A queue guarantees “at least once”, never “exactly once”. So the consumer must be idempotent — the pattern is the same one you used for the payment callback.</span><span class="in-zh">队列保证的是“至少一次”，不是“恰好一次”。所以消费端必须幂等——和你处理支付回调是同一套。</span></p>
+    <div class="answerbox"><b><span class="in-en">Short answer</span><span class="in-zh">先给答案</span></b><span class="bi-en">Duplicate consumption comes from <span class="tm" data-t="ack">ack</span> loss, rebalance, producer retry, or manual re-delivery. Fix it in the consumer: a business unique key or a state machine — never rely on the queue to deliver once.</span><span class="bi-zh">重复消费来自 ack 丢失、rebalance、生产端重试、人工重投。在消费端解决：业务唯一键或<span class="tm" data-t="状态机">状态机</span>——不能指望队列“只投一次”。</span></div>
+    <p class="tags"><span class="tag"><span class="in-en">must know</span><span class="in-zh">必背</span></span><span class="tag"><span class="in-en">2 min</span><span class="in-zh">2 分钟</span></span></p>
+    <button class="listen" data-listen type="button">🔊</button>
+  </div>
+
+  <section class="sec">
+    <h2><span class="num">01</span><span class="in-en">Where duplicates come from</span><span class="in-zh">重复从哪来</span></h2>
+    <table class="ledger">
+      <thead><tr><th><span class="in-en">Cause</span><span class="in-zh">原因</span></th><th><span class="in-en">What happens</span><span class="in-zh">发生什么</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="bi-en"><span class="tm" data-t="ack">ack</span> lost</span><span class="bi-zh">ack 丢了</span></td><td><span class="bi-en">message redelivered although processed</span><span class="bi-zh">处理过了但被重投</span></td></tr>
+        <tr><td><span class="bi-en">consumer rebalance</span><span class="bi-zh">消费者 rebalance</span></td><td><span class="bi-en">unacked messages go to another consumer</span><span class="bi-zh">未 ack 的消息转给别人</span></td></tr>
+        <tr><td><span class="bi-en">producer retry</span><span class="bi-zh">生产端重试</span></td><td><span class="bi-en">same logical event sent twice</span><span class="bi-zh">同一个业务事件发两次</span></td></tr>
+        <tr><td><span class="bi-en">manual replay</span><span class="bi-zh">人工重放</span></td><td><span class="bi-en">ops re-sends from the console</span><span class="bi-zh">运维在控制台重投</span></td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="sec">
+    <h2><span class="num">02</span><span class="in-en">The consumer skeleton</span><span class="in-zh">消费端骨架</span></h2>
+    <pre><code>@RabbitListener(queues = "order.paid")
+public void onPaid(OrderPaidEvent e) {
+    // ① 业务唯一键去重（和支付回调同一个思路）
+    int n = mapper.insertIgnore(e.getBizNo());
+    if (n == 0) { ack(); return; }        // 处理过，直接 ack
+
+    // ② 状态机只允许往前走一步
+    if (orderMapper.casToPaid(e.getOrderNo()) == 0) { ack(); return; }
+
+    // ③ 真正的业务，本身也要幂等
+    stockService.deduct(e.getSkuId());
+    ack();</code></pre>
+    <p class="note"><span class="bi-en">Two things must both be true: the message may repeat, and the handler must not care.</span><span class="bi-zh">两件事同时成立：消息可能重复，处理逻辑必须不介意。</span></p>
+  </section>
+  <section class="sec">
+    <h2><span class="num">03</span><span class="in-en">Do not do these</span><span class="in-zh">别这么做</span></h2>
+    <ul>
+      <li><span class="bi-en">“The queue says it delivers once.” It does not. No mainstream <span class="tm" data-t="MQ">MQ</span> does.</span><span class="bi-zh">“队列说只投一次。”它没说。主流 <span class="tm" data-t="MQ">MQ</span> 都没有。</span></li>
+      <li><span class="bi-en">Deduplicating by message id only. The same business event may arrive with different ids.</span><span class="bi-zh">只按 message id 去重。同一个业务事件，id 可能不同。</span></li>
+      <li><span class="bi-en">Ack before the work finishes. A crash then loses the message for good.</span><span class="bi-zh">活没干完先 ack。崩了就永久丢消息。</span></li>
+    </ul>
+  </section>
+  <section class="sec">
+    <h2><span class="num">04</span><span class="in-en">Say it like this</span><span class="in-zh">面试这么说</span></h2>
+    <blockquote class="read"><span class="lbl"><span class="in-en">Say it like this</span><span class="in-zh">面试就这么说</span></span>
+      <p><span class="bi-en">所有 MQ 都是至少一次投递，重复来自 ack 丢失、rebalance、生产端重试。我们在消费端做<span class="tm" data-t="幂等">幂等</span>：业务唯一键插入去重，再走<span class="tm" data-t="状态 CAS">状态 CAS</span>，最后业务本身也是条件更新。队列只管不丢，去重是消费方的责任。</span><span class="bi-zh">所有 MQ 都是至少一次投递，重复来自 ack 丢失、rebalance、生产端重试。我们在消费端做<span class="tm" data-t="幂等">幂等</span>：业务唯一键插入去重，再走<span class="tm" data-t="状态 CAS">状态 CAS</span>，最后业务本身也是条件更新。队列只管不丢，去重是消费方的责任。</span></p>
+    </blockquote>
+  </section>
+
+  <p class="log-tip"><a href="pay-callback.html"><span class="in-en">&#8592; Back to question 2</span><span class="in-zh">&#8592; 回到第 2 题</span></a></p>
+</main>
+
+<footer>
+  <div class="f-left"><span class="in-en">Written for learning English · Wang Tianyu</span><span class="in-zh">为学英语而写 · 王天宇</span></div>
+  <div class="f-right"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a><span class="sep">·</span><a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a></div>
+</footer>
+<script src="../assets/terms.js"></script>
+<script src="../assets/app.js"></script>
+</body>
+</html>

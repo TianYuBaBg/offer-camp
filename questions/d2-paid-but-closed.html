@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="zh-CN" data-lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Paid, but the order was already closed · Java Notes</title>
+<meta name="description" content="Paid, but the order was already closed">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="masthead">
+  <div class="mh-left">
+    <a class="mh-mark" href="../index.html">Java Notes</a>
+    <nav class="mh-nav">
+      <a href="../questions/index.html" class="on"><span class="in-en">Questions</span><span class="in-zh">题目</span></a>
+      <a href="../basics/array.html"><span class="in-en">Basics</span><span class="in-zh">基础</span></a>
+      <a href="../glossary.html"><span class="in-en">Words</span><span class="in-zh">词表</span></a>
+      <a href="../terms.html"><span class="in-en">Terms</span><span class="in-zh">术语</span></a>
+      <a href="../speak.html"><span class="in-en">Phrasing</span><span class="in-zh">话术</span></a>
+    </nav>
+  </div>
+  <div class="mh-right">
+    <span class="langswitch">
+      <button type="button" data-lang-set="zh">中文</button>
+      <button type="button" data-lang-set="both">中英</button>
+      <button type="button" data-lang-set="en">English</button>
+    </span>
+  </div>
+</header>
+
+<main>
+  <p class="crumb"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a> / <a href="pay-callback.html"><span class="in-en">Q2</span><span class="in-zh">第 2 题</span></a> / <span class="in-en">Paid but closed</span><span class="in-zh">已付但已关</span></p>
+
+  <div class="qhead">
+    <p class="kicker"><span class="in-en">Follow-up 03</span><span class="in-zh">追问 03</span></p>
+    <h1><span class="in-en">Money landed on an order that timed out 30 seconds ago.</span><span class="in-zh">钱到账了，可这单 30 秒前刚超时关掉。</span></h1>
+    <p class="lede"><span class="in-en">Do not swallow it, do not silently reopen it. Compare the timestamps, then refund or revive by rule.</span><span class="in-zh">既不能吞掉，也不能偷偷重开。比时间戳，按规则退款或者复活。</span></p>
+    <div class="answerbox"><b><span class="in-en">Short answer</span><span class="in-zh">先给答案</span></b><span class="bi-en"><span class="tm" data-t="CAS">CAS</span> returns 0 rows and the status is CLOSED, so this is “paid but cancelled”. Decide by rule: if the close time is later than the pay time, refund automatically and mark REFUNDING; never leave the money stuck.</span><span class="bi-zh">CAS 影响 0 行、状态是 CLOSED → 这就是“已付但已取消”。按规则处理：关单时间晚于支付时间就自动退款、置 REFUNDING；绝不能让钱卡在原地。</span></div>
+    <p class="tags"><span class="tag"><span class="in-en">must know</span><span class="in-zh">必背</span></span><span class="tag"><span class="in-en">3 min</span><span class="in-zh">3 分钟</span></span></p>
+    <button class="listen" data-listen type="button">🔊</button>
+  </div>
+
+  <section class="sec">
+    <h2><span class="num">01</span><span class="in-en">Why it happens at all</span><span class="in-zh">为什么会撞上</span></h2>
+    <ul>
+      <li><span class="bi-en">The user paid at 29:58; the timeout job closed the order at 30:01; the callback arrived at 30:02.</span><span class="bi-zh">用户 29:58 付款，超时任务 30:01 关单，回调 30:02 才到。</span></li>
+      <li><span class="bi-en">Payment succeeded on the platform side even though your order is closed — the two systems decided independently.</span><span class="bi-zh">支付平台那边成功了，你的订单这边已关闭——两个系统各自独立判断。</span></li>
+      <li><span class="bi-en">Clock skew between the pay server and your DB makes “who was first” a real question.</span><span class="bi-zh">支付服务器和你数据库的时钟差异，让“谁先”变成一个真问题。</span></li>
+    </ul>
+  </section>
+  <section class="sec">
+    <h2><span class="num">02</span><span class="in-en">The decision table</span><span class="in-zh">处理决策表</span></h2>
+    <table class="ledger">
+      <thead><tr><th><span class="in-en">Condition</span><span class="in-zh">条件</span></th><th><span class="in-en">Action</span><span class="in-zh">动作</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="bi-en">close_time &lt; pay_time</span><span class="bi-zh">关单时间 &lt; 支付时间</span></td><td><span class="bi-en">the order was closed before the money arrived → refund</span><span class="bi-zh">先关单后付款 → 退款</span></td></tr>
+        <tr><td><span class="bi-en">close_time &gt; pay_time (within grace)</span><span class="bi-zh">关单略晚于付款（容忍窗口内）</span></td><td><span class="bi-en">revive the order, ship as normal</span><span class="bi-zh">复活订单，正常发货</span></td></tr>
+        <tr><td><span class="bi-en">product is out of stock by now</span><span class="bi-zh">此时货已卖完</span></td><td><span class="bi-en">refund + notify, offer a replacement</span><span class="bi-zh">退款 + 通知，给替代方案</span></td></tr>
+      </tbody>
+    </table>
+    <p><span class="bi-en">The grace window exists because closing an order is not instantaneous: you need a few seconds of tolerance for callbacks that were already in flight.</span><span class="bi-zh">容忍窗口的意义：关单不是瞬时的，对“已经在路上的回调”要留几秒余地。</span></p>
+  </section>
+  <section class="sec">
+    <h2><span class="num">03</span><span class="in-en">Never “fix” it by force</span><span class="in-zh">别用强制手段“修”</span></h2>
+    <ul>
+      <li><span class="bi-en">Do not run <code>update orders set status='PAID'</code> without a condition — you lose the history and any concurrent job can resurrect it again.</span><span class="bi-zh">别不加条件地 <code>update ... set status='PAID'</code>——历史没了，别的任务再把它改回去。</span></li>
+      <li><span class="bi-en">Do not return success and do nothing. The platform thinks it is handled; the customer waits forever.</span><span class="bi-zh">别回成功却不做事。平台以为处理完了，客户永远等不到货。</span></li>
+      <li><span class="bi-en">Refund must itself be <span class="tm" data-t="idempotent">idempotent</span>: one out_refund_no per order, same unique-index trick.</span><span class="bi-zh">退款本身也要<span class="tm" data-t="幂等">幂等</span>：一单一个 out_refund_no，还是<span class="tm" data-t="唯一索引">唯一索引</span>那一套。</span></li>
+    </ul>
+  </section>
+  <section class="sec">
+    <h2><span class="num">04</span><span class="in-en">Say it like this</span><span class="in-zh">面试这么说</span></h2>
+    <blockquote class="read"><span class="lbl"><span class="in-en">Say it like this</span><span class="in-zh">面试就这么说</span></span>
+      <p><span class="bi-en"><span class="tm" data-t="CAS">CAS</span> 影响 0 行先看状态：如果已经 CLOSED，说明钱到的时候单子刚关。我们比关单时间和支付时间，超时关单在前就自动退款、置 REFUNDING；容忍窗口内就复活订单正常发货。退款用一单一个退款号，同样<span class="tm" data-t="幂等">幂等</span>。</span><span class="bi-zh">CAS 影响 0 行先看状态：如果已经 CLOSED，说明钱到的时候单子刚关。我们比关单时间和支付时间，超时关单在前就自动退款、置 REFUNDING；容忍窗口内就复活订单正常发货。退款用一单一个退款号，同样幂等。</span></p>
+    </blockquote>
+  </section>
+
+  <p class="log-tip"><a href="pay-callback.html"><span class="in-en">&#8592; Back to question 2</span><span class="in-zh">&#8592; 回到第 2 题</span></a></p>
+</main>
+
+<footer>
+  <div class="f-left"><span class="in-en">Written for learning English · Wang Tianyu</span><span class="in-zh">为学英语而写 · 王天宇</span></div>
+  <div class="f-right"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a><span class="sep">·</span><a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a></div>
+</footer>
+<script src="../assets/terms.js"></script>
+<script src="../assets/app.js"></script>
+</body>
+</html>
