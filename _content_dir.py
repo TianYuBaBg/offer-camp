@@ -3,25 +3,14 @@
 
 # 首页：所有题目（按学习顺序），meta 说明它现在是什么状态
 QLIST = [
-    dict(n="01", t="HashMap 到底是个什么东西？", a="一个桶数组，每个桶挂一条短链；冲突就排队，满了就扩容。",
-         m="第 1 题", href="questions/java-hashmap.html"),
-    dict(n="02", t="一个 key 怎么就跑到某个桶里？", a="先算 hash，再 h & (n-1) 取下标——所以容量必须是 2 的幂。",
-         m="第 4 课", href="basics/hash.html"),
-    dict(n="03", t="两个 key 撞进同一个桶，怎么办？", a="排队挂成链表；到 8 个、容量够 64 就转红黑树。",
-         m="第 2–3 课", href="basics/tree.html"),
-    dict(n="04", t="桶快满了呢？", a="装到 75% 翻倍，每个 key 要么原位、要么 +n，不用重算 hash。",
-         m="第 5 课", href="basics/big-o.html"),
-    dict(n="05", t="两个线程同时 put 会怎样？", a="丢数据；JDK 7 还会成环把 CPU 打满。换 ConcurrentHashMap。",
-         m="第 7 课", href="basics/threads.html"),
-    dict(n="06", t="工作中怎么拿它当缓存用？", a="Redis 挡在数据库前面——以及缓存咬你的三种方式。",
-         m="待写", href=""),
-    dict(n="07", t="微信回调同时来三条，怎么办？", a="幂等表 → 状态 CAS → 再上锁，三层顺序不能反。",
-         m="第 2 题", href="questions/pay-callback.html"),
-    dict(n="08", t="一万人抢一千件，怎么不超卖？", a="先在 Redis 预扣，数据库做最后一道闸，再拿延时队列关单。",
-         m="待写", href=""),
+    {"n": "01", "t": "说说 Java 中 HashMap 的原理？",
+     "a": "桶数组、链表与红黑树、扩容、线程安全——开场最常问的那道。",
+     "m": "60 秒", "href": "questions/java-hashmap.html"},
+    {"n": "02", "t": "微信回调同时来三条：只发一次货、库存只扣一次。",
+     "a": "幂等表、状态 CAS、分布式锁——支付链路上那道。",
+     "m": "60 秒", "href": "questions/pay-callback.html"},
 ]
 
-# 每道题页尾：这个问题长出来的新问题
 DERIVED = {
     "questions/java-hashmap.html": [
         ("为什么容量必须是 2 的幂？", "因为 h & (n-1) 等价于取模，只有在 n 是 2 的幂时成立。", "basics/hash.html"),

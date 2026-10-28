@@ -92,6 +92,12 @@ def tools_html():
     return "\n".join(out)
 
 
+GAME_CARD = """    <p class="lnline">
+      <a href="../game/hashmap.html">玩装桶小游戏（3 关，电脑上玩）</a> ·
+      <a href="../speak.html">高级程序员话术语录</a>
+    </p>"""
+
+
 def derived_section(path, number):
     items = DERIVED.get(path) or []
     if not items:
@@ -188,15 +194,25 @@ for lesson in (L1, L2, L3, L4, L5, L6, L7):
     R.page(lesson["path"], lesson, on="b")
 
 # 题目
-def _with_derived(page):
-    sec = derived_section(page["path"], "%02d" % (len([b for b in page["blocks"] if b[0] == "h2"]) + 1))
+def page_tail(page, with_tools=True):
+    """返回放在页面最底部（自测之后）的块：动手练 + 新问题。"""
+    tail = []
+    n = len([b for b in page["blocks"] if b[0] == "h2"]) + 1
+    if with_tools:
+        tail.append(("h2", "%02d" % n, "Practice", "动手练", [
+            ("p", "Play the buckets game, or read how a senior says the same thing.",
+             "想动手就玩装桶游戏；想学怎么说就翻话术语录。"),
+            ("html", GAME_CARD),
+        ]))
+        n += 1
+    sec = derived_section(page["path"], "%02d" % n)
     if sec:
-        page["blocks"] = list(page["blocks"]) + [sec]
-    return page
+        tail.append(sec)
+    return tail
 
 
-R.page(QUESTION["path"], _with_derived(QUESTION), on="q")
-R.page(QUESTION2["path"], _with_derived(QUESTION2), on="q")
+R.page(QUESTION["path"], QUESTION, on="q", tail_blocks=page_tail(QUESTION, with_tools=True))
+R.page(QUESTION2["path"], QUESTION2, on="q", tail_blocks=page_tail(QUESTION2, with_tools=False))
 QINDEX["blocks"] = [("h2", "01", "All questions", "全部题目", [
     ("p", "Same list as the home page. Each page ends with the new questions it opened.",
      "和首页同一张表。每页最后会列出“这道题又长出了哪些新问题”。"),

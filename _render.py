@@ -305,7 +305,6 @@ PAGE = """<!doctype html>
       <a href="__BASICS__"__ON_B__><span class="in-en">Basics</span><span class="in-zh">基础</span></a>
       <a href="__GLOSS__"__ON_W__><span class="in-en">Words</span><span class="in-zh">词表</span></a>
       <a href="__SPEAK__"__ON_S__><span class="in-en">Phrasing</span><span class="in-zh">话术</span></a>
-      <a class="nav-game" href="__GAME__"><span class="in-en">Play</span><span class="in-zh">游戏</span></a>
     </nav>
   </div>
   <div class="mh-right">
@@ -446,7 +445,7 @@ def checks_html(checks):
                      for e, z in checks)
 
 
-def page(path, data, on=""):
+def page(path, data, on="", tail_blocks=None):
     depth = path.count("/")
     up = "../" * depth
     tags = "".join(
@@ -479,6 +478,8 @@ def page(path, data, on=""):
     </details>
   </section>
 """ % (words_html(data["words"]), checks_html(data["checks"]), answers_html(data.get("answers", [])))
+        if tail_blocks:
+            body += "\n" + render_blocks(tail_blocks)
 
     subs = {
         "__TITLE__": data["title"][0], "__DESC__": data["title"][0],
