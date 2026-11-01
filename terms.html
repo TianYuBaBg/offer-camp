@@ -34,11 +34,11 @@
   <p class="crumb"><a href="index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a> / <span class="in-en">Terms</span><span class="in-zh">术语</span></p>
 
   <div class="qhead">
-    <p class="kicker"><span class="in-en">Terms · 56</span><span class="in-zh">术语 · 56 个</span></p>
+    <p class="kicker"><span class="in-en">Terms · 58</span><span class="in-zh">术语 · 58 个</span></p>
     <h1><span class="in-en">Every term on this site, in one place.</span><span class="in-zh">全站出现过的术语，都在这一页。</span></h1>
-    <p class="lede"><span class="in-en">Fifty-six terms. Read the 谐音 out loud first, then the meaning. Do not memorise — recognise.</span><span class="in-zh">五十六个词。先照着谐音读出来，再看含义。不用背，认得就行。</span></p>
+    <p class="lede"><span class="in-en">Fifty-eight terms. Read the 谐音 out loud first, then the meaning. Do not memorise — recognise.</span><span class="in-zh">五十八个词。先照着谐音读出来，再看含义。不用背，认得就行。</span></p>
     
-    <p class="tags"><span class="tag"><span class="in-en">56 terms</span><span class="in-zh">56 个</span></span><span class="tag"><span class="in-en">20 English</span><span class="in-zh">20 个英文</span></span><span class="tag"><span class="in-en">36 中文</span><span class="in-zh">36 中文</span></span></p>
+    <p class="tags"><span class="tag"><span class="in-en">58 terms</span><span class="in-zh">58 个</span></span><span class="tag"><span class="in-en">20 English</span><span class="in-zh">20 个英文</span></span><span class="tag"><span class="in-en">38 中文</span><span class="in-zh">38 中文</span></span></p>
     <button class="listen" data-listen type="button">🔊</button>
   </div>
 
@@ -234,6 +234,16 @@
         <span class="w">悲观锁</span>
         <span class="mean"><span class="bi-en">先锁住再改，`select ... for update` 就是它。</span><span class="bi-zh">先锁住再改，`select ... for update` 就是它。</span></span>
         <span class="links"><button class="spk" data-say="悲观锁" type="button" aria-label="say 悲观锁">&#128266;</button></span>
+      </div>
+      <div class="word four">
+        <span class="w">间隙锁</span>
+        <span class="mean"><span class="bi-en">要锁一个“不存在的行”时，InnoDB 锁住的是一段索引区间而不是一行——并发下容易锁等待和死锁。</span><span class="bi-zh">要锁一个“不存在的行”时，InnoDB 锁住的是一段索引区间而不是一行——并发下容易锁等待和死锁。</span></span>
+        <span class="links"><button class="spk" data-say="间隙锁" type="button" aria-label="say 间隙锁">&#128266;</button></span>
+      </div>
+      <div class="word four">
+        <span class="w">页锁</span>
+        <span class="mean"><span class="bi-en">latch: a short internal mutex InnoDB holds while touching a page.</span><span class="bi-zh">InnoDB 内部的一把短锁，改一个数据页时用；检查和插入都在它保护下，所以中间插不进别的会话。</span></span>
+        <span class="links"><button class="spk" data-say="页锁" type="button" aria-label="say 页锁">&#128266;</button></span>
       </div>
     </div>
   </section>

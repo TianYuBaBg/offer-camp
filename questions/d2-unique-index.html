@@ -53,6 +53,7 @@ T2: insert ...                                                  -- 被唯一索�
 -- 先查再插：两个都通过了检查，第二个插进去时才发现重复
 -- 唯一索引把它变成数据库层的互斥，不需要你先查</code></pre>
     <p><span class="bi-en">Repeating the check inside a transaction does not help either. To make the check meaningful you would need <code>select ... for update</code> — a pessimistic lock. If you are going to lock anyway, the unique index is cheaper and harder to get wrong.</span><span class="bi-zh">在事务里再查一次也没用。要让“查”有意义，得 <code>select ... for update</code> 变成<span class="tm" data-t="悲观锁">悲观锁</span>——既然都要锁，唯一索引更便宜也更不容易写错。</span></p>
+    <p><span class="bi-en">And locking a row that does not exist is not free: InnoDB takes a <b>gap lock</b> on a range of index entries instead of one row. Under concurrency that turns into lock waits and deadlocks, and it only works if the whole thing sits inside a transaction.</span><span class="bi-zh">而要锁住一个“不存在的行”，InnoDB 加的是<b><span class="tm" data-t="间隙锁">间隙锁</span></b>（gap lock）——锁的是一段索引区间，不是一行。并发一高就是锁等待甚至死锁，而且必须整段包在事务里才成立。</span></p>
   </section>
   <section class="sec">
     <h2><span class="num">02</span><span class="in-en">What the index actually does</span><span class="in-zh">索引到底做了什么</span></h2>
@@ -60,6 +61,7 @@ T2: insert ...                                                  -- 被唯一索�
       <li><span class="bi-en">InnoDB keeps the unique key in a B+tree. The insert walks to the leaf and must not find an equal key.</span><span class="bi-zh">InnoDB 把唯一键放在 B+tree 里。insert 走到叶子节点，必须找不到相同的键。</span></li>
       <li><span class="bi-en">The check happens <b>inside</b> the insert — there is no gap for another session to sneak in.</span><span class="bi-zh">这个检查发生在 insert <b>内部</b>——没有缝给别的会话钻。</span></li>
       <li><span class="bi-en">The loser gets error 1062 (Duplicate entry) and can treat it as “someone else already owns this”.</span><span class="bi-zh">输的那个拿到 1062（Duplicate entry），可以直接当成“这份活已经有人认领”。</span></li>
+      <li><span class="bi-en">The test and the insert run under the same page latch, so there is no instant where another session can slip in between them.</span><span class="bi-zh">检查和插入在同一把<span class="tm" data-t="页锁">页锁</span>（latch）内完成，中间没有一个能被别的会话插进来的点。</span></li>
     </ul>
     <p class="note"><span class="bi-en">One statement, one decision. That is why it is the strongest layer you have.</span><span class="bi-zh">一条语句一个决定。这就是它比任何应用层判断都硬的原因。</span></p>
   </section>
@@ -76,6 +78,7 @@ insert into pay_idempotent(out_trade_no, source, created_at)
 values(?, ?, now())
 on duplicate key update source = source;   -- 0 行 = 重复</code></pre>
     <p><span class="bi-en">Both versions give you the same thing: a single statement whose result tells you whether you own this job.</span><span class="bi-zh">两种写法结果一样：一条语句，返回值就告诉你这份活归不归你。</span></p>
+    <p class="note"><span class="bi-en">Two side effects of <code>on duplicate key update</code> worth knowing: it can burn auto-increment ids, and under some isolation levels it takes gap locks. If you do not need the update, plain insert plus catching 1062 is the simpler choice.</span><span class="bi-zh"><code>on duplicate key update</code> 有两个副作用值得知道：自增 id 会跳号；某些隔离级别下它会加间隙锁。不需要更新的时候，纯 insert 加捕 1062 是更简单的选择。</span></p>
   </section>
   <section class="sec">
     <h2><span class="num">04</span><span class="in-en">Where people get it wrong</span><span class="in-zh">最容易踩的坑</span></h2>
@@ -88,7 +91,7 @@ on duplicate key update source = source;   -- 0 行 = 重复</code></pre>
   <section class="sec">
     <h2><span class="num">05</span><span class="in-en">Say it like this</span><span class="in-zh">面试这么说</span></h2>
     <blockquote class="read"><span class="lbl"><span class="in-en">Say it like this</span><span class="in-zh">面试就这么说</span></span>
-      <p><span class="bi-en">两个<span class="tm" data-t="事务">事务</span>都能查到“不存在”，所以先查再插一定有窗口。我们用<span class="tm" data-t="唯一索引">唯一索引</span>把冲突检测交给数据库，插入那一刻就决定了归属；捕到 duplicate key 就直接回成功，但业务一步都不做。</span><span class="bi-zh">两个事务都能查到“不存在”，所以先查再插一定有窗口。我们用唯一索引把冲突检测交给数据库，插入那一刻就决定了归属；捕到 duplicate key 就直接回成功，但业务一步都不做。</span></p>
+      <p><span class="bi-en">Two transactions can both read “not there”, so check-then-insert always has a window. The unique index hands the check to the database and decides ownership at insert time; on duplicate key I answer success and do zero work. The win is that I manage no lock and need no transaction to wrap it — I only reach for on duplicate key update when I actually need insert-or-update.</span><span class="bi-zh">两个事务都能查到“不存在”，所以先查再插一定有窗口。唯一索引把冲突检测交给数据库，插入那一刻就定了归属；捕到 duplicate key 就直接回成功，但业务一步都不做。好处是我不需要自己管锁，也不用事务包起来；只有需要“插入或更新”的时候才用 on duplicate key update。</span></p>
     </blockquote>
   </section>
 

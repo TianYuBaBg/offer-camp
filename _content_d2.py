@@ -40,6 +40,11 @@ D2.append(dict(
                   "the unique index is cheaper and harder to get wrong.",
              "在事务里再查一次也没用。要让“查”有意义，得 <code>select ... for update</code> 变成悲观锁——"
              "既然都要锁，唯一索引更便宜也更不容易写错。"),
+            ("p", "And locking a row that does not exist is not free: InnoDB takes a <b>gap lock</b> on a range of index "
+                  "entries instead of one row. Under concurrency that turns into lock waits and deadlocks, and it only "
+                  "works if the whole thing sits inside a transaction.",
+             "而要锁住一个“不存在的行”，InnoDB 加的是<b>间隙锁</b>（gap lock）——锁的是一段索引区间，不是一行。"
+             "并发一高就是锁等待甚至死锁，而且必须整段包在事务里才成立。"),
         ]),
         ("h2", "02", "What the index actually does", "索引到底做了什么", [
             ("ul", [
@@ -49,6 +54,9 @@ D2.append(dict(
                  "这个检查发生在 insert <b>内部</b>——没有缝给别的会话钻。"),
                 ("The loser gets error 1062 (Duplicate entry) and can treat it as “someone else already owns this”.",
                  "输的那个拿到 1062（Duplicate entry），可以直接当成“这份活已经有人认领”。"),
+                ("The test and the insert run under the same page latch, so there is no instant where another session "
+                 "can slip in between them.",
+                 "检查和插入在同一把页锁（latch）内完成，中间没有一个能被别的会话插进来的点。"),
             ]),
             ("note", "One statement, one decision. That is why it is the strongest layer you have.",
              "一条语句一个决定。这就是它比任何应用层判断都硬的原因。"),
@@ -65,6 +73,11 @@ D2.append(dict(
                      "on duplicate key update source = source;   -- 0 行 = 重复"),
             ("p", "Both versions give you the same thing: a single statement whose result tells you whether you own this job.",
              "两种写法结果一样：一条语句，返回值就告诉你这份活归不归你。"),
+            ("note", "Two side effects of <code>on duplicate key update</code> worth knowing: it can burn auto-increment "
+             "ids, and under some isolation levels it takes gap locks. If you do not need the update, plain insert plus "
+             "catching 1062 is the simpler choice.",
+             "<code>on duplicate key update</code> 有两个副作用值得知道：自增 id 会跳号；某些隔离级别下它会加间隙锁。"
+             "不需要更新的时候，纯 insert 加捕 1062 是更简单的选择。"),
         ]),
         ("h2", "04", "Where people get it wrong", "最容易踩的坑", [
             ("ul", [
@@ -80,10 +93,13 @@ D2.append(dict(
         ]),
         ("h2", "05", "Say it like this", "面试这么说", [
             ("quote", "read",
-             "两个事务都能查到“不存在”，所以先查再插一定有窗口。我们用唯一索引把冲突检测交给数据库，"
-             "插入那一刻就决定了归属；捕到 duplicate key 就直接回成功，但业务一步都不做。",
-             "两个事务都能查到“不存在”，所以先查再插一定有窗口。我们用唯一索引把冲突检测交给数据库，"
-             "插入那一刻就决定了归属；捕到 duplicate key 就直接回成功，但业务一步都不做。"),
+             "Two transactions can both read “not there”, so check-then-insert always has a window. The unique index "
+             "hands the check to the database and decides ownership at insert time; on duplicate key I answer success "
+             "and do zero work. The win is that I manage no lock and need no transaction to wrap it — I only reach for "
+             "on duplicate key update when I actually need insert-or-update.",
+             "两个事务都能查到“不存在”，所以先查再插一定有窗口。唯一索引把冲突检测交给数据库，插入那一刻就定了归属；"
+             "捕到 duplicate key 就直接回成功，但业务一步都不做。好处是我不需要自己管锁，也不用事务包起来；"
+             "只有需要“插入或更新”的时候才用 on duplicate key update。"),
         ]),
     ],
     words=[], checks=[], answers=[],
