@@ -3,6 +3,8 @@
 
 from _content_d2 import BACK, CRUMB
 
+NL = chr(10)
+
 D2B = []
 
 # ---------------- 03 钱到了但订单已关闭 ----------------
@@ -408,7 +410,7 @@ D2B.append(dict(
           "别背名词。按三根轴搭骨架：粒度（锁谁）、模式（怎么锁）、思想（乐观还是悲观）。"),
     tags=[("must know", "必背"), ("5 min", "5 分钟")],
     answer=("Three levels of granularity: global, table (table lock, MDL, intention lock IS/IX), and row (record lock, gap lock, next-key lock, insert intention lock). Two modes: S shared and X exclusive. And the part that actually bites: row locks sit on index entries — no index, and you lock everything you scan.",
-            "粒度三级：全局锁、表级（表锁、MDL 元数据锁、意向锁 IS/IX）、行级（记录锁、间隙锁、临键锁、插入意向锁）。模式两种：S 共享、X 排他。最要命的一句：行锁加在索引上——没走索引，锁的就是扫描到的所有行。"),
+            "粒度三级：全局锁、表级（表锁、MDL 元数据锁、意向锁 IS/IX）、行级（记录锁、间隙锁、临键锁、插入意向锁）。模式两种：S 共享、X 排他。最要命的一句：行锁加在索引上——没走索引，锁的就是扫描到的所有行。悲观锁是 select ... for update，乐观锁是 where 带版本号的条件更新、看影响行数是 1 还是 0——两套写法，不是两把新锁。"),
     blocks=[
         ("h2", "01", "Three axes, one table", "三根轴，一张表", [
             ("table", [("Axis", "轴"), ("Values", "取值"), ("What it means", "什么意思")], [
@@ -461,10 +463,24 @@ D2B.append(dict(
             ("note", "A unique-index equality hit only needs a record lock — no gap. That is why “update one row by primary key” is the cheapest write you can make.",
              "唯一索引等值命中只需要记录锁、不加间隙。所以“按主键改一行”是你能写出的最便宜的写操作。"),
         ]),
-        ("h2", "05", "Say it like this", "面试这么说", [
+        ("h2", "05", "Two statements you can say out loud", "乐观锁和悲观锁，各一句 SQL", [
+            ("pre", "begin;" + NL + "select * from orders where id = 1 for update;   -- 悲观锁：这行被锁死，别人改要等" + NL + "update orders set status = 'PAID' where id = 1;" + NL + "commit;"),
+            ("pre", "update accounts" + NL + "   set balance = balance - 100," + NL + "       version = version + 1" + NL + " where id = 1 and version = 3;   -- 影响 1 行 = 成功，0 行 = 冲突"),
+            ("ul", [
+                ("<b>Pessimistic</b>: take the lock first, then read and write. <code>for update</code> adds an X record lock; if the row does not exist it becomes a gap lock, so a concurrent insert waits too.",
+                 "<b>悲观锁</b>：先锁住，再读再改。<code>for update</code> 加的是 X 记录锁；查不到那一行就退化成间隙锁，别人想插这个区间也得等。"),
+                ("<b>Optimistic</b>: no lock when reading; the version check happens in the same statement as the write. Affected rows = 1 means the version matched; affected rows = 0 means someone changed it first — re-read and retry.",
+                 "<b>乐观锁</b>：读的时候不加锁，版本校验和更新在同一条 SQL 里。影响 1 行说明版本对得上、改成功了；影响 0 行说明别人先改过，要重查再重试。"),
+                ("<b>Choosing</b>: low contention and cheap retries → optimistic; writes that must not fail → pessimistic; several rows or tables in one invariant → pessimistic plus a fixed lock order.",
+                 "<b>怎么选</b>：冲突少、重试便宜 → 乐观锁；写必须一次成功 → 悲观锁；一次要改多行多表 → 悲观锁加固定加锁顺序，避免互相等待成环。"),
+            ]),
+            ("note", "An optimistic lock is not a database lock at all — it is a where condition. So it never deadlocks, but you own the retry loop, and <code>version = version + 1</code> must sit in the same statement or the whole thing is a lie.",
+             "乐观锁本质上不是数据库的锁，只是 where 里多了一个条件。所以它不会死锁，但重试要你自己写；而且 <code>version = version + 1</code> 必须和更新在同一条语句里，否则等于没校验。"),
+        ]),
+        ("h2", "06", "Say it like this", "面试这么说", [
             ("quote", "read",
-             "Locks split into three granularities: global, table and row — InnoDB works at row level. Four row locks: record, gap, next-key, insert intention. RR takes next-key by default, which is what prevents phantom reads; RC is basically record locks only. At table level the two that matter are MDL and intention locks, and MDL is the main reason DDL and DML fight. The key point: row locks sit on index entries, so an update without an index locks everything it scans.",
-             "锁按粒度分三级：全局、表级、行级，InnoDB 日常用的是行级。行级有四种：记录锁、间隙锁、临键锁、插入意向锁；RR 下默认临键锁，防幻读靠的就是它，RC 下基本只有记录锁。表级里真正要记的是 MDL 和意向锁，MDL 是 DDL 和 DML 打架的主要原因。最关键的一点：行锁加在索引上，update 不走索引就会锁住扫到的所有行。"),
+             "Locks split into three granularities: global, table and row — InnoDB works at row level. Four row locks: record, gap, next-key, insert intention. RR takes next-key by default, which is what prevents phantom reads; RC is basically record locks only. At table level the two that matter are MDL and intention locks, and MDL is the main reason DDL and DML fight. The key point: row locks sit on index entries, so an update without an index locks everything it scans. And optimistic versus pessimistic is not two more locks: pessimistic is select for update, optimistic is a conditional update with a version in the where clause, judged by whether affected rows is 1 or 0.",
+             "锁按粒度分三级：全局、表级、行级，InnoDB 日常用的是行级。行级有四种：记录锁、间隙锁、临键锁、插入意向锁；RR 下默认临键锁，防幻读靠的就是它，RC 下基本只有记录锁。表级里真正要记的是 MDL 和意向锁，MDL 是 DDL 和 DML 打架的主要原因。最关键的一点：行锁加在索引上，update 不走索引就会锁住扫到的所有行。乐观锁和悲观锁不是两把新锁：悲观锁就是 select ... for update，乐观锁是 where 里带版本号的条件更新，看影响行数是 1 还是 0。"),
         ]),
     ],
     words=[], checks=[], answers=[],

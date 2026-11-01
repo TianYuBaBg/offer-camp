@@ -37,7 +37,7 @@
     <p class="kicker"><span class="in-en">Follow-up 09</span><span class="in-zh">追问 09</span></p>
     <h1><span class="in-en">Every lock in MySQL, on three axes.</span><span class="in-zh">MySQL 里到底有几种锁，各是什么意思。</span></h1>
     <p class="lede"><span class="in-en">Do not memorise the list. Hang it on three axes: granularity — who is locked; mode — how; idea — optimistic or pessimistic.</span><span class="in-zh">别背名词。按三根轴搭骨架：粒度（锁谁）、模式（怎么锁）、思想（乐观还是悲观）。</span></p>
-    <div class="answerbox"><b><span class="in-en">Short answer</span><span class="in-zh">先给答案</span></b><span class="bi-en">Three levels of granularity: global, table (table lock, MDL, intention lock IS/IX), and row (record lock, gap lock, next-key lock, insert intention lock). Two modes: S shared and X exclusive. And the part that actually bites: row locks sit on index entries — no index, and you lock everything you scan.</span><span class="bi-zh">粒度三级：全局锁、表级（表锁、MDL 元数据锁、意向锁 IS/IX）、行级（记录锁、<span class="tm" data-t="间隙锁">间隙锁</span>、临键锁、插入意向锁）。模式两种：S 共享、X 排他。最要命的一句：行锁加在索引上——没走索引，锁的就是扫描到的所有行。</span></div>
+    <div class="answerbox"><b><span class="in-en">Short answer</span><span class="in-zh">先给答案</span></b><span class="bi-en">Three levels of granularity: global, table (table lock, MDL, intention lock IS/IX), and row (record lock, gap lock, next-key lock, insert intention lock). Two modes: S shared and X exclusive. And the part that actually bites: row locks sit on index entries — no index, and you lock everything you scan.</span><span class="bi-zh">粒度三级：全局锁、表级（表锁、MDL 元数据锁、意向锁 IS/IX）、行级（记录锁、<span class="tm" data-t="间隙锁">间隙锁</span>、临键锁、插入意向锁）。模式两种：S 共享、X 排他。最要命的一句：行锁加在索引上——没走索引，锁的就是扫描到的所有行。<span class="tm" data-t="悲观锁">悲观锁</span>是 select ... for update，<span class="tm" data-t="乐观锁">乐观锁</span>是 where 带版本号的条件更新、看影响行数是 1 还是 0——两套写法，不是两把新锁。</span></div>
     <p class="tags"><span class="tag"><span class="in-en">must know</span><span class="in-zh">必背</span></span><span class="tag"><span class="in-en">5 min</span><span class="in-zh">5 分钟</span></span></p>
     <button class="listen" data-listen type="button">🔊</button>
   </div>
@@ -49,7 +49,7 @@
       <tbody>
         <tr><td><span class="bi-en">granularity</span><span class="bi-zh">粒度</span></td><td><span class="bi-en">global / table / row</span><span class="bi-zh">全局 / 表级 / 行级</span></td><td><span class="bi-en">InnoDB's day job is row level; the other two show up in DDL and backups</span><span class="bi-zh">InnoDB 日常用的是行级；另两级出现在 DDL 和备份场景</span></td></tr>
         <tr><td><span class="bi-en">mode</span><span class="bi-zh">模式</span></td><td><span class="bi-en">S shared / X exclusive</span><span class="bi-zh">S 共享 / X 排他</span></td><td><span class="bi-en">S is compatible with S; every other combination is mutually exclusive</span><span class="bi-zh">S 与 S 兼容，其余组合一律互斥</span></td></tr>
-        <tr><td><span class="bi-en">idea</span><span class="bi-zh">思想</span></td><td><span class="bi-en">optimistic / pessimistic</span><span class="bi-zh">乐观 / 悲观</span></td><td><span class="bi-en">optimistic is a version number or <span class="tm" data-t="CAS">CAS</span> in your code, not an engine lock</span><span class="bi-zh"><span class="tm" data-t="乐观锁">乐观锁</span>是代码里的版本号或 <span class="tm" data-t="CAS">CAS</span>，不是引擎的锁</span></td></tr>
+        <tr><td><span class="bi-en">idea</span><span class="bi-zh">思想</span></td><td><span class="bi-en">optimistic / pessimistic</span><span class="bi-zh">乐观 / 悲观</span></td><td><span class="bi-en">optimistic is a version number or <span class="tm" data-t="CAS">CAS</span> in your code, not an engine lock</span><span class="bi-zh">乐观锁是代码里的版本号或 <span class="tm" data-t="CAS">CAS</span>，不是引擎的锁</span></td></tr>
       </tbody>
     </table>
     <p class="note"><span class="bi-en">Interviewers start with “name the locks” and then drill into row locks. Answer the axes first, then the details — it shows you have a map, not a list.</span><span class="bi-zh">面试官通常先问“说说有哪些锁”，再往行锁里钻。先答三根轴，再补细节——说明你有地图，不是背清单。</span></p>
@@ -82,9 +82,26 @@
     <p class="note"><span class="bi-en">A unique-index equality hit only needs a record lock — no gap. That is why “update one row by primary key” is the cheapest write you can make.</span><span class="bi-zh">唯一索引等值命中只需要记录锁、不加间隙。所以“按主键改一行”是你能写出的最便宜的写操作。</span></p>
   </section>
   <section class="sec">
-    <h2><span class="num">05</span><span class="in-en">Say it like this</span><span class="in-zh">面试这么说</span></h2>
+    <h2><span class="num">05</span><span class="in-en">Two statements you can say out loud</span><span class="in-zh">乐观锁和悲观锁，各一句 SQL</span></h2>
+    <pre><code>begin;
+select * from orders where id = 1 for update;   -- 悲观锁：这行被锁死，别人改要等
+update orders set status = 'PAID' where id = 1;
+commit;</code></pre>
+    <pre><code>update accounts
+   set balance = balance - 100,
+       version = version + 1
+ where id = 1 and version = 3;   -- 影响 1 行 = 成功，0 行 = 冲突</code></pre>
+    <ul>
+      <li><span class="bi-en"><b>Pessimistic</b>: take the lock first, then read and write. <code>for update</code> adds an X record lock; if the row does not exist it becomes a gap lock, so a concurrent insert waits too.</span><span class="bi-zh"><b>悲观锁</b>：先锁住，再读再改。<code>for update</code> 加的是 X 记录锁；查不到那一行就退化成间隙锁，别人想插这个区间也得等。</span></li>
+      <li><span class="bi-en"><b>Optimistic</b>: no lock when reading; the version check happens in the same statement as the write. Affected rows = 1 means the version matched; affected rows = 0 means someone changed it first — re-read and retry.</span><span class="bi-zh"><b>乐观锁</b>：读的时候不加锁，版本校验和更新在同一条 <span class="tm" data-t="SQL">SQL</span> 里。影响 1 行说明版本对得上、改成功了；影响 0 行说明别人先改过，要重查再重试。</span></li>
+      <li><span class="bi-en"><b>Choosing</b>: low contention and cheap retries → optimistic; writes that must not fail → pessimistic; several rows or tables in one invariant → pessimistic plus a fixed lock order.</span><span class="bi-zh"><b>怎么选</b>：冲突少、重试便宜 → 乐观锁；写必须一次成功 → 悲观锁；一次要改多行多表 → 悲观锁加固定加锁顺序，避免互相等待成环。</span></li>
+    </ul>
+    <p class="note"><span class="bi-en">An optimistic lock is not a database lock at all — it is a where condition. So it never deadlocks, but you own the retry loop, and <code>version = version + 1</code> must sit in the same statement or the whole thing is a lie.</span><span class="bi-zh">乐观锁本质上不是数据库的锁，只是 where 里多了一个条件。所以它不会死锁，但重试要你自己写；而且 <code>version = version + 1</code> 必须和更新在同一条语句里，否则等于没校验。</span></p>
+  </section>
+  <section class="sec">
+    <h2><span class="num">06</span><span class="in-en">Say it like this</span><span class="in-zh">面试这么说</span></h2>
     <blockquote class="read"><span class="lbl"><span class="in-en">Say it like this</span><span class="in-zh">面试就这么说</span></span>
-      <p><span class="bi-en">Locks split into three granularities: global, table and row — InnoDB works at row level. Four row locks: record, gap, next-key, insert intention. RR takes next-key by default, which is what prevents phantom reads; RC is basically record locks only. At table level the two that matter are MDL and intention locks, and MDL is the main reason DDL and DML fight. The key point: row locks sit on index entries, so an update without an index locks everything it scans.</span><span class="bi-zh">锁按粒度分三级：全局、表级、行级，InnoDB 日常用的是行级。行级有四种：记录锁、间隙锁、临键锁、插入意向锁；RR 下默认临键锁，防幻读靠的就是它，RC 下基本只有记录锁。表级里真正要记的是 MDL 和意向锁，MDL 是 DDL 和 DML 打架的主要原因。最关键的一点：行锁加在索引上，update 不走索引就会锁住扫到的所有行。</span></p>
+      <p><span class="bi-en">Locks split into three granularities: global, table and row — InnoDB works at row level. Four row locks: record, gap, next-key, insert intention. RR takes next-key by default, which is what prevents phantom reads; RC is basically record locks only. At table level the two that matter are MDL and intention locks, and MDL is the main reason DDL and DML fight. The key point: row locks sit on index entries, so an update without an index locks everything it scans. And optimistic versus pessimistic is not two more locks: pessimistic is select for update, optimistic is a conditional update with a version in the where clause, judged by whether affected rows is 1 or 0.</span><span class="bi-zh">锁按粒度分三级：全局、表级、行级，InnoDB 日常用的是行级。行级有四种：记录锁、间隙锁、临键锁、插入意向锁；RR 下默认临键锁，防幻读靠的就是它，RC 下基本只有记录锁。表级里真正要记的是 MDL 和意向锁，MDL 是 DDL 和 DML 打架的主要原因。最关键的一点：行锁加在索引上，update 不走索引就会锁住扫到的所有行。乐观锁和悲观锁不是两把新锁：悲观锁就是 select ... for update，乐观锁是 where 里带版本号的条件更新，看影响行数是 1 还是 0。</span></p>
     </blockquote>
   </section>
 
