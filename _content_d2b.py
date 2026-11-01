@@ -396,3 +396,77 @@ D2B.append(dict(
     words=[], checks=[], answers=[],
     next=BACK,
 ))
+
+# ---------------- 09 MySQL 的锁 ----------------
+D2B.append(dict(
+    path="questions/d2-mysql-locks.html",
+    title=("What locks exist in MySQL", "MySQL 里的锁"),
+    crumb=CRUMB + '<span class="in-en">MySQL locks</span><span class="in-zh">MySQL 的锁</span>',
+    kicker=("Follow-up 09", "追问 09"),
+    h1=("Every lock in MySQL, on three axes.", "MySQL 里到底有几种锁，各是什么意思。"),
+    lede=("Do not memorise the list. Hang it on three axes: granularity — who is locked; mode — how; idea — optimistic or pessimistic.",
+          "别背名词。按三根轴搭骨架：粒度（锁谁）、模式（怎么锁）、思想（乐观还是悲观）。"),
+    tags=[("must know", "必背"), ("5 min", "5 分钟")],
+    answer=("Three levels of granularity: global, table (table lock, MDL, intention lock IS/IX), and row (record lock, gap lock, next-key lock, insert intention lock). Two modes: S shared and X exclusive. And the part that actually bites: row locks sit on index entries — no index, and you lock everything you scan.",
+            "粒度三级：全局锁、表级（表锁、MDL 元数据锁、意向锁 IS/IX）、行级（记录锁、间隙锁、临键锁、插入意向锁）。模式两种：S 共享、X 排他。最要命的一句：行锁加在索引上——没走索引，锁的就是扫描到的所有行。"),
+    blocks=[
+        ("h2", "01", "Three axes, one table", "三根轴，一张表", [
+            ("table", [("Axis", "轴"), ("Values", "取值"), ("What it means", "什么意思")], [
+                [("granularity", "粒度"), ("global / table / row", "全局 / 表级 / 行级"),
+                 ("InnoDB's day job is row level; the other two show up in DDL and backups",
+                  "InnoDB 日常用的是行级；另两级出现在 DDL 和备份场景")],
+                [("mode", "模式"), ("S shared / X exclusive", "S 共享 / X 排他"),
+                 ("S is compatible with S; every other combination is mutually exclusive",
+                  "S 与 S 兼容，其余组合一律互斥")],
+                [("idea", "思想"), ("optimistic / pessimistic", "乐观 / 悲观"),
+                 ("optimistic is a version number or CAS in your code, not an engine lock",
+                  "乐观锁是代码里的版本号或 CAS，不是引擎的锁")],
+            ]),
+            ("note", "Interviewers start with “name the locks” and then drill into row locks. Answer the axes first, then the details — it shows you have a map, not a list.",
+             "面试官通常先问“说说有哪些锁”，再往行锁里钻。先答三根轴，再补细节——说明你有地图，不是背清单。"),
+        ]),
+        ("h2", "02", "The four row locks", "行锁的四种形态", [
+            ("ul", [
+                ("<b>Record lock</b>: locks one index record. A unique-index equality hit degenerates to exactly this.",
+                 "<b>记录锁</b>：锁住一条索引记录。唯一索引等值命中时，加的就是它。"),
+                ("<b>Gap lock</b>: locks the open interval between two index records, so it only blocks inserts.",
+                 "<b>间隙锁</b>：锁住两条索引记录之间的开区间，只拦插入，不拦别人读。"),
+                ("<b>Next-key lock</b>: record lock plus the gap in front of it. The default shape under RR, and what stops phantom reads.",
+                 "<b>临键锁</b>：记录锁加上它前面的间隙。RR 下的默认形态，防幻读靠的就是它。"),
+                ("<b>Insert intention lock</b>: taken on a gap before inserting, meaning “I am about to insert here”. It conflicts with gap locks held by others.",
+                 "<b>插入意向锁</b>：插入前在间隙上加，表示“我要往这里插”。它和别人的间隙锁冲突。"),
+            ]),
+            ("note", "Gap locks only matter at RR and above. Under RC there is basically only the record lock — which is why RC sees fewer deadlocks and shorter lock waits.",
+             "间隙锁只在 RR 及以上有意义。RC 下基本只有记录锁——所以高并发服务里 RC 的死锁和锁等待都更少。"),
+        ]),
+        ("h2", "03", "The three table-level ones", "表级的三把锁", [
+            ("ul", [
+                ("<b>Table lock</b> (<code>lock tables ... read/write</code>): the whole table at once. A MyISAM-era tool that InnoDB rarely needs.",
+                 "<b>表锁</b>（<code>lock tables ... read/write</code>）：一次锁整表。MyISAM 时代的工具，InnoDB 很少主动用。"),
+                ("<b>MDL metadata lock</b>: added automatically. DML takes a read MDL, DDL takes a write MDL — so one long uncommitted transaction can block <code>alter table</code>, and everything queues behind it.",
+                 "<b>MDL 元数据锁</b>：自动加的。DML 拿读 MDL、DDL 拿写 MDL——所以一个长事务不提交，就能把 <code>alter table</code> 堵住，后面所有查询跟着排队。"),
+                ("<b>Intention lock</b> IS/IX: a table-level flag meaning “some row here is locked”. Without it, deciding whether a table lock is allowed would mean scanning every row.",
+                 "<b>意向锁</b> IS/IX：表级的一个标志，说明“这张表里有行被锁了”。没有它，判断能不能加表锁得逐行扫。"),
+            ]),
+        ]),
+        ("h2", "04", "The one people get wrong: locks live on indexes", "最容易答错的一题：锁加在索引上", [
+            ("ul", [
+                ("With an index, <code>update orders set status = 'PAID' where order_no = 'T100'</code> locks that one entry (or that range).",
+                 "有索引时，<code>update orders set status = 'PAID' where order_no = 'T100'</code> 只锁这一条（或这一段）。"),
+                ("Without an index, <code>where remark = 'x'</code> scans the whole table — and every scanned row gets locked. That is the “delete without a where clause” of the production world.",
+                 "没索引时，<code>where remark = 'x'</code> 全表扫描——扫到多少行就锁多少行。这就是线上版的“不带 where 的 delete”。"),
+                ("Debugging: <code>show engine innodb status</code> for LOCK WAIT, and <code>information_schema.innodb_trx</code> to find who is holding it.",
+                 "排查：<code>show engine innodb status</code> 看 LOCK WAIT，<code>information_schema.innodb_trx</code> 找谁占着锁。"),
+            ]),
+            ("note", "A unique-index equality hit only needs a record lock — no gap. That is why “update one row by primary key” is the cheapest write you can make.",
+             "唯一索引等值命中只需要记录锁、不加间隙。所以“按主键改一行”是你能写出的最便宜的写操作。"),
+        ]),
+        ("h2", "05", "Say it like this", "面试这么说", [
+            ("quote", "read",
+             "Locks split into three granularities: global, table and row — InnoDB works at row level. Four row locks: record, gap, next-key, insert intention. RR takes next-key by default, which is what prevents phantom reads; RC is basically record locks only. At table level the two that matter are MDL and intention locks, and MDL is the main reason DDL and DML fight. The key point: row locks sit on index entries, so an update without an index locks everything it scans.",
+             "锁按粒度分三级：全局、表级、行级，InnoDB 日常用的是行级。行级有四种：记录锁、间隙锁、临键锁、插入意向锁；RR 下默认临键锁，防幻读靠的就是它，RC 下基本只有记录锁。表级里真正要记的是 MDL 和意向锁，MDL 是 DDL 和 DML 打架的主要原因。最关键的一点：行锁加在索引上，update 不走索引就会锁住扫到的所有行。"),
+        ]),
+    ],
+    words=[], checks=[], answers=[],
+    next=BACK,
+))

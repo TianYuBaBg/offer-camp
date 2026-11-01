@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="zh-CN" data-lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What locks exist in MySQL · Java Notes</title>
+<meta name="description" content="What locks exist in MySQL">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="masthead">
+  <div class="mh-left">
+    <a class="mh-mark" href="../index.html">Java Notes</a>
+    <nav class="mh-nav">
+      <a href="../questions/index.html" class="on"><span class="in-en">Questions</span><span class="in-zh">题目</span></a>
+      <a href="../basics/array.html"><span class="in-en">Basics</span><span class="in-zh">基础</span></a>
+      <a href="../glossary.html"><span class="in-en">Words</span><span class="in-zh">词表</span></a>
+      <a href="../terms.html"><span class="in-en">Terms</span><span class="in-zh">术语</span></a>
+      <a href="../speak.html"><span class="in-en">Phrasing</span><span class="in-zh">话术</span></a>
+    </nav>
+  </div>
+  <div class="mh-right">
+    <span class="langswitch">
+      <button type="button" data-lang-set="zh">中文</button>
+      <button type="button" data-lang-set="both">中英</button>
+      <button type="button" data-lang-set="en">English</button>
+    </span>
+  </div>
+</header>
+
+<main>
+  <p class="crumb"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a> / <a href="pay-callback.html"><span class="in-en">Q2</span><span class="in-zh">第 2 题</span></a> / <span class="in-en">MySQL locks</span><span class="in-zh">MySQL 的锁</span></p>
+
+  <div class="qhead">
+    <p class="kicker"><span class="in-en">Follow-up 09</span><span class="in-zh">追问 09</span></p>
+    <h1><span class="in-en">Every lock in MySQL, on three axes.</span><span class="in-zh">MySQL 里到底有几种锁，各是什么意思。</span></h1>
+    <p class="lede"><span class="in-en">Do not memorise the list. Hang it on three axes: granularity — who is locked; mode — how; idea — optimistic or pessimistic.</span><span class="in-zh">别背名词。按三根轴搭骨架：粒度（锁谁）、模式（怎么锁）、思想（乐观还是悲观）。</span></p>
+    <div class="answerbox"><b><span class="in-en">Short answer</span><span class="in-zh">先给答案</span></b><span class="bi-en">Three levels of granularity: global, table (table lock, MDL, intention lock IS/IX), and row (record lock, gap lock, next-key lock, insert intention lock). Two modes: S shared and X exclusive. And the part that actually bites: row locks sit on index entries — no index, and you lock everything you scan.</span><span class="bi-zh">粒度三级：全局锁、表级（表锁、MDL 元数据锁、意向锁 IS/IX）、行级（记录锁、<span class="tm" data-t="间隙锁">间隙锁</span>、临键锁、插入意向锁）。模式两种：S 共享、X 排他。最要命的一句：行锁加在索引上——没走索引，锁的就是扫描到的所有行。</span></div>
+    <p class="tags"><span class="tag"><span class="in-en">must know</span><span class="in-zh">必背</span></span><span class="tag"><span class="in-en">5 min</span><span class="in-zh">5 分钟</span></span></p>
+    <button class="listen" data-listen type="button">🔊</button>
+  </div>
+
+  <section class="sec">
+    <h2><span class="num">01</span><span class="in-en">Three axes, one table</span><span class="in-zh">三根轴，一张表</span></h2>
+    <table class="ledger">
+      <thead><tr><th><span class="in-en">Axis</span><span class="in-zh">轴</span></th><th><span class="in-en">Values</span><span class="in-zh">取值</span></th><th><span class="in-en">What it means</span><span class="in-zh">什么意思</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="bi-en">granularity</span><span class="bi-zh">粒度</span></td><td><span class="bi-en">global / table / row</span><span class="bi-zh">全局 / 表级 / 行级</span></td><td><span class="bi-en">InnoDB's day job is row level; the other two show up in DDL and backups</span><span class="bi-zh">InnoDB 日常用的是行级；另两级出现在 DDL 和备份场景</span></td></tr>
+        <tr><td><span class="bi-en">mode</span><span class="bi-zh">模式</span></td><td><span class="bi-en">S shared / X exclusive</span><span class="bi-zh">S 共享 / X 排他</span></td><td><span class="bi-en">S is compatible with S; every other combination is mutually exclusive</span><span class="bi-zh">S 与 S 兼容，其余组合一律互斥</span></td></tr>
+        <tr><td><span class="bi-en">idea</span><span class="bi-zh">思想</span></td><td><span class="bi-en">optimistic / pessimistic</span><span class="bi-zh">乐观 / 悲观</span></td><td><span class="bi-en">optimistic is a version number or <span class="tm" data-t="CAS">CAS</span> in your code, not an engine lock</span><span class="bi-zh"><span class="tm" data-t="乐观锁">乐观锁</span>是代码里的版本号或 <span class="tm" data-t="CAS">CAS</span>，不是引擎的锁</span></td></tr>
+      </tbody>
+    </table>
+    <p class="note"><span class="bi-en">Interviewers start with “name the locks” and then drill into row locks. Answer the axes first, then the details — it shows you have a map, not a list.</span><span class="bi-zh">面试官通常先问“说说有哪些锁”，再往行锁里钻。先答三根轴，再补细节——说明你有地图，不是背清单。</span></p>
+  </section>
+  <section class="sec">
+    <h2><span class="num">02</span><span class="in-en">The four row locks</span><span class="in-zh">行锁的四种形态</span></h2>
+    <ul>
+      <li><span class="bi-en"><b>Record lock</b>: locks one index record. A unique-index equality hit degenerates to exactly this.</span><span class="bi-zh"><b>记录锁</b>：锁住一条索引记录。<span class="tm" data-t="唯一索引">唯一索引</span>等值命中时，加的就是它。</span></li>
+      <li><span class="bi-en"><b>Gap lock</b>: locks the open interval between two index records, so it only blocks inserts.</span><span class="bi-zh"><b>间隙锁</b>：锁住两条索引记录之间的开区间，只拦插入，不拦别人读。</span></li>
+      <li><span class="bi-en"><b>Next-key lock</b>: record lock plus the gap in front of it. The default shape under RR, and what stops phantom reads.</span><span class="bi-zh"><b>临键锁</b>：记录锁加上它前面的间隙。RR 下的默认形态，防幻读靠的就是它。</span></li>
+      <li><span class="bi-en"><b>Insert intention lock</b>: taken on a gap before inserting, meaning “I am about to insert here”. It conflicts with gap locks held by others.</span><span class="bi-zh"><b>插入意向锁</b>：插入前在间隙上加，表示“我要往这里插”。它和别人的间隙锁冲突。</span></li>
+    </ul>
+    <p class="note"><span class="bi-en">Gap locks only matter at RR and above. Under RC there is basically only the record lock — which is why RC sees fewer deadlocks and shorter lock waits.</span><span class="bi-zh">间隙锁只在 RR 及以上有意义。RC 下基本只有记录锁——所以高并发服务里 RC 的死锁和锁等待都更少。</span></p>
+  </section>
+  <section class="sec">
+    <h2><span class="num">03</span><span class="in-en">The three table-level ones</span><span class="in-zh">表级的三把锁</span></h2>
+    <ul>
+      <li><span class="bi-en"><b>Table lock</b> (<code>lock tables ... read/write</code>): the whole table at once. A MyISAM-era tool that InnoDB rarely needs.</span><span class="bi-zh"><b>表锁</b>（<code>lock tables ... read/write</code>）：一次锁整表。MyISAM 时代的工具，InnoDB 很少主动用。</span></li>
+      <li><span class="bi-en"><b>MDL metadata lock</b>: added automatically. DML takes a read MDL, DDL takes a write MDL — so one long uncommitted transaction can block <code>alter table</code>, and everything queues behind it.</span><span class="bi-zh"><b>MDL 元数据锁</b>：自动加的。DML 拿读 MDL、DDL 拿写 MDL——所以一个长<span class="tm" data-t="事务">事务</span>不提交，就能把 <code>alter table</code> 堵住，后面所有查询跟着排队。</span></li>
+      <li><span class="bi-en"><b>Intention lock</b> IS/IX: a table-level flag meaning “some row here is locked”. Without it, deciding whether a table lock is allowed would mean scanning every row.</span><span class="bi-zh"><b>意向锁</b> IS/IX：表级的一个标志，说明“这张表里有行被锁了”。没有它，判断能不能加表锁得逐行扫。</span></li>
+    </ul>
+  </section>
+  <section class="sec">
+    <h2><span class="num">04</span><span class="in-en">The one people get wrong: locks live on indexes</span><span class="in-zh">最容易答错的一题：锁加在索引上</span></h2>
+    <ul>
+      <li><span class="bi-en">With an index, <code>update orders set status = 'PAID' where order_no = 'T100'</code> locks that one entry (or that range).</span><span class="bi-zh">有索引时，<code>update orders set status = 'PAID' where order_no = 'T100'</code> 只锁这一条（或这一段）。</span></li>
+      <li><span class="bi-en">Without an index, <code>where remark = 'x'</code> scans the whole table — and every scanned row gets locked. That is the “delete without a where clause” of the production world.</span><span class="bi-zh">没索引时，<code>where remark = 'x'</code> 全表扫描——扫到多少行就锁多少行。这就是线上版的“不带 where 的 delete”。</span></li>
+      <li><span class="bi-en">Debugging: <code>show engine innodb status</code> for LOCK WAIT, and <code>information_schema.innodb_trx</code> to find who is holding it.</span><span class="bi-zh">排查：<code>show engine innodb status</code> 看 LOCK WAIT，<code>information_schema.innodb_trx</code> 找谁占着锁。</span></li>
+    </ul>
+    <p class="note"><span class="bi-en">A unique-index equality hit only needs a record lock — no gap. That is why “update one row by primary key” is the cheapest write you can make.</span><span class="bi-zh">唯一索引等值命中只需要记录锁、不加间隙。所以“按主键改一行”是你能写出的最便宜的写操作。</span></p>
+  </section>
+  <section class="sec">
+    <h2><span class="num">05</span><span class="in-en">Say it like this</span><span class="in-zh">面试这么说</span></h2>
+    <blockquote class="read"><span class="lbl"><span class="in-en">Say it like this</span><span class="in-zh">面试就这么说</span></span>
+      <p><span class="bi-en">Locks split into three granularities: global, table and row — InnoDB works at row level. Four row locks: record, gap, next-key, insert intention. RR takes next-key by default, which is what prevents phantom reads; RC is basically record locks only. At table level the two that matter are MDL and intention locks, and MDL is the main reason DDL and DML fight. The key point: row locks sit on index entries, so an update without an index locks everything it scans.</span><span class="bi-zh">锁按粒度分三级：全局、表级、行级，InnoDB 日常用的是行级。行级有四种：记录锁、间隙锁、临键锁、插入意向锁；RR 下默认临键锁，防幻读靠的就是它，RC 下基本只有记录锁。表级里真正要记的是 MDL 和意向锁，MDL 是 DDL 和 DML 打架的主要原因。最关键的一点：行锁加在索引上，update 不走索引就会锁住扫到的所有行。</span></p>
+    </blockquote>
+  </section>
+
+  <p class="log-tip"><a href="pay-callback.html"><span class="in-en">&#8592; Back to question 2</span><span class="in-zh">&#8592; 回到第 2 题</span></a></p>
+</main>
+
+<footer>
+  <div class="f-left"><span class="in-en">Written for learning English · Wang Tianyu</span><span class="in-zh">为学英语而写 · 王天宇</span></div>
+  <div class="f-right"><a href="../index.html"><span class="in-en">Home</span><span class="in-zh">首页</span></a><span class="sep">·</span><a href="https://github.com/TianYuBaBg/offer-camp">GitHub</a></div>
+</footer>
+<script src="../assets/terms.js"></script>
+<script src="../assets/app.js"></script>
+</body>
+</html>

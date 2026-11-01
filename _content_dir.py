@@ -110,6 +110,9 @@ TOOLS = [
 DERIVED["questions/pay-callback.html"] = [
     ("为什么用唯一索引当锁，而不是先查再插？",
      "两个线程能同时查出“不存在”；唯一索引是数据库自己把门的。", "d2-unique-index.html"),
+    ("MySQL 里都有哪些锁，分别是什么意思？",
+     "三级：全局、表级（表锁/MDL/意向锁）、行级（记录/间隙/临键/插入意向）；行锁加在索引上，没索引就锁全表。",
+     "d2-mysql-locks.html"),
     ("幂等记录插进去了，但业务崩了怎么办？",
      "靠状态 CAS 兜底：只允许 PENDING → PAID，重试影响 0 行就按已处理返回。", "d2-crash-after-idempotent.html"),
     ("钱到了但订单已经关闭，怎么处理？",
